@@ -35,8 +35,6 @@ enum DetailButton {
   favorite('favorite'),
   personalRating('personalRating'),
   playlist('playlist'),
-  download('download'),
-  deleteFiles('deleteFiles'),
   goToSeries('goToSeries'),
   seerrWatchlist('seerrWatchlist'),
   seerrReportIssue('seerrReportIssue'),
@@ -72,8 +70,6 @@ enum DetailButton {
     }
     return switch (this) {
       DetailButton.cast => !PlatformDetection.isTV,
-      DetailButton.download ||
-      DetailButton.deleteFiles => PlatformDetection.supportsOfflineDownloads,
       DetailButton.seerrRequest ||
       DetailButton.seerrRequest4k ||
       DetailButton.seerrWatchlist ||
@@ -159,8 +155,6 @@ enum DetailButton {
     DetailButton.favorite => Icons.favorite_border,
     DetailButton.personalRating => Icons.star_outline,
     DetailButton.playlist => Icons.playlist_add,
-    DetailButton.download => Icons.download_for_offline,
-    DetailButton.deleteFiles => Icons.delete_outline,
     DetailButton.goToSeries => Icons.tv,
     DetailButton.seerrRequest || DetailButton.seerrRequest4k => Icons.add,
     DetailButton.seerrWatchlist => Icons.bookmark_border,
@@ -183,8 +177,6 @@ enum DetailButton {
     DetailButton.favorite => l10n.favorite,
     DetailButton.personalRating => l10n.rate,
     DetailButton.playlist => l10n.addToPlaylist,
-    DetailButton.download => l10n.download,
-    DetailButton.deleteFiles => l10n.deleteDownloadedFiles,
     DetailButton.goToSeries => l10n.goToSeries,
     DetailButton.seerrRequest => l10n.request,
     DetailButton.seerrRequest4k => l10n.request4k,

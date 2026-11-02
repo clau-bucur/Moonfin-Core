@@ -1,8 +1,6 @@
-import 'dart:convert';
 
 import 'package:server_core/server_core.dart';
 
-import '../database/offline_database.dart';
 
 class AggregatedItem {
   final String id;
@@ -14,15 +12,6 @@ class AggregatedItem {
     required this.serverId,
     required this.rawData,
   });
-
-  factory AggregatedItem.fromOffline(DownloadedItem row) {
-    final rawData = jsonDecode(row.metadataJson) as Map<String, dynamic>;
-    return AggregatedItem(
-      id: row.itemId,
-      serverId: row.serverId,
-      rawData: rawData,
-    );
-  }
 
   String get name => rawData['Name'] as String? ?? '';
   String? get sortName => rawData['SortName'] as String?;

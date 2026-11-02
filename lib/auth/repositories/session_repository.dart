@@ -33,7 +33,6 @@ import '../../data/models/aggregated_item.dart';
 import '../../data/services/carplay_service.dart';
 import '../../data/services/cast/cast_service.dart';
 import '../../data/services/crash_report_service.dart';
-import '../../data/services/download_notification_service.dart';
 import '../../data/services/topshelf_service.dart';
 import '../../data/services/tv_channels_service.dart';
 import '../../data/services/watch_next_service.dart';
@@ -799,7 +798,6 @@ class SessionRepository {
       }
       _clientFactory.removeClient(serverId);
       resetActiveStreamResolver();
-      clearAutoDownloadForSignOut();
     }
 
     await _authPrefs.setLastServerId('');
@@ -1401,15 +1399,10 @@ class SessionRepository {
     }
   }
 
-  /// Shows a message another client sent to this one. It takes the system
-  /// notification where the device has them and an in-app banner where it
-  /// doesn't, so a message the sender saw go through always lands somewhere.
+  /// Shows a message from another client as an in-app banner.
   Future<void> _showRemoteMessage(String text, String? header) async {
-    final delivered = await GetIt.instance<DownloadNotificationService>()
-        .showRemoteMessage(text: text, header: header);
-    if (delivered) return;
 
-    final context = appRouter.routerDelegate.navigatorKey.currentContext;
+    final context = appRouter.routerDelegate.navigatorKey.currentState?.overlay?.context;
     if (context == null || !context.mounted) return;
     final l10n = currentAppLocalizations();
     FloatingNotification.show(

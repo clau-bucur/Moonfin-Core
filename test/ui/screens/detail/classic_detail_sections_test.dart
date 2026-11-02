@@ -8,7 +8,6 @@ import 'package:moonfin/auth/repositories/session_repository.dart';
 import 'package:moonfin/auth/repositories/user_repository.dart';
 import 'package:moonfin/data/repositories/item_mutation_repository.dart';
 import 'package:moonfin/data/repositories/mdblist_repository.dart';
-import 'package:moonfin/data/repositories/offline_repository.dart';
 import 'package:moonfin/data/repositories/tmdb_repository.dart';
 import 'package:moonfin/data/services/plugin_sync_service.dart';
 import 'package:moonfin/data/services/row_data_source.dart';
@@ -39,7 +38,6 @@ class _SessionRepository extends Mock implements SessionRepository {}
 
 class _PlaybackManager extends Mock implements PlaybackManager {}
 
-class _OfflineRepository extends Mock implements OfflineRepository {}
 
 class _QueueService extends Mock implements QueueService {}
 
@@ -71,11 +69,8 @@ void main() {
     GetIt.instance.registerSingleton<UserPreferences>(prefs);
     GetIt.instance.registerSingleton<UserRepository>(UserRepository());
     GetIt.instance.registerSingleton<PlaybackManager>(_PlaybackManager());
-    GetIt.instance.registerSingleton<OfflineRepository>(_OfflineRepository());
     when(() => GetIt.instance<PlaybackManager>().queueService)
         .thenReturn(_QueueService());
-    when(() => GetIt.instance<OfflineRepository>().getItem(any()))
-        .thenAnswer((_) async => null);
     final seerrStore = PreferenceStore();
     await seerrStore.init();
     GetIt.instance.registerSingleton<SeerrPreferences>(

@@ -18,7 +18,8 @@ class FloatingNotification {
     VoidCallback? onTap, {
     IconData icon = Icons.notifications_active_outlined,
   }) {
-    final overlay = Overlay.maybeOf(context, rootOverlay: true);
+    final overlay = Overlay.maybeOf(context, rootOverlay: true) ??
+      Navigator.maybeOf(context, rootNavigator: true)?.overlay;
     if (overlay == null) return;
 
     late OverlayEntry entry;

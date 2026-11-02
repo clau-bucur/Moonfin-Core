@@ -5,22 +5,19 @@ import '../models/aggregated_item.dart';
 /// The item's chapters as `{title, startMs}`, for the chapter menu, the seek
 /// bar marks and the transport buttons.
 ///
-/// An offline item keeps its copy on the manager, since there's no route left
-/// to ask the server for one.
-///
 /// [mediaSourceId] names the version that plays: a server that sends each
 /// version's own chapters on its media source (Silo) gets that
 /// version's, others the item's.
 List<Map<String, dynamic>> chaptersForItem(
   dynamic item,
-  Map<String, dynamic>? offlineMetadata, {
+  Map<String, dynamic>? itemMetadata, {
   String? mediaSourceId,
 }) {
   List<Map<String, dynamic>>? raw;
   if (item is AggregatedItem) {
     raw = itemChaptersForSource(item, mediaSourceId);
   } else if (item is String) {
-    raw = (offlineMetadata?['Chapters'] as List?)?.cast<Map<String, dynamic>>();
+    raw = (itemMetadata?['Chapters'] as List?)?.cast<Map<String, dynamic>>();
   }
   if (raw == null) return const [];
 

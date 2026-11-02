@@ -29,14 +29,12 @@ import '../../util/platform_detection.dart';
 import '../navigation/destinations.dart';
 import '../navigation/home_refresh_bus.dart';
 import '../navigation/route_lifecycle_observer.dart';
-import 'downloads_nav_slot.dart';
 import 'friends_nav_slot.dart';
 import 'expandable_icon_button.dart';
 import 'marquee_text.dart';
 import 'overlay_sheet.dart';
 import 'navigation_layout.dart';
 import 'settings/settings_panel.dart';
-import '../screens/downloads/downloads_panel.dart';
 import '../screens/settings/settings_side_panel.dart';
 import '../screens/watch_party/watch_together_route.dart';
 import 'seerr_icons.dart';
@@ -532,24 +530,6 @@ class _TopToolbarState extends State<TopToolbar> with RouteAware {
       from: _inlineLibrariesTriggerFocus,
     );
     if (!moved) _settingsFocus.requestFocus();
-  }
-
-  /// Renders nothing while there is nothing saved.
-  Widget _buildDownloadsButton({
-    required Color? navColor,
-    required bool alwaysExpanded,
-    required String label,
-  }) {
-    return DownloadsNavSlot(
-      builder: (context) => ExpandableIconButton(
-        key: const ValueKey('toolbar-downloads'),
-        forceExpanded: alwaysExpanded,
-        icon: Icons.download_for_offline,
-        label: label,
-        baseColor: navColor,
-        onPressed: () => showDownloadsDialog(context),
-      ),
-    );
   }
 
   /// Moves focus one button along the toolbar, in painted order.
@@ -1199,18 +1179,6 @@ class _TopToolbarState extends State<TopToolbar> with RouteAware {
                 ),
               ],
               _gap(),
-              if (DownloadsNavSlot.isOffered())
-                _orderButton(
-                  order: 97,
-                  // The slot is taken here rather than inside the builder, so
-                  // the icons after it keep their colour whether or not
-                  // anything is saved to show.
-                  child: _buildDownloadsButton(
-                    navColor: nextNavColor(),
-                    alwaysExpanded: alwaysExpanded,
-                    label: l10n.savedMedia,
-                  ),
-                ),
               if (FriendsNavSlot.isOffered() && _friendsAvailable)
                 _orderButton(
                   order: 97.5,

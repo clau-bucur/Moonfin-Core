@@ -60,7 +60,7 @@ class PlaybackLifecycleHandler with WidgetsBindingObserver {
     if (currentItem is AggregatedItem) {
       isAudio = currentItem.isAudioLike;
     } else if (currentItem is String) {
-      final meta = _manager.currentOfflineMetadata;
+      final meta = _manager.currentItemMetadata;
       if (meta != null) {
         final type = meta['Type']?.toString();
         final mediaType = meta['MediaType']?.toString();

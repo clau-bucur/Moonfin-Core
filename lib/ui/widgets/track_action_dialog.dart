@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:moonfin_design/moonfin_design.dart';
 
 import '../../data/models/aggregated_item.dart';
-import '../../data/repositories/offline_repository.dart';
-import '../../data/services/download_service.dart';
 import '../../l10n/app_localizations.dart';
-import '../../util/download_utils.dart';
 import 'focusable_dialog_row.dart';
 import 'overlay_sheet.dart';
 
@@ -77,23 +73,7 @@ class TrackActionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final downloadService = GetIt.instance<DownloadService>();
-    final offlineRepo = GetIt.instance<OfflineRepository>();
-
-    return StreamBuilder(
-      stream: offlineRepo.watchItem(track.id),
-      builder: (context, snapshot) {
-        return ListenableBuilder(
-          listenable: downloadService,
-          builder: (context, _) {
-            final offlineItem = snapshot.data;
-            final isDownloaded =
-                offlineItem?.downloadStatus == 2 && offlineItem?.localFilePath != null;
-            final isDownloading = downloadService.isDownloading(track.id);
-            final supportsOffline =
-                userCanDownload() && _supportsOfflineActions(track);
-
-            return Dialog(
+    return Dialog(
               backgroundColor: Colors.transparent,
               child: Container(
                 constraints: const BoxConstraints(minWidth: 340, maxWidth: 440),
@@ -200,52 +180,6 @@ class TrackActionDialog extends StatelessWidget {
                               onAddToPlaylist!();
                             },
                           ),
-                        if (supportsOffline && !isDownloaded && !isDownloading)
-                          FocusableDialogRow(
-                            icon: Icons.download_for_offline,
-                            label: l10n.download,
-                            onTap: () {
-                              Navigator.pop(context);
-                              downloadService.downloadItem(track);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(l10n.trackActionDownloading(track.name)),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            },
-                          ),
-                        if (supportsOffline && isDownloading)
-                          FocusableDialogRow(
-                            icon: Icons.close,
-                            label: l10n.trackActionCancelDownload,
-                            onTap: () {
-                              Navigator.pop(context);
-                              downloadService.cancelDownload(track.id);
-                            },
-                          ),
-                        if (supportsOffline && isDownloaded)
-                          FocusableDialogRow(
-                            icon: Icons.delete_outline,
-                            label: l10n.deleteDownloaded,
-                            onTap: () async {
-                              final capturedL10n = l10n;
-                              Navigator.pop(context);
-                              final success = await downloadService.deleteDownloadedFiles(track);
-                              if (!context.mounted) {
-                                return;
-                              }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    success
-                                        ? capturedL10n.trackActionDeletedFile
-                                        : capturedL10n.trackActionDeleteFileFailed,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
                         if (onRemoveFromPlaylist != null)
                           FocusableDialogRow(
                             icon: Icons.playlist_remove,
@@ -316,14 +250,7 @@ class TrackActionDialog extends StatelessWidget {
                 ),
               ),
             );
-          },
-        );
-      },
-    );
   }
 
-  bool _supportsOfflineActions(AggregatedItem item) {
-    final mediaType = item.rawData['MediaType'] as String?;
-    return item.type == 'Audio' || item.type == 'AudioBook' || mediaType == 'Audio';
-  }
+
 }

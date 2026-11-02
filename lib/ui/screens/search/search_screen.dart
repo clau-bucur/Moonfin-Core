@@ -1,3 +1,4 @@
+import '../../../util/server_availability.dart';
 import 'dart:async';
 
 import 'package:custom_tv_text_field/custom_tv_text_field.dart';
@@ -11,7 +12,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:server_core/server_core.dart';
 
 import '../../../data/models/aggregated_item.dart';
-import '../../../data/offline/connectivity_aware_media_server_client.dart';
 import '../../../data/repositories/multi_server_repository.dart';
 import '../../../data/repositories/search_repository.dart';
 import '../../../data/repositories/seerr_repository.dart';
@@ -127,7 +127,7 @@ class _SearchScreenState extends State<SearchScreen>
       scopedParentId: widget.scopedLibraryId,
       multiServerRepository: widget.scopedLibraryId == null &&
               _userPreferences.get(UserPreferences.enableMultiServerLibraries) &&
-              !shouldUseOfflineCatalog()
+              !(!canReachActiveServer())
           ? getIt<MultiServerRepository>()
           : null,
     );

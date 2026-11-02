@@ -10,6 +10,9 @@ class AppLocalizationsSk extends AppLocalizations {
   AppLocalizationsSk([String locale = 'sk']) : super(locale);
 
   @override
+  String get pressBackAgainToExit => 'Press back again to exit';
+
+  @override
   String get appTitle => 'Moonfin';
 
   @override

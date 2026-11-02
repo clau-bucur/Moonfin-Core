@@ -409,11 +409,11 @@ List<_SettingsSearchEntry> _buildSettingsSearchIndex({
     icon: Icons.tune,
     open: () => push(const _AdvancedOptionsScreen()),
   );
-  final downloads = _SearchSection(
+  final cache = _SearchSection(
     slug: 'storage',
     path: [l10n.storage],
-    icon: Icons.download_for_offline,
-    open: () => push(const DownloadSettingsScreen()),
+    icon: Icons.cached_rounded,
+    open: () => push(const CacheSettingsScreen()),
   );
   final services = _SearchSection(
     slug: 'services',
@@ -562,13 +562,6 @@ List<_SettingsSearchEntry> _buildSettingsSearchIndex({
         subtitle: l10n.scrollSensitivitySubtitle,
         keywords: ['mouse', 'wheel', 'speed', 'scrolling'],
       ),
-    if (!PlatformDetection.isWeb)
-      general.leaf(
-        'confirm_exit',
-        l10n.confirmExit,
-        subtitle: l10n.showConfirmationBeforeExiting,
-        keywords: ['quit', 'close'],
-      ),
     if (PlatformDetection.isAndroid)
       general.leaf(
         'pref_performance_mode',
@@ -602,6 +595,7 @@ List<_SettingsSearchEntry> _buildSettingsSearchIndex({
         l10n.glassQuality,
         keywords: ['blur', 'performance'],
       ),
+    cache.screen(keywords: ['artwork', 'image cache', 'storage']),
     themeStore.screen(keywords: ['download themes', 'community']),
     savedThemes.screen(keywords: ['custom themes', 'manage']),
     style.leaf(
@@ -1930,96 +1924,6 @@ List<_SettingsSearchEntry> _buildSettingsSearchIndex({
       subtitle: 'Prompt to Continue Watching after X consecutive episodes.',
       keywords: ['are you still watching'],
     ),
-
-    if (!PlatformDetection.isWeb) ...[
-      downloads.screen(keywords: ['offline', 'storage']),
-      downloads.leaf(
-        'image_cache_limit_mb',
-        l10n.imageCacheLimit,
-        keywords: ['storage', 'disk'],
-      ),
-      downloads.leaf('clear_image_cache', l10n.clearImageCache),
-    ],
-    if (PlatformDetection.supportsOfflineDownloads &&
-        !PlatformDetection.isWeb) ...[
-      downloads.leaf(
-        'download_default_quality',
-        l10n.defaultDownloadQuality,
-        keywords: ['offline quality'],
-      ),
-      downloads.leaf(
-        'download_wifi_only',
-        l10n.wifiOnlyDownloads,
-        subtitle: l10n.onlyDownloadOnWifi,
-        keywords: ['cellular', 'data'],
-      ),
-      downloads.leaf(
-        'download_concurrent_count',
-        l10n.settingsConcurrentDownloads,
-        subtitle: l10n.settingsConcurrentDownloadsDescription,
-        keywords: ['parallel', 'simultaneous'],
-      ),
-      downloads.leaf('download_storage_limit_mb', l10n.storageLimit),
-      downloads.leaf(
-        'download_remove_watched_after_hours',
-        l10n.removeWatchedDownloads,
-        subtitle: l10n.removeWatchedDownloadsSubtitle,
-        keywords: ['delete', 'watched', 'automatic', 'cleanup', 'space'],
-        header: l10n.storage,
-      ),
-      if (AutoDownloadService.isSupportedPlatform) ...[
-        downloads.leaf(
-          'smart_downloads_enabled',
-          l10n.smartDownloadsEnable,
-          subtitle: l10n.smartDownloadsEnableDescription,
-          keywords: ['smart', 'next episode', 'series', 'automatic', 'delete'],
-          header: l10n.smartDownloadsSection,
-        ),
-        downloads.leaf(
-          'smart_downloads_keep_ready',
-          l10n.smartDownloadsKeepReady,
-          keywords: ['smart', 'episodes', 'ahead'],
-          header: l10n.smartDownloadsSection,
-        ),
-        downloads.leaf(
-          'auto_download_enabled',
-          l10n.autoDownloadEnable,
-          subtitle: l10n.autoDownloadEnableSubtitle,
-          keywords: ['follow', 'series', 'subscription'],
-          header: l10n.autoDownloadSection,
-        ),
-        downloads.leaf(
-          'auto_download_keep_unwatched',
-          l10n.autoDownloadKeepUnwatched,
-          keywords: ['episodes', 'limit'],
-          header: l10n.autoDownloadSection,
-        ),
-        downloads.leaf(
-          'auto_download_delete_after_hours',
-          l10n.autoDownloadDelete,
-          subtitle: l10n.autoDownloadDeleteFollowedSubtitle,
-          keywords: ['watched', 'remove'],
-          header: l10n.autoDownloadSection,
-        ),
-        downloads.leaf(
-          'auto_download_background_refresh',
-          l10n.autoDownloadBackgroundRefresh,
-          subtitle: l10n.autoDownloadBackgroundRefreshSubtitle,
-          keywords: ['background', 'periodic'],
-          header: l10n.autoDownloadSection,
-        ),
-      ],
-      downloads.leaf(
-        'download_custom_path',
-        l10n.downloadLocation,
-        keywords: ['folder', 'path'],
-      ),
-      downloads.leaf(
-        'clear_all_downloads',
-        l10n.clearAllDownloads,
-        keywords: ['delete downloads'],
-      ),
-    ],
 
     if (canToggleGameBackend && gamesOnAnyServer)
       playback.leaf(

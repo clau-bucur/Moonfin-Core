@@ -182,7 +182,6 @@ void main() {
       UserPreferences.showFavoritesButton,
       UserPreferences.showLiveTvButton,
       UserPreferences.showSyncPlayButton,
-      UserPreferences.showDownloadsButton,
       UserPreferences.showLibrariesInToolbar,
       UserPreferences.showLibrariesIndividually,
       UserPreferences.showSeerrButton,
@@ -1092,7 +1091,6 @@ void main() {
       // Friends still needs the server's friends feature, and Downloads a
       // user who may download.
       controller
-        ..tryValue('pref_show_downloads_button', true)
         ..tryValue('pref_show_server_messages_button', true)
         ..tryValue('pref_show_friends_button', true)
         ..tryValue('pref_show_libraries_in_toolbar', false);
@@ -1102,25 +1100,7 @@ void main() {
       expect(find.byIcon(Icons.download_for_offline), findsNothing);
       expect(find.byIcon(Icons.movie_rounded), findsNothing);
 
-      // Nothing is saved yet, and Downloads shows all the same.
-      final users = _Users();
-      when(() => users.currentUser).thenReturn(
-        PrivateUser(
-          id: 'user',
-          name: 'moonfin',
-          serverId: 'server',
-          accessToken: 'token',
-          lastUsed: DateTime(2026),
-          canDownload: true,
-        ),
-      );
-      GetIt.instance.registerSingleton<UserRepository>(users);
-      controller.tryValue('pref_show_downloads_button', true);
-      await pumpPreview(tester, controller);
-      expect(find.byIcon(Icons.download_for_offline), findsOneWidget);
-
       controller
-        ..tryValue('pref_show_downloads_button', false)
         ..tryValue('pref_show_server_messages_button', false);
       await pumpPreview(tester, controller);
       expect(find.byIcon(Icons.download_for_offline), findsNothing);

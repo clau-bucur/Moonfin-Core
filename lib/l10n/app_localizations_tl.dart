@@ -10,6 +10,9 @@ class AppLocalizationsTl extends AppLocalizations {
   AppLocalizationsTl([String locale = 'tl']) : super(locale);
 
   @override
+  String get pressBackAgainToExit => 'Press back again to exit';
+
+  @override
   String get appTitle => 'Moonfin';
 
   @override

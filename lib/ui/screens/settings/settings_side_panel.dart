@@ -1,3 +1,4 @@
+import 'cache_settings_screen.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -15,7 +16,6 @@ import 'package:server_core/server_core.dart' hide ImageType;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/services/achievements_service.dart';
-import '../../../data/services/auto_download_service.dart';
 import '../../../data/services/moonbase_endpoint.dart';
 import '../../../data/services/plugin_sync_service.dart';
 import '../../../data/services/custom_external_lists_service.dart';
@@ -87,13 +87,11 @@ import 'live_preview/settings_live_preview.dart';
 import '../../widgets/settings/settings_section_header.dart';
 import '../../widgets/bottom_nav/bottom_nav_destinations.dart';
 import '../../widgets/navigation_layout.dart';
-import '../../widgets/downloads_nav_slot.dart';
 import '../../widgets/support_dialog.dart';
 import '../../widgets/focus/request_initial_focus.dart';
 import '../home/home_view_model.dart';
 import 'appearance_theme_screen.dart';
 import 'diagnostics_settings_screen.dart';
-import 'download_settings_screen.dart';
 import 'saved_themes_screen.dart';
 import 'theme_store_screen.dart';
 import 'home_sections_screen.dart';
@@ -622,7 +620,7 @@ class _SettingsSidePanelState extends ConsumerState<SettingsSidePanel> {
         _SettingsCategory(
           l10n.storage,
           l10n.settingsStorageSubtitle,
-          () => const DownloadSettingsScreen(),
+          () => const CacheSettingsScreen(),
         ),
       // Seerr and achievements both come from the Moonfin plugin. With
       // neither on offer (only Silo signed in) the screen would be empty.

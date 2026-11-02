@@ -1,11 +1,9 @@
 import 'dart:async';
 
-import 'package:get_it/get_it.dart';
 import 'package:server_core/server_core.dart';
 
 import '../../preference/user_preferences.dart';
 import '../models/aggregated_item.dart';
-import '../offline/offline_catalog.dart';
 import '../utils/blocked_ratings.dart';
 
 /// Decides whether an item may be opened or played.
@@ -55,7 +53,7 @@ class BlockedContentGate {
     if (seriesId == null || seriesId.isEmpty) return false;
     if (_stickyBlocked.contains(seriesId)) return true;
 
-    final cached = _seriesRating[seriesId] ?? _offlineSeriesRating(seriesId);
+    final cached = _seriesRating[seriesId];
     return cached == null ? false : isRatingBlocked(cached);
   }
 
@@ -81,12 +79,7 @@ class BlockedContentGate {
     return _stickyBlocked.contains(seriesId);
   }
 
-  String? _offlineSeriesRating(String seriesId) {
-    if (!GetIt.instance.isRegistered<OfflineCatalog>()) return null;
-    final entry = GetIt.instance<OfflineCatalog>().byId(seriesId);
-    final rating = entry?.metadata['OfficialRating']?.toString().trim();
-    return (rating != null && rating.isNotEmpty) ? rating : null;
-  }
+
 
   /// The series' rating, and whether the question could be answered at all.
   ///
@@ -95,11 +88,6 @@ class BlockedContentGate {
   Future<(String?, bool)> _resolveSeriesRating(String seriesId) async {
     if (_seriesRating.containsKey(seriesId)) {
       return (_seriesRating[seriesId], true);
-    }
-    final offline = _offlineSeriesRating(seriesId);
-    if (offline != null) {
-      _seriesRating[seriesId] = offline;
-      return (offline, true);
     }
 
     // One request even when a whole season is queued.

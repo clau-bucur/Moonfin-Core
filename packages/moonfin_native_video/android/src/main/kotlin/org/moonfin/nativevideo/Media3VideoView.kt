@@ -1070,6 +1070,7 @@ class Media3VideoView(
     internal var leaveCensus: (() -> Unit)? = null
     private var isDisposedByFlutter = false
     private var lastAudioClockRecoveryAtMs = 0L
+    private var sourceOpenedAtMs = 0L
     private var playerCreatedAtMs = 0L
     private val audioClockListener: (Long) -> Unit = { maybeRecoverAudioClock(it) }
     private var isPlayerReleased = false
@@ -1549,6 +1550,16 @@ class Media3VideoView(
             )
         }
 
+        override fun onAudioPositionAdvancing(
+            eventTime: AnalyticsListener.EventTime,
+            playoutStartSystemTimeMs: Long,
+        ) {
+            Media3Bridge.emitEvent(mapOf(
+                "event" to "audioPositionAdvancing",
+                "sinceSourceOpenMs" to SystemClock.elapsedRealtime() - sourceOpenedAtMs,
+            ))
+        }
+
         override fun onAudioTrackInitialized(
             eventTime: AnalyticsListener.EventTime,
             audioTrackConfig: AudioSink.AudioTrackConfig,
@@ -1570,6 +1581,7 @@ class Media3VideoView(
             Media3Bridge.emitEvent(
                 mapOf(
                     "event" to "audioTrackInitialized",
+                    "sinceSourceOpenMs" to SystemClock.elapsedRealtime() - sourceOpenedAtMs,
                     "encoding" to audioTrackConfig.encoding,
                     "encodingName" to encodingName(audioTrackConfig.encoding),
                     "passthrough" to !Util.isEncodingLinearPcm(audioTrackConfig.encoding),
@@ -1786,19 +1798,19 @@ class Media3VideoView(
             .toInt()
         val builder = DefaultLoadControl.Builder()
             .setTargetBufferBytes(targetBufferBytes)
-        // Low RAM boxes cant spare the stretched runway on top of decode
-        // buffers, so they keep the stock time budgets.
-        if (!isLowRamDevice) {
-            builder.setBufferDurationsMsForStreaming(
-                DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
-                STREAMING_MAX_BUFFER_MS,
-                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
-                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
-            )
-        }
+        // Start from a smaller initial buffer while retaining the full steady
+        // state and rebuffer runway. HDMI mode-switch settling remains separate.
+        builder.setBufferDurationsMsForStreaming(
+            DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
+            if (isLowRamDevice) DefaultLoadControl.DEFAULT_MAX_BUFFER_MS else STREAMING_MAX_BUFFER_MS,
+            minOf(500, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS),
+            DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
+        )
         Media3Bridge.emitEvent(
             mapOf(
                 "event" to "loadControl",
+                "initialPlaybackBufferMs" to minOf(500, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS),
+                "rebufferPlaybackBufferMs" to DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
                 "targetBufferBytes" to targetBufferBytes,
                 "maxHeapBytes" to maxHeapBytes,
                 "lowRam" to isLowRamDevice,
@@ -2708,6 +2720,7 @@ class Media3VideoView(
         secondarySubtitleDelayMs = clampManualDelayMs((args["secondarySubtitleDelayMs"] as? Number)?.toLong() ?: 0L)
         lastSourceArguments = args
         val url = args["url"]?.toString() ?: return
+        sourceOpenedAtMs = SystemClock.elapsedRealtime()
         val startPositionMs = (args["startPositionMs"] as? Number)?.toLong() ?: 0L
         val autoPlay = args["autoPlay"] as? Boolean ?: false
         displayModeSwitchRetriesForCurrentSource = 0

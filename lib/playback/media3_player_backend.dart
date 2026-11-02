@@ -552,13 +552,18 @@ class Media3PlayerBackend extends PlayerBackend
           'Media3: buffer target '
           '${_toInt(map['targetBufferBytes']) ~/ 1048576}MB '
           '(heap limit ${_toInt(map['maxHeapBytes']) ~/ 1048576}MB, '
-          'lowRam=${map['lowRam'] == true})',
+          'lowRam=${map['lowRam'] == true}, '
+          'startup=${map['initialPlaybackBufferMs']}ms, '
+          'rebuffer=${map['rebufferPlaybackBufferMs']}ms)',
         );
       case 'videoDecoderInit':
         _diag('Media3: video decoder initialized (${map['decoder'] ?? ''})');
       case 'audioDecoderInit':
         _diag('Media3: audio decoder initialized (${map['decoder'] ?? ''})');
+      case 'audioPositionAdvancing':
+        _diag('Media3: audio position advancing after ${map['sinceSourceOpenMs']}ms');
       case 'audioTrackInitialized':
+        _diag('Media3: audio track initialized after ${map['sinceSourceOpenMs']}ms');
         _onAudioTrackInitialized(map);
       case 'audioTrackMapping':
         _onAudioTrackMapping(map);

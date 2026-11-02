@@ -13,7 +13,6 @@ import '../../../data/repositories/user_views_repository.dart';
 import '../../../data/services/achievements_service.dart';
 import '../../../data/services/library_scope_service.dart';
 import '../../../data/services/plugin_sync_service.dart';
-import '../../../data/services/saved_media_presence.dart';
 import '../../../data/services/server_messages_service.dart';
 import '../../../preference/bottom_nav_tabs.dart';
 import '../../../preference/preference_constants.dart';
@@ -21,7 +20,6 @@ import '../../../preference/user_preferences.dart';
 import '../../../util/game_library.dart';
 import '../../../util/live_tv_library.dart';
 import '../../../util/signed_in_server_features.dart';
-import '../downloads_nav_slot.dart';
 import '../friends_nav_slot.dart';
 import 'bottom_nav_model.dart';
 
@@ -35,7 +33,6 @@ class BottomNavController extends ChangeNotifier {
     _pluginSync?.addListener(_onPrefsChanged);
     _messages?.addListener(notifyListeners);
     _achievements?.addListener(notifyListeners);
-    _savedMedia?.addListener(notifyListeners);
     _userSub = _userRepo.currentUserStream.listen((_) {
       _loadUser();
       notifyListeners();
@@ -52,7 +49,6 @@ class BottomNavController extends ChangeNotifier {
   final PluginSyncService? _pluginSync = _maybe<PluginSyncService>();
   final ServerMessagesService? _messages = _maybe<ServerMessagesService>();
   final AchievementsService? _achievements = _maybe<AchievementsService>();
-  final SavedMediaPresence? _savedMedia = _maybe<SavedMediaPresence>();
 
   static T? _maybe<T extends Object>() =>
       GetIt.instance.isRegistered<T>() ? GetIt.instance<T>() : null;
@@ -147,8 +143,6 @@ class BottomNavController extends ChangeNotifier {
       gates: gates,
       barItems: barItems(),
       isAvailable: isAvailable,
-      savedAvailable:
-          DownloadsNavSlot.isOffered() && DownloadsNavSlot.hasSavedMedia(),
       shuffle: _prefs.get(UserPreferences.showShuffleButton),
       syncPlay: syncPlay,
       quickConnect: _activeServerHasQuickConnect,
@@ -198,7 +192,6 @@ class BottomNavController extends ChangeNotifier {
         _prefs.get(UserPreferences.showSyncPlayButton),
         _prefs.get(UserPreferences.showServerMessagesButton),
         _prefs.get(UserPreferences.showFriendsButton),
-        _prefs.get(UserPreferences.showDownloadsButton),
         _prefs.get(UserPreferences.enableMultiServerLibraries),
         _prefs.get(UserPreferences.navbarColor),
         _prefs.get(UserPreferences.navbarOpacity),
@@ -288,7 +281,6 @@ class BottomNavController extends ChangeNotifier {
       _pluginSync?.removeListener(_onPrefsChanged);
       _messages?.removeListener(notifyListeners);
       _achievements?.removeListener(notifyListeners);
-      _savedMedia?.removeListener(notifyListeners);
     } catch (_) {}
     _userSub?.cancel();
     _librariesReloadDebounce?.cancel();

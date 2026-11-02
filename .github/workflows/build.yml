@@ -32,6 +32,13 @@ jobs:
           test/data/repositories/user_views_repository_test.dart
           test/data/services/plugin_sync_service_loop_test.dart
           test/util/focus/android_tv_navigation_scope_test.dart
+          test/ui/widgets/back_to_exit_test.dart
+          test/ui/widgets/focus/row_glide_test.dart
+          test/ui/widgets/focus/tv_scroll_controller_test.dart
+          test/ui/widgets/offline_aware_image_decode_test.dart
+          test/playback/restart_video_test.dart
+          test/playback/osd_buttons_test.dart
+          test/viewmodels/item_detail_episode_ordering_test.dart
       - uses: actions/upload-artifact@v4
         with:
           name: android-tv-video

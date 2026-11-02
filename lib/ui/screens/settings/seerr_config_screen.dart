@@ -4,12 +4,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:server_core/server_core.dart';
 
 import '../../../data/repositories/seerr_repository.dart';
-import '../../../data/services/local_notification_bootstrap.dart';
 import '../../../data/services/plugin_sync_service.dart';
 import '../../../data/services/seerr/seerr_api_models.dart';
 import '../../../data/services/seerr/seerr_models.dart';
@@ -284,28 +282,24 @@ class _SeerrConfigScreenState extends State<SeerrConfigScreen> {
   Future<void> _setNotifyOnNewRequests(bool value) async {
     await _seerrPrefs.setNotifyOnNewRequests(value);
     if (mounted) setState(() {});
-    if (value) await _requestNotificationPermission();
     await _pushNotificationPrefs();
   }
 
   Future<void> _setNotifyOnLibraryAdded(bool value) async {
     await _seerrPrefs.setNotifyOnLibraryAdded(value);
     if (mounted) setState(() {});
-    if (value) await _requestNotificationPermission();
     await _pushNotificationPrefs();
   }
 
   Future<void> _setNotifyOnIssues(bool value) async {
     await _seerrPrefs.setNotifyOnIssues(value);
     if (mounted) setState(() {});
-    if (value) await _requestNotificationPermission();
     await _pushNotificationPrefs();
   }
 
   Future<void> _setNotifyOnNewMedia(bool value) async {
     await _seerrPrefs.setNotifyOnNewMedia(value);
     if (mounted) setState(() {});
-    if (value) await _requestNotificationPermission();
     await _pushNotificationPrefs();
   }
 
@@ -316,23 +310,7 @@ class _SeerrConfigScreenState extends State<SeerrConfigScreen> {
     await _syncService.pushNotificationPrefs(client);
   }
 
-  Future<void> _requestNotificationPermission() async {
-    if (!PlatformDetection.isMobile) return;
-    try {
-      final plugin = LocalNotificationBootstrap.instance.plugin;
-      if (PlatformDetection.isAndroid) {
-        await plugin
-            .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()
-            ?.requestNotificationsPermission();
-      } else if (PlatformDetection.isIOS) {
-        await plugin
-            .resolvePlatformSpecificImplementation<
-                IOSFlutterLocalNotificationsPlugin>()
-            ?.requestPermissions(alert: true, badge: true, sound: true);
-      }
-    } catch (_) {}
-  }
+
 
   Future<void> _setSeerrEnabled(bool value) async {
     await _seerrPrefs.setEnabled(value);

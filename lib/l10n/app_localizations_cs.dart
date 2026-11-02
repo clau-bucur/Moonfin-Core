@@ -10,6 +10,9 @@ class AppLocalizationsCs extends AppLocalizations {
   AppLocalizationsCs([String locale = 'cs']) : super(locale);
 
   @override
+  String get pressBackAgainToExit => 'Press back again to exit';
+
+  @override
   String get appTitle => 'Moonfin';
 
   @override

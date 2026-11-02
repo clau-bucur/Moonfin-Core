@@ -394,11 +394,6 @@ class PlatformDetection {
   static bool get useDesktopUi => !_hasMobileFormFactor && !isTV;
   static bool get useMobileUi => _hasMobileFormFactor && !isTV;
 
-  /// Offline media is available on phones, tablets, desktops, and Android TV.
-  /// Other TV platforms do not currently provide the download backend.
-  static bool get supportsOfflineDownloads =>
-      !VideoAppProfile.enabled && (!isTV || isAndroid || isForcedTv);
-
   static bool get useNativeVideoSurface => isAndroid && isTV;
 
   /// Volume is driven by the remote through AudioTrack, so the player's own

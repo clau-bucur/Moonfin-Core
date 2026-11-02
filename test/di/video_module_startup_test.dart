@@ -5,11 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:moonfin/data/services/achievements_service.dart';
-import 'package:moonfin/data/services/background_download_coordinator.dart';
-import 'package:moonfin/data/services/download_notification_service.dart';
 import 'package:moonfin/data/services/media_server_client_factory.dart';
-import 'package:moonfin/data/services/remove_watched_service.dart';
-import 'package:moonfin/data/services/sync_service.dart';
 import 'package:moonfin/di/modules/app_module.dart';
 import 'package:moonfin/di/modules/playback_module.dart';
 import 'package:moonfin/di/modules/server_module.dart';
@@ -66,13 +62,9 @@ void main() {
     );
   });
 
-  test('video startup excludes download and achievement services', () {
+  test('video startup excludes achievement services', () {
     registerServerModule();
     registerAppModule();
-    expect(getIt.isRegistered<BackgroundDownloadCoordinator>(), isFalse);
-    expect(getIt.isRegistered<DownloadNotificationService>(), isFalse);
-    expect(getIt.isRegistered<SyncService>(), isFalse);
-    expect(getIt.isRegistered<RemoveWatchedService>(), isFalse);
     expect(getIt.isRegistered<AchievementsService>(), isFalse);
   }, skip: !VideoAppProfile.enabled);
 }

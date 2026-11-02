@@ -1,3 +1,4 @@
+import '../../data/services/plugin_sync_service.dart';
 import 'dart:async';
 
 import 'package:dio/dio.dart';
@@ -15,7 +16,6 @@ import '../../data/repositories/anime_marker_repository.dart';
 import '../../data/repositories/mdblist_repository.dart';
 import '../../data/repositories/multi_server_repository.dart';
 import '../../data/repositories/media_bar_repository.dart';
-import '../../data/repositories/offline_repository.dart';
 import '../../data/services/blocked_content_gate.dart';
 import '../../data/services/library_scope_service.dart';
 import '../../data/services/media_server_client_factory.dart';
@@ -37,26 +37,19 @@ import '../../data/services/cast/native_dlna_channel.dart';
 import '../../data/services/cast/native_cast_channel.dart';
 import '../../data/services/cast/remote_session_cast_provider.dart';
 import '../../data/services/achievements_service.dart';
-import '../../data/services/plugin_sync_service.dart';
 import '../../data/services/incomplete_recordings_service.dart';
 import '../../data/services/server_messages_service.dart';
 import '../../data/services/server_pin_service.dart';
 import '../../data/services/retro_artwork/retro_artwork_activity_gate.dart';
 import '../../data/services/retro_artwork/retro_artwork_cache.dart';
 import '../../data/services/retro_artwork/retro_artwork_disk_cache.dart';
-import '../../data/services/connectivity_service.dart';
 import '../../data/services/custom_external_lists_service.dart';
-import '../../data/services/download_service.dart';
-import '../../data/services/remove_watched_service.dart';
 import '../../data/services/row_data_source.dart';
 import '../../data/services/socket_handler.dart';
-import '../../data/services/pending_rating_store.dart';
-import '../../data/services/sync_service.dart';
 import '../../data/services/user_data_sync.dart';
 import '../../data/services/theme_music_service.dart';
 import '../../data/viewmodels/media_bar_view_model.dart';
 import '../../data/viewmodels/seerr_discover_view_model.dart';
-import '../../playback/current_playing_item.dart';
 import '../../playback/external_player_service.dart';
 import '../../preference/seerr_preferences.dart';
 import '../../preference/user_preferences.dart';
@@ -236,45 +229,6 @@ void registerAppModule() {
       _getIt<SessionRepository>(),
     ),
   );
-  if (!VideoAppProfile.enabled) {
-    _getIt.registerLazySingleton<SyncService>(
-      () => SyncService(
-        _getIt<OfflineRepository>(),
-        _getIt<PendingRatingStore>(),
-      ),
-    );
-    _getIt.registerLazySingleton(
-      () => RemoveWatchedService(
-        repository: _getIt<OfflineRepository>(),
-        prefs: _getIt<UserPreferences>(),
-        // Resolved per delete: the download service is replaced on every
-        // server or account switch.
-        deleteDownload: (item, {required serverId}) async =>
-            _getIt.isRegistered<DownloadService>() &&
-            await _getIt<DownloadService>().deleteServerDownload(
-              item,
-              serverId: serverId,
-            ),
-        signedInServer: () {
-          if (!_getIt.isRegistered<MediaServerClient>()) return null;
-          if (_getIt.isRegistered<ConnectivityService>() &&
-              !_getIt<ConnectivityService>().canReachServer) {
-            return null;
-          }
-          final client = _getIt<MediaServerClient>();
-          return (
-            client: client,
-            serverId: _getIt<MediaServerClientFactory>().serverIdOf(client),
-          );
-        },
-        syncInFlight: () =>
-            _getIt.isRegistered<ConnectivityService>() &&
-            _getIt<ConnectivityService>().isSyncing,
-        playingItemId: currentPlayingItemId,
-      )..start(),
-      dispose: (service) => service.dispose(),
-    );
-  }
   _getIt.registerLazySingleton(() => const ExternalPlayerService());
 
   _registerUserScopedSingletons();

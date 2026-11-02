@@ -5,7 +5,6 @@ import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:moonfin/auth/repositories/user_repository.dart';
 import 'package:moonfin/data/models/aggregated_item.dart';
-import 'package:moonfin/data/repositories/offline_repository.dart';
 import 'package:moonfin/data/services/plugin_sync_service.dart';
 import 'package:moonfin/data/viewmodels/item_detail_view_model.dart';
 import 'package:moonfin/l10n/app_localizations.dart';
@@ -24,7 +23,6 @@ class _SeerrPrefs extends Mock implements SeerrPreferences {}
 
 class _Users extends Mock implements UserRepository {}
 
-class _Offline extends Mock implements OfflineRepository {}
 
 class _Playback extends Mock implements PlaybackManager {}
 
@@ -52,9 +50,6 @@ void main() {
     when(() => users.currentUserStream).thenAnswer((_) => const Stream.empty());
     GetIt.instance.registerSingleton<UserRepository>(users);
 
-    final offline = _Offline();
-    when(() => offline.getItem(any())).thenAnswer((_) async => null);
-    GetIt.instance.registerSingleton<OfflineRepository>(offline);
 
     final queue = _Queue();
     final playback = _Playback();

@@ -3,20 +3,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:drift/drift.dart' hide isNull;
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:jellyfin_preference/jellyfin_preference.dart';
-import 'package:moonfin/data/database/offline_database.dart';
-import 'package:moonfin/data/offline/connectivity_aware_media_server_client.dart';
-import 'package:moonfin/data/offline/offline_catalog.dart';
-import 'package:moonfin/data/repositories/offline_repository.dart';
-import 'package:moonfin/data/services/pending_rating_store.dart';
-import 'package:moonfin/data/services/storage_path_service.dart';
 import 'package:moonfin/playback/silo_plugin_for.dart';
 import 'package:server_core/server_core.dart';
 import 'package:server_silo/server_silo.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 const _session = '5d1b6a0e-7f3c-4a7e-9a51-2f0c9e8b7a11';
 
@@ -69,27 +59,7 @@ class _Silo implements HttpClientAdapter {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  late OfflineDatabase db;
-  late OfflineCatalog catalog;
-  late PendingRatingStore pendingRatings;
-  late OfflineRepository repo;
-
-  setUp(() async {
-    SharedPreferences.setMockInitialValues({});
-    final prefs = PreferenceStore();
-    await prefs.init();
-    pendingRatings = PendingRatingStore(prefs);
-    db = OfflineDatabase(DatabaseConnection(NativeDatabase.memory()));
-    repo = OfflineRepository(db);
-    catalog = OfflineCatalog(repo);
-  });
-
-  tearDown(() async {
-    catalog.dispose();
-    await db.close();
-  });
-
-  test('plays through the app\'s wrapped Silo client', () async {
+  test('plays through the app\'s Silo client', () async {
     final server = _Silo();
     final now = DateTime.now().toUtc();
     final silo =
@@ -113,14 +83,6 @@ void main() {
             ),
           )
           ..profileId = 'p1';
-    final wrapped = ConnectivityAwareMediaServerClient(
-      silo,
-      useOffline: () => false,
-      catalog: catalog,
-      storagePath: StoragePathService(),
-      pendingRatings: pendingRatings,
-      offlineRepo: repo,
-    );
     final item = siloItemToBaseItemDto(
       _fixture('packages/server_silo/test/fixtures/silo/watch_movie.json'),
       images: SiloImageRegistry(() => 'https://silo.example'),
@@ -129,7 +91,7 @@ void main() {
       'packages/playback_silo/test/fixtures/device_profile_mpv.json',
     );
 
-    final plugin = siloPluginFor(wrapped);
+    final plugin = siloPluginFor(silo);
     final stream = await plugin.createStreamResolver().resolve(
       item,
       deviceProfile: profile,

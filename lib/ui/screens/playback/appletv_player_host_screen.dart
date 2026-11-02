@@ -414,7 +414,7 @@ class _AppleTvPlayerHostScreenState extends State<AppleTvPlayerHostScreen> {
   Map<String, dynamic>? _rawDataForQueueItem(dynamic item) {
     if (item is AggregatedItem) return item.rawData;
     if (item is Map) return item.cast<String, dynamic>();
-    if (item is String) return _manager?.currentOfflineMetadata;
+    if (item is String) return _manager?.currentItemMetadata;
     return null;
   }
 
@@ -506,7 +506,7 @@ class _AppleTvPlayerHostScreenState extends State<AppleTvPlayerHostScreen> {
       fallbackPlayMethod: manager.bringupState.playMethod,
       audioStreamIndex: manager.audioStreamIndex,
       subtitleStreamIndex: manager.subtitleStreamIndex,
-      offline: manager.isOfflinePlayback,
+      offline: false,
       transcodeForced: transcodeForcedBySettings(manager),
       qualityLimitMbps: qualityLimitMbps,
       player: 'AetherEngine',
@@ -928,7 +928,7 @@ class _AppleTvPlayerHostScreenState extends State<AppleTvPlayerHostScreen> {
 
   List<Map<String, dynamic>> _currentChapters() => chaptersForItem(
     _manager?.queueService.currentItem,
-    _manager?.currentOfflineMetadata,
+    _manager?.currentItemMetadata,
     mediaSourceId: _manager?.currentResolution?.mediaSourceId,
   );
 
@@ -1232,7 +1232,7 @@ class _AppleTvPlayerHostScreenState extends State<AppleTvPlayerHostScreen> {
         topSubtitle = '';
       }
     } else if (item is String) {
-      final meta = manager.currentOfflineMetadata;
+      final meta = manager.currentItemMetadata;
       final title = (meta?['Name'] as String?) ?? item.split('/').last;
       final series = (meta?['SeriesName'] as String?) ?? '';
       final idx = meta?['IndexNumber'] as int?;
@@ -1253,7 +1253,7 @@ class _AppleTvPlayerHostScreenState extends State<AppleTvPlayerHostScreen> {
 
     final allStreams =
         manager.currentResolution?.mediaStreams ??
-        (manager.currentOfflineMetadata?['MediaStreams'] as List?)
+        (manager.currentItemMetadata?['MediaStreams'] as List?)
             ?.cast<Map<String, dynamic>>() ??
         const <Map<String, dynamic>>[];
     final audioStreams = allStreams.where((s) => s['Type'] == 'Audio').toList();
@@ -1366,7 +1366,7 @@ class _AppleTvPlayerHostScreenState extends State<AppleTvPlayerHostScreen> {
 
   bool _canBrowseEpisodes(dynamic item) => canBrowseEpisodes(
     item,
-    offline: _manager?.isOfflinePlayback ?? false,
+    offline: false,
     inSyncPlay: _syncPlay?.state.enabled == true,
   );
 

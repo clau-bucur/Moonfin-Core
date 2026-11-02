@@ -1,6 +1,5 @@
 import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart' as pkg;
 import 'package:server_core/server_core.dart';
@@ -8,17 +7,12 @@ import 'package:uuid/uuid.dart';
 
 import '../auth/store/authentication_store.dart';
 import '../auth/store/client_certificate_store.dart';
-import '../data/database/database_connection.dart';
-import '../data/database/offline_database.dart';
-import '../data/offline/offline_catalog.dart';
-import '../data/repositories/offline_repository.dart';
 import '../data/services/client_certificate_service.dart';
 import '../data/services/connectivity_service.dart';
 import '../data/services/crash_report_service.dart';
 import '../data/services/log_service.dart';
 import '../data/services/media_server_client_factory.dart';
 import '../data/services/recent_searches_store.dart';
-import '../data/services/pending_rating_store.dart';
 import '../data/services/storage_path_service.dart';
 import '../platform/web_runtime_config.dart';
 import '../preference/preference_constants.dart';
@@ -27,7 +21,6 @@ import '../util/app_beta.dart';
 import '../util/http_overrides_stub.dart'
     if (dart.library.io) '../util/http_overrides_io.dart';
 import '../util/platform_detection.dart';
-import '../util/video_app_profile.dart';
 import 'modules/app_module.dart';
 import 'modules/auth_module.dart';
 import 'modules/server_module.dart';
@@ -392,31 +385,14 @@ Future<void> migrateTrickplayPreferenceConsolidation(
   await store.setBool(migrationKey, true);
 }
 
-/// The offline downloads storage plus what `setActiveServerClient` needs to
-/// wrap a client around it: shared by the app and the Android auto-download
-/// worker's headless engine, so the two cannot drift.
-void registerOfflineStorage() {
-  final storagePath = StoragePathService();
-  getIt.registerSingleton<StoragePathService>(storagePath);
-  getIt.registerSingleton<OfflineDatabase>(OfflineDatabase(openConnection()));
-  final offlineRepo = OfflineRepository(getIt<OfflineDatabase>());
-  getIt.registerSingleton<OfflineRepository>(offlineRepo);
-  getIt.registerSingleton<OfflineCatalog>(OfflineCatalog(offlineRepo));
-  getIt.registerLazySingleton<PendingRatingStore>(
-    () => PendingRatingStore(getIt<PreferenceStore>()),
-  );
-}
-
 /// Minimal DI for background isolates like the Watch Next worker: what a
-/// headless engine needs to restore a session. With [offline] it also brings
-/// up the downloads storage, enough for `setActiveServerClient` to build a
-/// download service.
+/// headless engine needs to restore a streaming session.
 ///
 /// This must not call registerPlaybackModule: constructing
 /// Media3PlayerBackend subscribes to the process-global
 /// moonfin/media3_video_events channel and would hijack the foreground
 /// engine's event sink, freezing the player OSD mid-playback.
-Future<void> configureBackgroundDependencies({bool offline = false}) async {
+Future<void> configureBackgroundDependencies() async {
   if (getIt.isRegistered<DeviceInfo>()) return;
 
   configureHttpOverrides();
@@ -436,7 +412,6 @@ Future<void> configureBackgroundDependencies({bool offline = false}) async {
   );
 
   registerPreferenceModule(preferenceStore);
-  if (offline) registerOfflineStorage();
   registerServerModule();
   registerAuthModule();
   await getIt<AuthenticationStore>().init();
@@ -481,11 +456,7 @@ Future<void> configureDependencies() async {
     () => RecentSearchesStore(preferenceStore),
   );
 
-  registerOfflineStorage();
-  if (!VideoAppProfile.enabled) {
-    await _migrateIosPaths(getIt<OfflineRepository>());
-    await getIt<OfflineCatalog>().warm();
-  }
+  getIt.registerSingleton<StoragePathService>(StoragePathService());
 
   final connectivityService = ConnectivityService();
   connectivityService.initialize();
@@ -514,48 +485,4 @@ Future<void> configureDependencies() async {
       getIt<MediaServerClientFactory>(),
     ),
   );
-}
-
-String? migrateIosPath(String? storedPath, String currentDocsPath) {
-  if (storedPath == null) return null;
-  final docsIndex = storedPath.indexOf('/Documents/');
-  if (docsIndex == -1) return storedPath;
-  final relativePath = storedPath.substring(docsIndex + '/Documents/'.length);
-  return '$currentDocsPath/$relativePath';
-}
-
-Future<void> _migrateIosPaths(OfflineRepository repo) async {
-  if (!PlatformDetection.isIOS) return;
-
-  try {
-    final docs = await getApplicationDocumentsDirectory();
-    final currentDocsPath = docs.path;
-
-    final items = await repo.getItems();
-    for (final item in items) {
-      final newLocalFilePath = migrateIosPath(item.localFilePath, currentDocsPath);
-      final newPosterPath = migrateIosPath(item.posterPath, currentDocsPath);
-      final newBackdropPath = migrateIosPath(item.backdropPath, currentDocsPath);
-      final newLogoPath = migrateIosPath(item.logoPath, currentDocsPath);
-      final newThumbPath = migrateIosPath(item.thumbPath, currentDocsPath);
-
-      if (newLocalFilePath != item.localFilePath ||
-          newPosterPath != item.posterPath ||
-          newBackdropPath != item.backdropPath ||
-          newLogoPath != item.logoPath ||
-          newThumbPath != item.thumbPath) {
-        await repo.updateItemPaths(
-          itemId: item.itemId,
-          serverId: item.serverId,
-          localFilePath: newLocalFilePath,
-          posterPath: newPosterPath,
-          backdropPath: newBackdropPath,
-          logoPath: newLogoPath,
-          thumbPath: newThumbPath,
-        );
-      }
-    }
-  } catch (_) {
-    // Fail-silent to not block startup if anything goes wrong
-  }
 }

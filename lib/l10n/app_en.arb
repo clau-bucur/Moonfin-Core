@@ -1,4 +1,6 @@
 {
+  "pressBackAgainToExit": "Press back again to exit",
+  "@pressBackAgainToExit": {"description": "Toast shown after pressing Back at the app root"},
   "@@locale": "en",
   "appTitle": "Moonfin",
   "@appTitle": {

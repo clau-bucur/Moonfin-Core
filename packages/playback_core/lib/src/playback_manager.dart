@@ -161,7 +161,7 @@ class PlaybackManager implements AudioOwnable {
   /// Keyed to the item rather than cleared when a stream starts, because the
   /// same item restarts for a track switch, a transcode retry or a resume,
   /// and clearing would drop its chapters for the rest of its playback.
-  /// Compared by identity, since the queue holds bare paths offline and
+  /// Compared by identity, since raw URLs and server item objects can coexist and
   /// asking those for an id throws.
   List<Duration> _chapterStarts = const [];
   Object? _chapterStartsItem;
@@ -226,19 +226,13 @@ class PlaybackManager implements AudioOwnable {
   bool _isManualNexting = false;
   bool suppressAutoNext = false;
   bool autoAdvanceEnabled = true;
-  bool _isOfflinePlayback = false;
   bool _forceTranscodeForQueue = false;
   // What playItems was asked to allow for this queue. A recovery re-resolve
   // defaults enableDirectPlay to true, and without this it would silently
   // switch a viewer who had direct play off back on.
   bool _directPlayAllowedForQueue = true;
-  String? _streamFromServerItemId;
-  bool _streamFromServerForQueue = false;
   bool _backendSelectionLockedForSession = false;
   PlayerBackend? _sessionLockedBackend;
-  Future<void> Function()? _onOfflineStop;
-  Future<void> Function(String url)? _onOfflineAutoNext;
-  Map<String, Map<String, dynamic>> _offlineMetadataByUrl = {};
   Future<bool>? _stopInFlight;
   int _playbackSessionToken = 0;
   // Unlike the request token, this survives stream and player rebuilds.
@@ -440,7 +434,7 @@ class PlaybackManager implements AudioOwnable {
   void _armLiveStallWatchdog() {
     _liveStallWatchdog?.cancel();
     _liveStallWatchdog = null;
-    if (!_liveStallWatchActive || !_currentItemIsLive || _isOfflinePlayback) {
+    if (!_liveStallWatchActive || !_currentItemIsLive) {
       return;
     }
     final intent = _viewerIntentGeneration;
@@ -484,7 +478,7 @@ class PlaybackManager implements AudioOwnable {
   /// buffering flicker must not keep resetting the first-frame window.
   void _evaluateLiveStallWatchdog() {
     if (!_liveStallWatchActive) return;
-    if (!_currentItemIsLive || _isOfflinePlayback) return;
+    if (!_currentItemIsLive) return;
     if (!_liveStallSuspected()) {
       _disarmLiveStallWatchdog();
       return;
@@ -767,19 +761,11 @@ class PlaybackManager implements AudioOwnable {
     _forceExternalChooserOnce = true;
   }
 
-  /// The next queue that starts on [itemId] streams from the server even
-  /// where a downloaded copy exists.
-  void streamFromServerOnce(String itemId) {
-    _streamFromServerItemId = itemId;
-  }
-
   bool consumeForceExternalChooserOnce() {
     final shouldForce = _forceExternalChooserOnce;
     _forceExternalChooserOnce = false;
     return shouldForce;
   }
-
-  bool get streamsFromServer => _streamFromServerForQueue;
 
   void setBitrateOverride(int? mbps) {
     _maxBitrateOverrideMbps = mbps;
@@ -790,10 +776,8 @@ class PlaybackManager implements AudioOwnable {
   /// True when this queue was started with direct play and direct stream both
   /// turned off.
   bool get isTranscodeForced => _forceTranscodeForQueue;
-  bool get isOfflinePlayback => _isOfflinePlayback;
 
-  /// Completes when any in-flight stop operation (including the offline
-  /// tracker's DB write) finishes.  Returns `null` when no stop is pending.
+  /// Completes when an in-flight stop report and resource release finishes.
   Future<void>? get pendingStop => _stopInFlight;
   Duration consumeDeferredStartPosition() {
     final value = _deferredStartPosition;
@@ -801,14 +785,17 @@ class PlaybackManager implements AudioOwnable {
     return value;
   }
 
-  Map<String, dynamic>? get currentOfflineMetadata {
-    final url = queueService.currentItem;
-    if (url is! String) return null;
-    return _offlineMetadataByUrl[url];
-  }
+  /// Metadata of the current server item, including raw-map queue entries.
+  Map<String, dynamic>? get currentItemMetadata => _metadataOf(queueService.currentItem);
 
-  void setOfflineMetadataByUrl(Map<String, Map<String, dynamic>> metadata) {
-    _offlineMetadataByUrl = metadata;
+  static Map<String, dynamic>? _metadataOf(dynamic item) {
+    if (item is Map) return item.cast<String, dynamic>();
+    try {
+      final raw = item?.rawData;
+      return raw is Map ? raw.cast<String, dynamic>() : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   void setPendingItemOverrides({
@@ -838,9 +825,7 @@ class PlaybackManager implements AudioOwnable {
   List<Map<String, dynamic>> get _currentMediaStreams {
     final resStreams = _currentResolution?.mediaStreams;
     if (resStreams != null) return resStreams;
-    final url = queueService.currentItem;
-    if (url is! String) return const [];
-    final meta = _offlineMetadataByUrl[url];
+    final meta = currentItemMetadata;
     return (meta?['MediaStreams'] as List?)?.cast<Map<String, dynamic>>() ??
         const [];
   }
@@ -1095,8 +1080,7 @@ class PlaybackManager implements AudioOwnable {
             backend.buffer <= Duration.zero &&
             backend.duration <= Duration.zero);
 
-    return !_isOfflinePlayback &&
-        queueService.currentItem == null &&
+    return queueService.currentItem == null &&
         _currentResolution == null &&
         _lastPlaybackResolution == null &&
         _lastPlaybackItem == null &&
@@ -1202,11 +1186,9 @@ class PlaybackManager implements AudioOwnable {
   @override
   AudioProducer get audioProducerId => AudioProducer.mainPlayback;
 
-  /// Whether [item] is music or an audiobook, from a library item, an offline
-  /// url's downloaded metadata, or a raw item map.
+  /// Whether a server item or raw queue map is audio.
   bool _isAudioLikeItem(dynamic item) {
     final Map<dynamic, dynamic>? meta = switch (item) {
-      String url => _offlineMetadataByUrl[url],
       Map map => map,
       _ => null,
     };
@@ -1947,8 +1929,7 @@ class PlaybackManager implements AudioOwnable {
     // snackbar on a screen that is already leaving. Nothing legitimate is
     // lost: the backend is only asked to play once _currentResolution is
     // set, and a resolve failure is reported by _playCurrentItem itself.
-    if (!_isOfflinePlayback &&
-        _currentResolution == null &&
+    if (_currentResolution == null &&
         _lastPlaybackResolution == null) {
       final message = event['message']?.toString();
       _diagnosticLogger?.call(
@@ -1988,7 +1969,6 @@ class PlaybackManager implements AudioOwnable {
     bool canRetryTranscodeSwitch() =>
         resolution != null &&
         resolution.playMethod == StreamPlayMethod.transcode &&
-        !_isOfflinePlayback &&
         !_waitingForMedia &&
         !_transcodeSwitchRecoveryConsumed &&
         _lastTrackSwitchReResolveAt != null &&
@@ -2031,7 +2011,7 @@ class PlaybackManager implements AudioOwnable {
       // which on a flaky feed is the next real one, and the budget would never
       // be spent. A re-resolve's own dying-player noise is already dropped by
       // the _teardownForReResolve guard above.
-      if (_currentItemIsLive && !_isOfflinePlayback) {
+      if (_currentItemIsLive) {
         await _recoverStalledStream(trigger: 'source-error');
         return;
       }
@@ -2076,7 +2056,6 @@ class PlaybackManager implements AudioOwnable {
     bool canReResolve() =>
         resolution != null &&
         resolution.playMethod != StreamPlayMethod.transcode &&
-        !_isOfflinePlayback &&
         !_unsupportedAudioRecoveryInFlight;
 
     Future<void> recoverViaTranscode() async {
@@ -2106,7 +2085,7 @@ class PlaybackManager implements AudioOwnable {
     // shares the recovery budget: a channel that is simply gone used to
     // re-tune the tuner for as long as the screen stayed open.
     if (kind == 'live_source_reset') {
-      if (resolution == null || _isOfflinePlayback || _waitingForMedia) {
+      if (resolution == null || _waitingForMedia) {
         return;
       }
       _suppressNextGenericBackendError = true;
@@ -2158,7 +2137,6 @@ class PlaybackManager implements AudioOwnable {
     // still allowed it, so a fresh veto makes one more resolve meaningful.
     if (vetoAdded &&
         resolution.playMethod == StreamPlayMethod.transcode &&
-        !_isOfflinePlayback &&
         !_waitingForMedia &&
         !_unsupportedAudioRecoveryInFlight) {
       await recoverViaTranscode();
@@ -2168,19 +2146,7 @@ class PlaybackManager implements AudioOwnable {
   Future<void> _autoNext() async {
     if (await _maybeIntercept(TransportAction.next)) return;
     _mediaSourceId = null;
-    if (_isOfflinePlayback) {
-      await _stopAndReportCurrent(skipQueueChange: true);
-      final hadNext = queueService.next();
-      if (hadNext) {
-        final item = queueService.currentItem as String?;
-        if (item != null) {
-          await _onOfflineAutoNext?.call(item);
-        }
-      } else {
-        _notifySessionEnded();
-      }
-      return;
-    }
+
     await _stopAndReportCurrent(skipQueueChange: true);
     _resetBackendSelectionLock();
     final hadNext = queueService.next();
@@ -2198,7 +2164,6 @@ class PlaybackManager implements AudioOwnable {
   Future<bool> _tryAutoAdvanceToNextSeason() async {
     final provider = _nextSeasonItemsProvider;
     if (provider == null) return false;
-    if (_isOfflinePlayback) return false;
     if (queueService.repeatMode != RepeatMode.none) return false;
 
     final completedItem = queueService.currentItem;
@@ -2231,7 +2196,6 @@ class PlaybackManager implements AudioOwnable {
   void _preFetchNextSeasonIfNeeded() async {
     final provider = _nextSeasonItemsProvider;
     if (provider == null) return;
-    if (_isOfflinePlayback) return;
     if (queueService.repeatMode != RepeatMode.none) return;
 
     final currentItem = queueService.currentItem;
@@ -2257,7 +2221,6 @@ class PlaybackManager implements AudioOwnable {
       }
     } catch (_) {}
   }
-
 
   Future<void> playItems(
     List<dynamic> items, {
@@ -2337,10 +2300,6 @@ class PlaybackManager implements AudioOwnable {
     _mediaSourceId = mediaSourceId;
     _forceTranscodeForQueue = !enableDirectPlay && !enableDirectStream;
     _directPlayAllowedForQueue = enableDirectPlay;
-    _streamFromServerForQueue =
-        pendingItem != null &&
-        _traceItemId(pendingItem) == _streamFromServerItemId;
-    _streamFromServerItemId = null;
     final adjuster = _startPositionAdjuster;
     if (adjuster != null && startPosition > Duration.zero && items.isNotEmpty) {
       final currentItem = items[startIndex.clamp(0, items.length - 1)];
@@ -2479,8 +2438,8 @@ class PlaybackManager implements AudioOwnable {
       setBackend(lockedBackend, disposePrevious: false);
     }
 
-    // Seed with where this session means to resume from, the way the offline
-    // path does. If the backend never starts, every position source stays at
+    // Seed with where this session means to resume from. If the backend
+    // never starts, every position source stays at
     // zero and the stop report tells the server the item was left at the very
     // beginning, wiping the resume point the user was about to return to.
     // The shown position is seeded too: an auto-advance keeps the queue, so
@@ -3730,14 +3689,7 @@ class PlaybackManager implements AudioOwnable {
       }
     }
 
-    if (_isOfflinePlayback) {
-      final mpvId = _mpvTrackIdForStream(streamIndex, 'Audio');
-      if (mpvId != null) {
-        await _backend?.setAudioTrack(mpvId);
-      } else {
-        _waitAndApplyTrackSelections(_playbackSessionToken);
-      }
-    } else if (_currentResolution?.playMethod == StreamPlayMethod.directPlay &&
+    if (_currentResolution?.playMethod == StreamPlayMethod.directPlay &&
         (_backend?.supportsDirectPlayAudioSwitch ?? false) &&
         !_videoWithholdsAudioCodec(
           _backend?.getDeviceProfile(),
@@ -4149,13 +4101,12 @@ class PlaybackManager implements AudioOwnable {
     // session was built from, so an index the server added since then finds
     // nothing and the selection quietly does nothing. Re-resolving rebuilds
     // the list first and carries the index into it.
-    if (refreshStreams && !_isOfflinePlayback) {
+    if (refreshStreams) {
       await _reResolveAtCurrentPosition();
       return;
     }
 
-    if (!_isOfflinePlayback &&
-        !(_backend?.supportsRuntimeTrackSelection ?? true)) {
+    if (!(_backend?.supportsRuntimeTrackSelection ?? true)) {
       final canRenderBitmap = _backend?.canRenderBitmapSubtitles ?? false;
       await _reResolveAtCurrentPosition(
         forceTranscode: isBitmap && !canRenderBitmap,
@@ -4163,14 +4114,11 @@ class PlaybackManager implements AudioOwnable {
       return;
     }
 
-    if (_currentResolution?.playMethod == StreamPlayMethod.directPlay ||
-        _isOfflinePlayback) {
+    if (_currentResolution?.playMethod == StreamPlayMethod.directPlay) {
       final isExternal = _isSubtitleDeliveredExternally(streamIndex);
       if (isBitmap && !(_backend?.canRenderBitmapSubtitles ?? false)) {
         await _backend?.disableSubtitleTrack();
-        if (!_isOfflinePlayback) {
-          await _reResolveAtCurrentPosition(forceTranscode: true);
-        }
+        await _reResolveAtCurrentPosition(forceTranscode: true);
         return;
       }
       if (isExternal) {
@@ -4243,8 +4191,7 @@ class PlaybackManager implements AudioOwnable {
     }
 
     await _resetSubtitleRendererMode();
-    if (previousWasBurned || (!_isOfflinePlayback &&
-        !(_backend?.supportsRuntimeTrackSelection ?? true))) {
+    if (previousWasBurned || !(_backend?.supportsRuntimeTrackSelection ?? true)) {
       await _reResolveAtCurrentPosition();
       return;
     }
@@ -4450,8 +4397,7 @@ class PlaybackManager implements AudioOwnable {
       final canRenderBitmap = _backend?.canRenderBitmapSubtitles ?? false;
       if (isBitmap && !canRenderBitmap) {
         if (_subtitleSelectionExplicit &&
-            _currentResolution?.playMethod == StreamPlayMethod.directPlay &&
-            !_isOfflinePlayback) {
+            _currentResolution?.playMethod == StreamPlayMethod.directPlay) {
           await _reResolveAtCurrentPosition(forceTranscode: true);
         } else {
           await _resetSubtitleRendererMode();
@@ -4646,79 +4592,6 @@ class PlaybackManager implements AudioOwnable {
         embeddedStripped: _embeddedSubtitlesUnavailable,
       );
 
-  Future<void> playOffline(
-    String url, {
-    Duration startPosition = Duration.zero,
-    Duration itemDuration = Duration.zero,
-    List<String> queueUrls = const [],
-    int startIndex = 0,
-    Future<void> Function()? onStop,
-    Future<void> Function(String url)? onAutoNext,
-  }) async {
-    _deferredStartPosition = Duration.zero;
-    _deferPlaybackToExternalPlayer = false;
-    _lastItemId = null;
-    _secondarySubtitleStreamIndex = null;
-    _secondarySubtitleDelaySeconds = 0;
-    _lastExplicitAudioLanguage = null;
-    _lastExplicitAudioIndex = null;
-    _lastExplicitAudioTitle = null;
-    _lastExplicitSubtitleLanguage = null;
-    _lastExplicitSubtitleEnabled = null;
-    _audioStreamIndex = null;
-    _subtitleStreamIndex = null;
-    _isAutoNexting = false;
-    _isManualNexting = false;
-    suppressAutoNext = false;
-    await _stopAndReportCurrent();
-    _resetBackendSelectionLock();
-    _isOfflinePlayback = true;
-    _onOfflineStop = onStop;
-    _onOfflineAutoNext = onAutoNext;
-    _itemKnownDuration = itemDuration;
-    _currentResolution = null;
-    _lastKnownPosition = startPosition;
-    state.setPosition(startPosition);
-
-    if (queueUrls.isNotEmpty) {
-      queueService.setQueue(queueUrls, startIndex: startIndex);
-    } else {
-      queueService.setQueue([url]);
-    }
-
-    if (itemDuration > Duration.zero) {
-      state.setDuration(itemDuration);
-    }
-
-    _playbackStartTime = clock();
-    _waitingForMedia = true;
-    ++_playbackSessionToken;
-    final offlineStreams =
-        (_offlineMetadataByUrl[url]?['MediaStreams'] as List?)
-            ?.cast<Map<String, dynamic>>() ??
-        const <Map<String, dynamic>>[];
-    try {
-      await _backend!.play(
-        _buildBackendMediaPayload(
-          url: url,
-          mediaStreams: offlineStreams,
-          audioStreamIndex: _audioStreamIndex,
-          subtitleStreamIndex: _subtitleStreamIndex,
-          audioLike: _isAudioLikeItem(url),
-        ),
-        startPosition: startPosition,
-      );
-      await _syncBackendRepeatModeIfSupported();
-      await _waitForMediaReady(timeout: const Duration(seconds: 5));
-    } finally {
-      _waitingForMedia = false;
-    }
-
-    if (startPosition > Duration.zero) {
-      await _seekWhilePausedAndMaybeResume(startPosition);
-    }
-  }
-
   void _resetSubtitleDelaySession() {
     _subtitleDelaySessionId++;
     _secondarySubtitleDelaySeconds = 0;
@@ -4761,7 +4634,7 @@ class PlaybackManager implements AudioOwnable {
         if (!skipQueueChange) {
           _forceTranscodeForQueue = false;
           _directPlayAllowedForQueue = true;
-          _streamFromServerForQueue = false;
+
           _resetBackendSelectionLock();
           queueService.clear();
           state.reset();
@@ -4769,27 +4642,7 @@ class PlaybackManager implements AudioOwnable {
         }
         return true;
       }
-      if (_isOfflinePlayback) {
-        if (!skipQueueChange) {
-          await _onOfflineStop?.call();
-          _onOfflineStop = null;
-          _onOfflineAutoNext = null;
-        }
-        await _backend?.stop();
-        _playbackStartTime = null;
-        _waitingForMedia = false;
-        if (!skipQueueChange) {
-          _isOfflinePlayback = false;
-          _forceTranscodeForQueue = false;
-          _directPlayAllowedForQueue = true;
-          _streamFromServerForQueue = false;
-          _resetBackendSelectionLock();
-          queueService.clear();
-          state.reset();
-          _setBringupState(const PlaybackBringupState.idle());
-        }
-        return true;
-      }
+
       final item = queueService.currentItem;
       final resolution = _currentResolution ?? _lastPlaybackResolution;
       final reportItem = item ?? _lastPlaybackItem;
@@ -4841,7 +4694,7 @@ class PlaybackManager implements AudioOwnable {
       if (!skipQueueChange) {
         _forceTranscodeForQueue = false;
         _directPlayAllowedForQueue = true;
-        _streamFromServerForQueue = false;
+
         _resetBackendSelectionLock();
         queueService.clear();
         state.reset();

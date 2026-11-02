@@ -1,3 +1,4 @@
+import '../../../playback/restart_video.dart';
 import '../../../util/video_app_profile.dart';
 
 import 'dart:async';
@@ -671,8 +672,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     }
 
     if (item is String) {
-      final offlineMeta = _manager.currentOfflineMetadata;
-      return _streamMaps(offlineMeta?['MediaStreams']);
+      final itemMetadata = _manager.currentItemMetadata;
+      return _streamMaps(itemMetadata?['MediaStreams']);
     }
 
     if (item is Map) {
@@ -1630,7 +1631,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _chaptersMediaSourceId = _manager.currentResolution?.mediaSourceId;
     _chapters = chaptersForItem(
       _queue.currentItem,
-      _manager.currentOfflineMetadata,
+      _manager.currentItemMetadata,
       mediaSourceId: _chaptersMediaSourceId,
     );
     _manager.setChapterStarts([
@@ -1675,7 +1676,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
               .firstOrNull ??
           sources.firstOrNull;
     } else if (item is String) {
-      final meta = _manager.currentOfflineMetadata;
+      final meta = _manager.currentItemMetadata;
       streams =
           (meta?['MediaStreams'] as List?)?.cast<Map<String, dynamic>>() ??
           const <Map<String, dynamic>>[];
@@ -1693,7 +1694,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       audioStreamIndex: _manager.audioStreamIndex,
       subtitleStreamIndex: _manager.subtitleStreamIndex,
       transcodingInfo: transcodingInfo,
-      offline: _manager.isOfflinePlayback,
+      offline: false,
       transcodeForced: transcodeForcedBySettings(_manager),
       qualityLimitMbps: userQualityLimitMbps(
         _manager.maxBitrateOverrideMbps,
@@ -1838,7 +1839,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       topSubtitle = series;
       topTitle = [?episodeInfo, title].where((s) => s.isNotEmpty).join(' - ');
     } else if (item is String) {
-      final meta = _manager.currentOfflineMetadata;
+      final meta = _manager.currentItemMetadata;
       final title = (meta?['Name'] as String?) ?? item.split('/').last;
       final series = (meta?['SeriesName'] as String?) ?? '';
       final idx = meta?['IndexNumber'] as int?;
@@ -4549,7 +4550,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           '';
     }
     if (item is String) {
-      final meta = _manager.currentOfflineMetadata;
+      final meta = _manager.currentItemMetadata;
       return _firstNonEmptyText([
             meta?['SeriesName'] as String?,
             meta?['Name'] as String?,
@@ -4571,7 +4572,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       ]);
     }
     if (item is String) {
-      final meta = _manager.currentOfflineMetadata;
+      final meta = _manager.currentItemMetadata;
       return _firstNonEmptyText([
         meta?['Overview'] as String?,
         (meta?['Taglines'] as List?)?.firstOrNull as String?,
@@ -4699,7 +4700,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           ? 'S${item['ParentIndexNumber'] ?? '?'}:E${item['IndexNumber']}'
           : null;
     } else if (item is String) {
-      final meta = _manager.currentOfflineMetadata;
+      final meta = _manager.currentItemMetadata;
       title = (meta?['Name'] as String?) ?? item.split('/').last;
       seriesName = meta?['SeriesName'] as String?;
       final idx = meta?['IndexNumber'] as int?;
@@ -5721,6 +5722,20 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         }
 
         final byButton = <OsdButton, Widget>{
+          if (shows(OsdButton.restart) && item is AggregatedItem &&
+              const {'Movie', 'Episode', 'Video'}.contains(item.type) &&
+              !_isPrerollQueueItem(item))
+            OsdButton.restart: _controlButton(
+              Icons.replay_rounded,
+              onPressed: () async {
+                _showControls();
+                _dropScrubSession(resume: false);
+                _suppressSeekPrompts();
+                await restartCurrentVideo(_manager);
+              },
+              size: secondaryIconSize, extent: secondaryExtent,
+              tooltip: l10n.restart,
+            ),
           if (shows(OsdButton.syncPlay) &&
               _syncPlayManager?.state.enabled == true)
             OsdButton.syncPlay: SyncPlayPlayerButton(
@@ -7402,7 +7417,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   bool _canBrowseEpisodes(dynamic item) => canBrowseEpisodes(
     item,
-    offline: _manager.isOfflinePlayback,
+    offline: false,
     inSyncPlay:
         _syncPlayManager?.state.enabled == true ||
         _watchParty?.controlsPlayback == true,
@@ -7600,14 +7615,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     final item = _queue.currentItem;
     if (item is! AggregatedItem) return;
 
-    if (_manager.isOfflinePlayback) {
-      if (!mounted) return;
-      final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.castingUnavailableOffline)));
-      return;
-    }
+
 
     final positionTicks = _state.position.inMicroseconds * 10;
     final startIndex = _queue.currentIndex < 0 ? 0 : _queue.currentIndex;

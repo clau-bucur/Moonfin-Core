@@ -25,12 +25,7 @@ import '../../../data/repositories/item_mutation_repository.dart';
 import '../../../data/repositories/mdblist_repository.dart';
 import '../../../data/repositories/tmdb_repository.dart';
 import '../../../data/services/background_service.dart';
-import '../../../data/services/auto_download_service.dart';
-import '../../../data/services/download_service.dart';
-import '../../../data/models/download_quality.dart';
-import '../../../data/database/offline_database.dart';
 import '../../../data/models/lyrics.dart';
-import '../../../data/repositories/offline_repository.dart';
 import '../../../data/services/media_server_client_factory.dart';
 import '../../../data/services/book_reader_service.dart';
 import '../../../data/services/theme_music_service.dart';
@@ -114,7 +109,6 @@ import '../../widgets/focus/can_claim_initial_focus.dart';
 import '../../widgets/focus/context_action.dart';
 import '../../widgets/focus/context_menu_sheet.dart';
 import '../../widgets/live_tv/incomplete_recording.dart';
-import '../../widgets/focus/dpad_list_tile.dart';
 import '../../widgets/focus/focusable_button.dart';
 import '../../widgets/focus/menu_action_row.dart';
 import '../../widgets/focus/request_initial_focus.dart';
@@ -128,7 +122,6 @@ import '../../../watch_party/silo_watch_party_manager.dart';
 import '../watch_party/silo_watch_party_screen.dart';
 import '../../../util/audio_labels.dart';
 import '../../../util/detail_trailer.dart';
-import '../../../util/download_utils.dart';
 import '../../../util/episode_playability.dart';
 import '../../../util/item_watch_state.dart';
 import '../../../util/season_queue_context.dart';
@@ -3158,9 +3151,6 @@ class _DetailContentState extends State<_DetailContent> {
     final canManagePlaylistTracks =
         isPlaylist && viewModel.canManagePlaylistTracks;
     final canDeleteItem = item.canDelete;
-    final canDeleteDownloaded =
-        !PlatformDetection.isTV &&
-        (item.type == 'MusicAlbum' || item.type == 'AudioBook');
     final availableMediaTypes = isPlaylist
         ? viewModel.tracks
             .map((t) => t.type)
@@ -3181,13 +3171,6 @@ class _DetailContentState extends State<_DetailContent> {
           )
         : viewModel.tracks;
 
-    final canDownloadAll =
-        userCanDownload() &&
-        (item.type == 'MusicAlbum' ||
-            item.type == 'AudioBook' ||
-            (item.type == 'Playlist' &&
-                displayedTracks.isNotEmpty &&
-                displayedTracks.every(_isAudioItem)));
 
     final isDefaultPlaylistOrder =
         _playlistSortBy == LibrarySortBy.playlistOrder &&
@@ -3234,17 +3217,6 @@ class _DetailContentState extends State<_DetailContent> {
           }
         },
         showAddToPlaylist: !isPlaylist,
-        onDownloadAll: canDownloadAll
-            ? () => _downloadTrackList(
-                context,
-                item.name,
-                displayedTracks,
-                itemLabel: isAudiobook ? 'chapters' : 'tracks',
-              )
-            : null,
-        onDeleteDownloaded: canDeleteDownloaded
-            ? () => _confirmDeleteDownloadedAlbum(context, item.name)
-            : null,
         onDeletePlaylist: canDeleteItem
             ? () => _confirmDeleteServerItem(context, item)
             : null,
@@ -3486,89 +3458,6 @@ class _DetailContentState extends State<_DetailContent> {
     return item.type == 'Audio' ||
         item.type == 'AudioBook' ||
         mediaType == 'Audio';
-  }
-
-  void _downloadTrackList(
-    BuildContext context,
-    String title,
-    List<AggregatedItem> tracks, {
-    String itemLabel = 'items',
-  }) {
-    final l10n = AppLocalizations.of(context);
-    if (tracks.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.noItemsLoaded(itemLabel))));
-      return;
-    }
-
-    GetIt.instance<DownloadService>().downloadItems(tracks);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.downloadingTitle(title, tracks.length)),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  Future<void> _confirmDeleteDownloadedAlbum(
-    BuildContext context,
-    String title,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    final tracks = viewModel.tracks.where(_isAudioItem).toList(growable: false);
-    if (tracks.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.noTracksLoaded)));
-      return;
-    }
-
-    final ok = await showFocusRestoringDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog.adaptive(
-        backgroundColor: const Color(0xFF171717),
-        title: Text(
-          l10n.deleteDownloadedAlbum,
-          style: const TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          l10n.deleteDownloadedTracksMessage(title),
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          adaptiveDialogAction(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(
-              l10n.cancel,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-            ),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFD32F2F),
-            ),
-            child: Text(l10n.delete),
-          ),
-        ],
-      ),
-    );
-    if (ok != true || !context.mounted) return;
-
-    final success = await GetIt.instance<DownloadService>()
-        .deleteDownloadedItems(tracks);
-    if (!context.mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          success
-              ? l10n.downloadedTracksDeleted
-              : l10n.downloadedTracksDeleteFailed,
-        ),
-      ),
-    );
   }
 
   Future<void> _confirmDeleteServerItem(
@@ -4165,83 +4054,6 @@ class _LyricsPanel extends StatelessWidget {
   }
 }
 
-class _DownloadedBadge extends StatefulWidget {
-  final String itemId;
-  const _DownloadedBadge({required this.itemId});
-
-  @override
-  State<_DownloadedBadge> createState() => _DownloadedBadgeState();
-}
-
-class _DownloadedBadgeState extends State<_DownloadedBadge> {
-  bool _downloaded = false;
-  DownloadService? _downloadService;
-
-  @override
-  void initState() {
-    super.initState();
-    if (GetIt.instance.isRegistered<DownloadService>()) {
-      _downloadService = GetIt.instance<DownloadService>();
-      _downloadService!.addListener(_onDownloadChanged);
-    }
-    _check();
-  }
-
-  @override
-  void dispose() {
-    _downloadService?.removeListener(_onDownloadChanged);
-    super.dispose();
-  }
-
-  void _onDownloadChanged() => _check();
-
-  Future<void> _check() async {
-    if (!PlatformDetection.supportsOfflineDownloads) return;
-    final repo = GetIt.instance<OfflineRepository>();
-    final available = await repo.isAvailableOffline(widget.itemId);
-    if (mounted && available != _downloaded) {
-      setState(() => _downloaded = available);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_downloaded) return const SizedBox.shrink();
-    return Positioned(
-      bottom: 8,
-      left: 6,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: const Color(0xFF4CAF50),
-          borderRadius: AppRadius.circular(4),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const AdaptiveIcon(
-              Icons.download_done,
-              color: Colors.white,
-              size: 12,
-            ),
-            const SizedBox(width: 3),
-            Text(
-              AppLocalizations.of(context).downloaded,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                overflow: TextOverflow.clip,
-              ),
-              maxLines: 1,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class DetailPosterImage extends StatelessWidget {
   final AggregatedItem item;
   final ImageApi imageApi;
@@ -4324,7 +4136,7 @@ class DetailPosterImage extends StatelessWidget {
                 ),
               ),
             ),
-          _DownloadedBadge(itemId: item.id),
+          const SizedBox.shrink(),
         ],
       ),
     );
@@ -5882,8 +5694,6 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
 
   bool _playLaunchInFlight = false;
   bool _autoPlayTriggered = false;
-  bool _availableOffline = false;
-  DownloadService? _downloadService;
   StreamSubscription<Object?>? _userSub;
   final FocusNode _localTvPlayFocusNode = FocusNode(
     debugLabel: 'detail_play_button',
@@ -5981,21 +5791,16 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
   @override
   void initState() {
     super.initState();
-    if (GetIt.instance.isRegistered<DownloadService>()) {
-      _downloadService = GetIt.instance<DownloadService>();
-      _downloadService!.addListener(_onDownloadChanged);
-    }
+
     _userSub = GetIt.instance<UserRepository>().currentUserStream.listen((_) {
       if (!mounted) return;
       setState(() {});
     });
-    _checkOffline();
     _maybeTriggerAutoPlay();
   }
 
   @override
   void dispose() {
-    _downloadService?.removeListener(_onDownloadChanged);
     _userSub?.cancel();
     _localTvPlayFocusNode.dispose();
     _overflowMoreFocusNode.dispose();
@@ -6069,32 +5874,8 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
         suppressAutoScrollToTop: suppressAutoScrollToTop,
       );
     }
-    if (button is _DownloadButton) {
-      return _DownloadButton(
-        item: button.item,
-        resolveAudioStreamIndex: button.resolveAudioStreamIndex,
-        viewModel: button.viewModel,
-        focusNode: focusNode,
-        onFocused: onFocused,
-        onArrowUp: onArrowUp,
-        onArrowDown: onArrowDown,
-        onArrowLeft: onArrowLeft,
-        onArrowRight: onArrowRight,
-        suppressAutoScrollToTop: suppressAutoScrollToTop ?? false,
-      );
-    }
-    if (button is _DeleteDownloadButton) {
-      return _DeleteDownloadButton(
-        item: button.item,
-        focusNode: focusNode,
-        onFocused: onFocused,
-        onArrowUp: onArrowUp,
-        onArrowDown: onArrowDown,
-        onArrowLeft: onArrowLeft,
-        onArrowRight: onArrowRight,
-        suppressAutoScrollToTop: suppressAutoScrollToTop ?? false,
-      );
-    }
+
+
     return button;
   }
 
@@ -6335,34 +6116,6 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
     });
   }
 
-  void _onDownloadChanged() => _checkOffline();
-
-  /// The download service notifies on every progress tick, so only rebuild
-  /// when the resolved offline availability actually changes.
-  Future<void> _checkOffline() async {
-    if (!PlatformDetection.supportsOfflineDownloads) return;
-    final item = viewModel.item;
-    if (item == null || !_isDownloadable(item.type)) return;
-    final repo = GetIt.instance<OfflineRepository>();
-
-    bool available;
-    if (item.type == 'Season' || item.type == 'Series') {
-      final episodes = item.type == 'Season'
-          ? await repo.getSeasonEpisodes(item.id)
-          : await repo.getSeriesEpisodes(item.id);
-      available = episodes.any(
-        (e) => e.downloadStatus == 2 && e.localFilePath != null,
-      );
-    } else {
-      final row = await repo.getItem(item.id);
-      available = row != null && row.downloadStatus == 2;
-    }
-
-    if (mounted && available != _availableOffline) {
-      setState(() => _availableOffline = available);
-    }
-  }
-
   /// Spotlight overflow: opens the remaining actions as a popup menu. Each
   /// row invokes the original button's handler after the menu closes, so no
   /// action logic is duplicated. Focus returns to the ellipsis through the
@@ -6410,115 +6163,9 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
     if (button is _DetailActionButton) {
       return button;
     }
-    if (button is _DownloadButton) {
-      return _buildDownloadDetailAction(
-        context,
-        button.item,
-        button.resolveAudioStreamIndex,
-      );
-    }
-    if (button is _DeleteDownloadButton) {
-      return _buildDeleteDetailAction(context, button.item);
-    }
+
+
     return null;
-  }
-
-  _DetailActionButton _buildDownloadDetailAction(
-    BuildContext context,
-    AggregatedItem item,
-    int? Function()? resolveAudioStreamIndex,
-  ) {
-    final l10n = AppLocalizations.of(context);
-    final downloadService = GetIt.instance.isRegistered<DownloadService>()
-        ? GetIt.instance<DownloadService>()
-        : null;
-    final progress = downloadService?.activeDownloads[item.id];
-    final batch = downloadService?.batchProgressFor(item.id);
-
-    if (progress != null && !progress.isComplete && progress.error == null) {
-      final label = progress.isFinalizing
-          ? l10n.finalizingDownload
-          : progress.isQueued
-          ? l10n.queuedDownload
-          : progress.progress >= 0
-          ? '${(progress.progress * 100).toInt()}%'
-          : progress.bytesReceived > 0
-          ? '${(progress.bytesReceived / 1048576).toStringAsFixed(1)} MB'
-          : '…';
-      return _DetailActionButton(
-        label: label,
-        icon: Icons.close,
-        onPressed: () => downloadService?.cancelDownload(item.id),
-        isActive: true,
-        activeColor: AppColorScheme.accent,
-      );
-    }
-
-    if (batch != null) {
-      return _DetailActionButton(
-        label: _DownloadButtonState._batchLabel(batch),
-        icon: Icons.close,
-        onPressed: () => downloadService!.cancelBatch(item.id),
-        isActive: true,
-        activeColor: AppColorScheme.accent,
-      );
-    }
-
-    if (_availableOffline || (progress != null && progress.isComplete)) {
-      return _DetailActionButton(
-        label: l10n.downloaded,
-        icon: Icons.download_done,
-        isActive: true,
-        activeColor: const Color(0xFF4CAF50),
-        onPressed: () {
-          if (downloadService != null) {
-            _DownloadButton.showDownloadOptions(
-              context,
-              item,
-              downloadService,
-              audioStreamIndex: resolveAudioStreamIndex?.call(),
-            );
-          }
-        },
-      );
-    }
-
-    return _DetailActionButton(
-      label: l10n.download,
-      icon: Icons.download_for_offline,
-      onPressed: () {
-        if (downloadService != null) {
-          _DownloadButton.showDownloadOptions(
-            context,
-            item,
-            downloadService,
-            audioStreamIndex: resolveAudioStreamIndex?.call(),
-          );
-        }
-      },
-    );
-  }
-
-  _DetailActionButton _buildDeleteDetailAction(
-    BuildContext context,
-    AggregatedItem item,
-  ) {
-    final l10n = AppLocalizations.of(context);
-    return _DetailActionButton(
-      label: l10n.deleteDownloadedFiles,
-      icon: Icons.delete_outline,
-      onPressed: () => _DeleteDownloadButton.confirmDelete(
-        context,
-        item,
-        onDeleted: () {
-          if (mounted) {
-            setState(() => _availableOffline = false);
-          }
-        },
-      ),
-      isActive: true,
-      activeColor: const Color(0xFFFF4757),
-    );
   }
 
   /// The count-based overflow decision, extracted pure so the Spotlight cap
@@ -6666,8 +6313,6 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
       _selectedSubtitleIndex = null;
     }
     if (oldWidget.itemId != widget.itemId) {
-      _availableOffline = false;
-      _checkOffline();
     }
     // Auto play can be asked for again once the first has been used up.
     if (widget.autoPlay && !oldWidget.autoPlay) _autoPlayTriggered = false;
@@ -6990,8 +6635,6 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
       selectedSource,
     ).where((s) => s['Type'] == 'Audio').toList();
 
-    final canShowDownloadActions =
-        _isDownloadable(item.type) && userCanDownload();
 
     final String playButtonLabel;
     if (isPhoto) {
@@ -7232,20 +6875,6 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
             serverId: item.serverId,
           ),
         ),
-      if (canShowDownloadActions && shows(DetailButton.download))
-        DetailButton.download: _DownloadButton(
-          // Led by the picked version so the size estimate and the download
-          // follow it.
-          item: withPreferredMediaSource(item, widget.selectedMediaSourceId),
-          resolveAudioStreamIndex: () => _effectiveAudioStreamIndex(
-            _mediaStreamsForCurrentSelection(item),
-          ),
-          viewModel: viewModel,
-        ),
-      if (canShowDownloadActions &&
-          shows(DetailButton.deleteFiles) &&
-          _availableOffline)
-        DetailButton.deleteFiles: _DeleteDownloadButton(item: item),
       if ((item.type == 'Episode' || item.type == 'Season') &&
           item.seriesId != null &&
           shows(DetailButton.goToSeries))
@@ -8636,15 +8265,6 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
           icon: Icons.open_in_new,
           onTap: () {
             _play(context, item, resume: resume, openInExternalPlayer: true);
-          },
-        ),
-      if (canPlayFromServer(item))
-        _AdvancedPlaybackOption(
-          label: l10n.playFromServer,
-          icon: Icons.cloud_outlined,
-          onTap: () {
-            GetIt.instance<PlaybackManager>().streamFromServerOnce(item.id);
-            _play(context, item, resume: resume);
           },
         ),
       _AdvancedPlaybackOption(
@@ -11169,20 +10789,6 @@ Future<_DolbyVisionPlayDecision?> _showDolbyVisionFallbackDecisionDialog(
   );
 }
 
-Future<bool> _anyItemHasCompletedDownload(
-  Iterable<AggregatedItem> items,
-) async {
-  if (!PlatformDetection.supportsOfflineDownloads) return false;
-  final repo = GetIt.instance<OfflineRepository>();
-  for (final item in items) {
-    final row = await repo.getItem(item.id);
-    if (row != null && row.downloadStatus == 2 && row.localFilePath != null) {
-      return true;
-    }
-  }
-  return false;
-}
-
 /// [queue] with [parts] playing right after [target], or unchanged when the
 /// target isn't the item at [startIndex]. Public for its tests. Every
 /// production caller lives in this file.
@@ -11259,9 +10865,6 @@ Future<bool> shouldForceTranscodeForDolbyVisionQueue(
     return false;
   }
 
-  if (await _anyItemHasCompletedDownload(queue)) {
-    return false;
-  }
 
   final prefs = GetIt.instance<UserPreferences>();
   final allowDolbyVisionProfile7ElDirectPlay =
@@ -11493,1101 +11096,6 @@ bool _isAudiobookCollectionItem(AggregatedItem item) {
           .toList() ??
       const <String>[];
   return genres.any((g) => g.contains('audiobook') || g.contains('audio book'));
-}
-
-bool _isDownloadable(String? type) {
-  return type == 'Movie' ||
-      type == 'Audio' ||
-      type == 'AudioBook' ||
-      type == 'Book' ||
-      type == 'Episode' ||
-      type == 'Season' ||
-      type == 'Series' ||
-      type == 'BoxSet' ||
-      type == 'MusicVideo' ||
-      type == 'Video' ||
-      type == 'MusicAlbum';
-}
-
-class _DownloadButton extends StatefulWidget {
-  final AggregatedItem item;
-
-  /// Reads the track the Audio button shows when Download is pressed, since a
-  /// transcode keeps only that one.
-  final int? Function()? resolveAudioStreamIndex;
-  final ItemDetailViewModel viewModel;
-  final FocusNode? focusNode;
-  final VoidCallback? onFocused;
-  final VoidCallback? onArrowUp;
-  final VoidCallback? onArrowDown;
-  final VoidCallback? onArrowLeft;
-  final VoidCallback? onArrowRight;
-  final bool suppressAutoScrollToTop;
-
-  const _DownloadButton({
-    required this.item,
-    this.resolveAudioStreamIndex,
-    required this.viewModel,
-    this.focusNode,
-    this.onFocused,
-    this.onArrowUp,
-    this.onArrowDown,
-    this.onArrowLeft,
-    this.onArrowRight,
-    this.suppressAutoScrollToTop = false,
-  });
-
-  static void showDownloadOptions(
-    BuildContext context,
-    AggregatedItem item,
-    DownloadService service, {
-    int? audioStreamIndex,
-  }) => _DownloadButtonState._showDownloadOptionsFor(
-    context,
-    item,
-    service,
-    audioStreamIndex: audioStreamIndex,
-  );
-
-  @override
-  State<_DownloadButton> createState() => _DownloadButtonState();
-}
-
-class _DownloadButtonState extends State<_DownloadButton> {
-  bool _isOffline = false;
-  DownloadService? _downloadService;
-
-  static String _originalQualitySubtitle(
-    BuildContext context,
-    AggregatedItem item, {
-    required bool isMulti,
-    List<AggregatedItem> batchItems = const [],
-  }) {
-    final l10n = AppLocalizations.of(context);
-    if (isMulti) {
-      final sizeLabel = _batchSizeLabel(
-        context,
-        batchItems,
-        sourceSizeBytes,
-        l10n.downloadSizeTotal,
-      );
-      return sizeLabel == null
-          ? l10n.originalFilesNoReencoding
-          : '$sizeLabel • ${l10n.originalFilesNoReencoding}';
-    }
-
-    final mediaSource = item.mediaSources.isNotEmpty
-        ? item.mediaSources.first
-        : null;
-    final sizeBytes = sourceSizeBytes(item);
-    final container = (mediaSource?['Container'] as String?)?.toUpperCase();
-    final videoCodec = item.videoCodec?.toUpperCase();
-    final audioCodec = item.audioCodec?.toUpperCase();
-
-    final details = <String>[];
-    if (sizeBytes > 0) {
-      details.add(formatBytes(sizeBytes));
-    }
-    if (container != null && container.isNotEmpty) {
-      details.add(container);
-    }
-    if (videoCodec != null && audioCodec != null) {
-      details.add('$videoCodec/$audioCodec');
-    } else if (videoCodec != null) {
-      details.add(videoCodec);
-    } else if (audioCodec != null) {
-      details.add(audioCodec);
-    }
-
-    if (details.isEmpty) {
-      return l10n.originalFileNoReencoding;
-    }
-
-    return details.join(' • ');
-  }
-
-  static String _qualitySubtitle(
-    BuildContext context,
-    AggregatedItem item,
-    DownloadQuality quality, {
-    required bool supportsTranscoding,
-    required bool isMulti,
-    List<AggregatedItem> batchItems = const [],
-  }) {
-    if (!quality.isTranscoded || !supportsTranscoding) {
-      return _originalQualitySubtitle(
-        context,
-        item,
-        isMulti: isMulti,
-        batchItems: batchItems,
-      );
-    }
-
-    final estimate = isMulti
-        ? _batchSizeLabel(
-            context,
-            batchItems,
-            (batchItem) => estimateTranscodedSizeBytes(batchItem, quality),
-            AppLocalizations.of(context).downloadEstimateTotal,
-          )
-        : switch (estimateTranscodedSizeBytes(item, quality)) {
-            final bytes? => '~${formatBytes(bytes)}',
-            null => null,
-          };
-    return '${estimate ?? quality.estimatedSizePerHour} • ${quality.encodingInfo}';
-  }
-
-  /// Sums [bytesOf] over [items], skipping items whose size is unknown, and
-  /// formats the total with [label]. Notes how many items were skipped.
-  /// Null when no item had a size.
-  static String? _batchSizeLabel(
-    BuildContext context,
-    List<AggregatedItem> items,
-    int? Function(AggregatedItem item) bytesOf,
-    String Function(String size) label,
-  ) {
-    var totalBytes = 0;
-    var knownCount = 0;
-    for (final item in items) {
-      final bytes = bytesOf(item);
-      if (bytes != null && bytes > 0) {
-        totalBytes += bytes;
-        knownCount++;
-      }
-    }
-    if (knownCount == 0) return null;
-
-    final sizeLabel = label(formatBytes(totalBytes));
-    if (knownCount == items.length) return sizeLabel;
-    final unknown = AppLocalizations.of(
-      context,
-    ).downloadEstimateUnknownCount(items.length - knownCount);
-    return '$sizeLabel ($unknown)';
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (GetIt.instance.isRegistered<DownloadService>()) {
-      _downloadService = GetIt.instance<DownloadService>();
-      _downloadService!.addListener(_onChanged);
-    }
-    _checkOffline();
-  }
-
-  @override
-  void dispose() {
-    _downloadService?.removeListener(_onChanged);
-    super.dispose();
-  }
-
-  void _onChanged() => _checkOffline();
-
-  Future<void> _checkOffline() async {
-    final repo = GetIt.instance<OfflineRepository>();
-    final available = await repo.isAvailableOffline(widget.item.id);
-    if (mounted && available != _isOffline) {
-      setState(() => _isOffline = available);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final downloadService =
-        _downloadService ?? GetIt.instance<DownloadService>();
-    return ListenableBuilder(
-      listenable: downloadService,
-      builder: (context, _) {
-        final item = widget.item;
-        final batch = downloadService.batchProgressFor(item.id);
-        final progress = downloadService.activeDownloads[item.id];
-        final downloadError = progress?.error;
-
-        // Forward the focus node and arrow wiring the action row assigns to this
-        // slot so the button is reachable by d-pad in every download state.
-        _DetailActionButton wire({
-          required String label,
-          required IconData icon,
-          required VoidCallback onPressed,
-          bool isActive = false,
-          Color? activeColor,
-        }) {
-          return _DetailActionButton(
-            label: label,
-            icon: icon,
-            onPressed: onPressed,
-            isActive: isActive,
-            activeColor: activeColor,
-            focusNode: widget.focusNode,
-            onFocused: widget.onFocused,
-            onArrowUp: widget.onArrowUp,
-            onArrowDown: widget.onArrowDown,
-            onArrowLeft: widget.onArrowLeft,
-            onArrowRight: widget.onArrowRight,
-            suppressAutoScrollToTop: widget.suppressAutoScrollToTop,
-          );
-        }
-
-        if (progress != null &&
-            !progress.isComplete &&
-            progress.error == null) {
-          // Transcoded downloads on the native engine report no byte counts,
-          // so show an ellipsis rather than a misleading "0.0 MB".
-          final label = progress.isFinalizing
-              ? AppLocalizations.of(context).finalizingDownload
-              : progress.isQueued
-              ? AppLocalizations.of(context).queuedDownload
-              : progress.progress >= 0
-              ? '${(progress.progress * 100).toInt()}%'
-              : progress.bytesReceived > 0
-              ? '${(progress.bytesReceived / 1048576).toStringAsFixed(1)} MB'
-              : '…';
-          return wire(
-            label: label,
-            icon: Icons.close,
-            onPressed: () => downloadService.cancelDownload(item.id),
-            isActive: true,
-            activeColor: AppColorScheme.accent,
-          );
-        }
-
-        if (batch != null) {
-          return wire(
-            label: _batchLabel(batch),
-            icon: Icons.close,
-            onPressed: () => downloadService.cancelBatch(item.id),
-            isActive: true,
-            activeColor: AppColorScheme.accent,
-          );
-        }
-
-        if (_isOffline || (progress != null && progress.isComplete)) {
-          return wire(
-            label: AppLocalizations.of(context).downloaded,
-            icon: Icons.download_done,
-            isActive: true,
-            activeColor: const Color(0xFF4CAF50),
-            onPressed: () => _showDownloadOptions(context, downloadService),
-          );
-        }
-
-        if (downloadError != null) {
-          return wire(
-            label: AppLocalizations.of(context).retry,
-            icon: Icons.error_outline,
-            isActive: true,
-            activeColor: const Color(0xFFD32F2F),
-            onPressed: () {
-              if (downloadError.isNotEmpty) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text(downloadError)));
-              }
-              _showDownloadOptions(context, downloadService);
-            },
-          );
-        }
-
-        return wire(
-          label: AppLocalizations.of(context).download,
-          icon: Icons.download_for_offline,
-          onPressed: () => _showDownloadOptions(context, downloadService),
-        );
-      },
-    );
-  }
-
-  static bool _isBatchType(String? type) =>
-      type == 'Season' || type == 'Series' || type == 'BoxSet';
-
-  /// "2/5 · 40%": the item in progress and, when known, its percentage.
-  static String _batchLabel(BatchProgress batch) {
-    final current = batch.current;
-    final pct = current != null && current.progress >= 0
-        ? ' · ${(current.progress * 100).toInt()}%'
-        : '';
-    return '${batch.done + 1}/${batch.total}$pct';
-  }
-
-  /// One line of context under a sheet title.
-  static Widget _sheetNote(BuildContext sheetContext, String text) => Padding(
-    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-    child: Text(
-      text,
-      style: TextStyle(
-        fontSize: 13,
-        color: PlatformDetection.isTV
-            ? null
-            : Colors.white.withValues(alpha: 0.6),
-      ),
-    ),
-  );
-
-  static Widget _sheetTitle(BuildContext sheetContext, String text) => Padding(
-    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-    child: Text(
-      text,
-      style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  );
-
-  void _showDownloadOptions(BuildContext context, DownloadService service) {
-    _showDownloadOptionsFor(
-      context,
-      widget.item,
-      service,
-      audioStreamIndex: widget.resolveAudioStreamIndex?.call(),
-    );
-  }
-
-  /// Entry point for the download button. Series, seasons and collections
-  /// first ask whether to download everything or only unwatched items; single
-  /// items go straight to the quality picker.
-  static void _showDownloadOptionsFor(
-    BuildContext context,
-    AggregatedItem item,
-    DownloadService service, {
-    int? audioStreamIndex,
-  }) {
-    if (_isBatchType(item.type)) {
-      _showScopePicker(context, item, service);
-    } else {
-      _showQualityPicker(
-        context,
-        item,
-        service,
-        audioStreamIndex: audioStreamIndex,
-      );
-    }
-  }
-
-  /// Asks whether to download all items or only unwatched ones, then opens
-  /// the quality picker for the chosen list. The list is resolved once here
-  /// so the counts, the size estimates and the queued downloads all agree.
-  static Future<void> _showScopePicker(
-    BuildContext context,
-    AggregatedItem item,
-    DownloadService service,
-  ) async {
-    final isCollection = item.type == 'BoxSet';
-    final seriesId = item.seriesId;
-
-    // Always fetched through the service: the detail view model loads only
-    // overview fields, and the Original row needs media sources for sizes.
-    final Future<List<AggregatedItem>> fetch = switch (item.type) {
-      'Season' =>
-        seriesId == null
-            ? Future.error(StateError('Season ${item.id} has no SeriesId'))
-            : service.fetchEpisodes(seriesId, seasonId: item.id),
-      'Series' => service.fetchEpisodes(item.id),
-      _ => service.fetchBoxSetPlayableItems(item.id),
-    };
-    // Failure becomes null: the sheet subscribes a frame later, so a fast
-    // failure would otherwise surface as an unhandled async error.
-    final Future<List<AggregatedItem>?> itemsFuture = fetch
-        .then<List<AggregatedItem>?>(
-          (items) => items,
-          onError: (Object error) {
-            debugPrint('Download scope fetch failed for ${item.id}: $error');
-            return null;
-          },
-        );
-
-    final autoDownloads =
-        item.type == 'Series' &&
-            GetIt.instance.isRegistered<AutoDownloadService>()
-        ? GetIt.instance<AutoDownloadService>()
-        : null;
-
-    // Set by the auto-download row before it closes the sheet.
-    var autoChosen = false;
-    // Read before the sheet opens so the row knows from its first frame
-    // whether the series is followed. On the stream alone it would offer to
-    // follow one already followed, and a tap that early would follow it
-    // again and move its start date forward.
-    AutoDownloadSubscription? subscription = autoDownloads == null
-        ? null
-        : await autoDownloads.getSubscription(item.id);
-    if (!context.mounted) return;
-
-    final chosen =
-        await showFocusRestoringModalBottomSheet<List<AggregatedItem>>(
-          context: context,
-          isScrollControlled: PlatformDetection.isTV,
-          backgroundColor: const Color(0xFF1E1E1E),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          builder: (sheetContext) {
-            final l10n = AppLocalizations.of(sheetContext);
-            return SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _sheetTitle(sheetContext, l10n.downloadScopeTitle),
-                  FutureBuilder<List<AggregatedItem>?>(
-                    future: itemsFuture,
-                    builder: (_, snapshot) {
-                      final loading =
-                          snapshot.connectionState != ConnectionState.done;
-                      final allItems =
-                          snapshot.data ?? const <AggregatedItem>[];
-                      if (!loading && allItems.isEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                          child: Text(
-                            snapshot.data == null
-                                ? l10n.downloadScopeLoadFailed
-                                : isCollection
-                                ? l10n.noItems
-                                : l10n.noEpisodesLoaded,
-                            style: TextStyle(
-                              color: PlatformDetection.isTV
-                                  ? null
-                                  : Colors.white70,
-                            ),
-                          ),
-                        );
-                      }
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _scopeRow(
-                            sheetContext,
-                            item: item,
-                            autofocus: true,
-                            icon: Icons.download_for_offline,
-                            label: isCollection
-                                ? l10n.downloadAllMovies
-                                : l10n.downloadAllEpisodes,
-                            items: allItems,
-                            loading: loading,
-                          ),
-                          _scopeRow(
-                            sheetContext,
-                            item: item,
-                            autofocus: false,
-                            icon: Icons.visibility_off_outlined,
-                            label: isCollection
-                                ? l10n.downloadUnwatchedMovies
-                                : l10n.downloadUnwatchedEpisodes,
-                            items: allItems.where((i) => !i.isPlayed).toList(),
-                            loading: loading,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                  ?_keepDownloadedRow(item),
-                  if (autoDownloads != null)
-                    _autoDownloadRow(
-                      sheetContext,
-                      item,
-                      autoDownloads,
-                      initial: subscription,
-                      onSubscription: (current) => subscription = current,
-                      onTap: () {
-                        autoChosen = true;
-                        Navigator.pop(sheetContext);
-                      },
-                    ),
-                  const SizedBox(height: 8),
-                ],
-              ),
-            );
-          },
-        );
-    // Opened only after the scope sheet is gone, so the quality picker
-    // restores focus to the Download button rather than to a disposed row.
-    if (!context.mounted) return;
-    if (autoChosen) {
-      await _toggleAutoDownload(context, item, autoDownloads!, existing: subscription);
-      return;
-    }
-    if (chosen == null) return;
-    _showQualityPicker(context, item, service, items: chosen);
-  }
-
-  /// Follows or unfollows the series. Following asks for a quality first so
-  /// the subscription records one.
-  static Future<void> _toggleAutoDownload(
-    BuildContext context,
-    AggregatedItem item,
-    AutoDownloadService autoDownloads, {
-    required AutoDownloadSubscription? existing,
-  }) async {
-    final l10n = AppLocalizations.of(context);
-    if (existing != null) {
-      await autoDownloads.unsubscribe(item.id);
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.autoDownloadStoppedFor(item.name))),
-      );
-      return;
-    }
-    final qualities = await GetIt.instance<DownloadService>()
-        .offeredQualities();
-    if (!context.mounted) return;
-    final quality = await _pickQuality(
-      context,
-      item,
-      qualities: qualities,
-      title: l10n.autoDownloadQualityTitle,
-      note: l10n.autoDownloadTranscodedForegroundNote,
-    );
-    if (quality == null || !context.mounted) return;
-    unawaited(autoDownloads.subscribe(item, quality: quality));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.autoDownloadEnabledFor(item.name))),
-    );
-  }
-
-  /// Keeps a downloaded movie or episode, or every episode of a series, out
-  /// of the remove-watched rules. Null when no rule could remove it: movies
-  /// only go by the remove-watched setting, episodes also by smart downloads
-  /// and a followed series' delete setting.
-  static Widget? _keepDownloadedRow(AggregatedItem item) {
-    final prefs = GetIt.instance<UserPreferences>();
-    final removeWatched =
-        prefs.get(UserPreferences.downloadRemoveWatchedAfterHours) >= 0;
-    final autoDownloads = GetIt.instance.isRegistered<AutoDownloadService>();
-    final episodeRules =
-        autoDownloads &&
-        (prefs.get(UserPreferences.smartDownloadsEnabled) ||
-            (prefs.get(UserPreferences.autoDownloadEnabled) &&
-                prefs.get(UserPreferences.autoDownloadDeleteAfterHours) >= 0));
-    final applies = switch (item.type) {
-      'Movie' => removeWatched,
-      'Episode' || 'Series' => removeWatched || episodeRules,
-      _ => false,
-    };
-    if (!applies) return null;
-    // Keys use the id the rules read them by, which needs the client.
-    final factory = GetIt.instance<MediaServerClientFactory>();
-    final client = factory.getClientIfExists(item.serverId);
-    if (client == null) return null;
-    final serverId = factory.serverIdOf(client);
-    final isTV = PlatformDetection.isTV;
-    return ListenableBuilder(
-      listenable: prefs,
-      builder: (context, _) {
-        final l10n = AppLocalizations.of(context);
-        final seriesId = item.type == 'Episode' ? item.seriesId : null;
-        // A kept series keeps this episode whatever its own switch says.
-        final seriesKept =
-            seriesId != null && prefs.isDownloadKept(serverId, seriesId);
-        return DpadSwitchListTile(
-          secondary: AdaptiveIcon(
-            Icons.push_pin_outlined,
-            color: isTV ? null : Colors.white70,
-          ),
-          title: Text(
-            l10n.keepDownloaded,
-            style: isTV ? null : const TextStyle(color: Colors.white),
-          ),
-          subtitle: Text(
-            l10n.keepDownloadedSubtitle,
-            style: isTV
-                ? null
-                : TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-          ),
-          value: seriesKept || prefs.isDownloadKept(serverId, item.id),
-          onChanged: seriesKept
-              ? null
-              : (keep) => prefs.setDownloadKept(serverId, item.id, keep: keep),
-        );
-      },
-    );
-  }
-
-  /// Last row of a series' scope sheet: subscribe to new episodes, or stop.
-  /// Reports the current subscription through [onSubscription] so the
-  /// caller knows which of the two [onTap] meant.
-  static Widget _autoDownloadRow(
-    BuildContext sheetContext,
-    AggregatedItem item,
-    AutoDownloadService autoDownloads, {
-    required AutoDownloadSubscription? initial,
-    required void Function(AutoDownloadSubscription?) onSubscription,
-    required VoidCallback onTap,
-  }) {
-    final l10n = AppLocalizations.of(sheetContext);
-    final isTV = PlatformDetection.isTV;
-    final keep = GetIt.instance<UserPreferences>().get(
-      UserPreferences.autoDownloadKeepUnwatched,
-    );
-    return StreamBuilder<AutoDownloadSubscription?>(
-      initialData: initial,
-      stream: autoDownloads.watchSubscription(item.id),
-      builder: (_, snapshot) {
-        final subscription = snapshot.data;
-        onSubscription(subscription);
-        final quality = subscription == null
-            ? null
-            : DownloadQuality.fromName(subscription.qualityPreset);
-        return DpadListTile(
-          autofocus: false,
-          leading: AdaptiveIcon(
-            subscription == null ? Icons.autorenew : Icons.stop_circle_outlined,
-            color: isTV ? null : Colors.white70,
-          ),
-          title: Text(
-            subscription == null
-                ? l10n.autoDownloadNewEpisodes
-                : l10n.autoDownloadStop,
-            style: isTV ? null : const TextStyle(color: Colors.white),
-          ),
-          subtitle: Text(
-            subscription == null
-                ? l10n.autoDownloadKeepUnwatchedSubtitle(keep)
-                : AutoDownloadService.isForegroundOnly(quality!)
-                ? '${l10n.autoDownloadStopSubtitle(quality.label)} • ${l10n.autoDownloadForegroundOnly}'
-                : l10n.autoDownloadStopSubtitle(quality.label),
-            style: isTV
-                ? null
-                : TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-          ),
-          onTap: onTap,
-        );
-      },
-    );
-  }
-
-  static Widget _scopeRow(
-    BuildContext sheetContext, {
-    required AggregatedItem item,
-    required bool autofocus,
-    required IconData icon,
-    required String label,
-    required List<AggregatedItem> items,
-    required bool loading,
-  }) {
-    final l10n = AppLocalizations.of(sheetContext);
-    final isTV = PlatformDetection.isTV;
-    final enabled = loading || items.isNotEmpty;
-    final subtitle = loading
-        ? l10n.downloadScopeLoading
-        : item.type == 'BoxSet'
-        ? l10n.itemCountLabel(items.length)
-        : l10n.episodeCount(items.length);
-    return DpadListTile(
-      autofocus: autofocus,
-      enabled: enabled,
-      leading: AdaptiveIcon(icon, color: isTV ? null : Colors.white70),
-      title: Text(
-        label,
-        style: isTV
-            ? null
-            : TextStyle(color: enabled ? Colors.white : Colors.white38),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: isTV
-            ? null
-            : TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-      ),
-      // Always tappable so the row can take focus on TV while loading; the
-      // guard keeps a press during the fetch from selecting an empty list.
-      onTap: () {
-        if (loading) return;
-        Navigator.pop(sheetContext, items);
-      },
-    );
-  }
-
-  /// Shows the quality picker and queues the download. For series, seasons
-  /// and collections [items] is the list resolved by the scope picker and
-  /// drives both the size estimate and what gets queued.
-  static Future<void> _showQualityPicker(
-    BuildContext context,
-    AggregatedItem item,
-    DownloadService service, {
-    List<AggregatedItem>? items,
-    int? audioStreamIndex,
-  }) async {
-    final isMulti = _isBatchType(item.type);
-    final qualities = await service.offeredQualities();
-    if (!context.mounted) return;
-    if (qualities.length < 2 ||
-        (!isMulti && !_supportsTranscoding(item.type))) {
-      _startDownload(
-        context,
-        item,
-        service,
-        DownloadQuality.original,
-        items: items,
-      );
-      return;
-    }
-    final keepRow = isMulti || !await service.hasDownloadedFiles(item)
-        ? null
-        : _keepDownloadedRow(item);
-    if (!context.mounted) return;
-    final quality = await _pickQuality(
-      context,
-      item,
-      qualities: qualities,
-      title: isMulti
-          ? AppLocalizations.of(context).downloadAllQuality
-          : AppLocalizations.of(context).downloadQuality,
-      items: items ?? const [],
-      header: keepRow,
-    );
-    if (quality == null || !context.mounted) return;
-    _startDownload(
-      context,
-      item,
-      service,
-      quality,
-      items: items,
-      audioStreamIndex: audioStreamIndex,
-    );
-  }
-
-  static bool _supportsTranscoding(String? type) =>
-      type == 'Movie' ||
-      type == 'Episode' ||
-      type == 'MusicVideo' ||
-      type == 'Video';
-
-  /// Lets the user pick a quality for [widget.item] among the server's
-  /// [qualities]. Size estimates cover [items] for batches. Null when the
-  /// sheet is dismissed.
-  /// [note] is shown once under the title, for callers where the choice has
-  /// a consequence worth stating.
-  static Future<DownloadQuality?> _pickQuality(
-    BuildContext context,
-    AggregatedItem item, {
-    required List<DownloadQuality> qualities,
-    required String title,
-    List<AggregatedItem> items = const [],
-    String? note,
-    Widget? header,
-  }) {
-    final isMulti = _isBatchType(item.type);
-    final supportsTranscoding = isMulti || _supportsTranscoding(item.type);
-    final batchItems = items;
-
-    final sourceWidth = isMulti
-        ? (() {
-            int? maxWidth;
-            for (final episode in batchItems) {
-              final width = episode.sourceVideoWidth;
-              if (width == null) continue;
-              maxWidth = maxWidth == null || width > maxWidth
-                  ? width
-                  : maxWidth;
-            }
-            return maxWidth;
-          })()
-        : item.sourceVideoWidth;
-    final availableQualities = qualities.where((q) {
-      if (q.maxWidth == null) return true;
-      if (sourceWidth == null) return true;
-      return q.maxWidth! <= sourceWidth;
-    }).toList();
-    // Computed once: summing a whole series' sizes on every sheet rebuild
-    // (each focus move on TV) is wasted work.
-    final subtitles = {
-      for (final quality in availableQualities)
-        quality: _qualitySubtitle(
-          context,
-          item,
-          quality,
-          supportsTranscoding: supportsTranscoding,
-          isMulti: isMulti,
-          batchItems: batchItems,
-        ),
-    };
-    if (PlatformDetection.isTV) {
-      return showFocusRestoringModalBottomSheet<DownloadQuality>(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: const Color(0xFF1E1E1E),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        builder: (sheetContext) => SafeArea(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.9,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _sheetTitle(sheetContext, title),
-                if (note != null) _sheetNote(sheetContext, note),
-                ?header,
-                Flexible(
-                  child: ListView(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.only(bottom: 8),
-                    children: availableQualities.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final quality = entry.value;
-                      return DpadListTile(
-                        autofocus: index == 0,
-                        leading: AdaptiveIcon(
-                          quality.isTranscoded
-                              ? Icons.compress
-                              : Icons.file_copy_outlined,
-                        ),
-                        title: Text(quality.label),
-                        subtitle: Text(subtitles[quality]!),
-                        onTap: () => Navigator.pop(sheetContext, quality),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    return showFocusRestoringModalBottomSheet<DownloadQuality>(
-      context: context,
-      backgroundColor: const Color(0xFF1E1E1E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _sheetTitle(context, title),
-            if (note != null) _sheetNote(context, note),
-            ?header,
-            ...availableQualities.map(
-              (quality) => ListTile(
-                leading: AdaptiveIcon(
-                  quality.isTranscoded
-                      ? Icons.compress
-                      : Icons.file_copy_outlined,
-                  color: Colors.white70,
-                ),
-                title: Text(
-                  quality.label,
-                  style: const TextStyle(color: Colors.white),
-                ),
-                subtitle: Text(
-                  subtitles[quality]!,
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-                ),
-                onTap: () => Navigator.pop(context, quality),
-              ),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Queues the download. [items] is the list chosen in the scope sheet for
-  /// series, seasons and collections; single items leave it null.
-  static void _startDownload(
-    BuildContext context,
-    AggregatedItem item,
-    DownloadService service,
-    DownloadQuality quality, {
-    List<AggregatedItem>? items,
-    int? audioStreamIndex,
-  }) {
-    final l10n = AppLocalizations.of(context);
-    final String message;
-    if (items != null) {
-      if (items.isEmpty) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.noEpisodesLoaded)));
-        return;
-      }
-      service.downloadItems(items, quality: quality, ownerId: item.id);
-      message = l10n.downloadingTitle(item.name, items.length);
-    } else {
-      if (item.type == 'MusicAlbum') {
-        service.downloadAlbum(item.id, quality: quality);
-      } else {
-        // The button's item leads with the picked version.
-        service.downloadItem(
-          item,
-          quality: quality,
-          mediaSourceId: item.mediaSources.firstOrNull?['Id']?.toString(),
-          audioStreamIndex: audioStreamIndex,
-        );
-      }
-      message = l10n.downloadingItem(item.name, quality.label);
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
-    );
-  }
-}
-
-class _DeleteDownloadButton extends StatefulWidget {
-  final AggregatedItem item;
-  final FocusNode? focusNode;
-  final VoidCallback? onFocused;
-  final VoidCallback? onArrowUp;
-  final VoidCallback? onArrowDown;
-  final VoidCallback? onArrowLeft;
-  final VoidCallback? onArrowRight;
-  final bool suppressAutoScrollToTop;
-
-  const _DeleteDownloadButton({
-    required this.item,
-    this.focusNode,
-    this.onFocused,
-    this.onArrowUp,
-    this.onArrowDown,
-    this.onArrowLeft,
-    this.onArrowRight,
-    this.suppressAutoScrollToTop = false,
-  });
-
-  static Future<void> confirmDelete(
-    BuildContext context,
-    AggregatedItem item, {
-    VoidCallback? onDeleted,
-  }) => _DeleteDownloadButtonState._confirmDelete(
-    context,
-    item,
-    onDeleted: onDeleted,
-  );
-
-  @override
-  State<_DeleteDownloadButton> createState() => _DeleteDownloadButtonState();
-}
-
-class _DeleteDownloadButtonState extends State<_DeleteDownloadButton> {
-  bool _hasFiles = false;
-  bool _checking = true;
-  DownloadService? _downloadService;
-
-  @override
-  void initState() {
-    super.initState();
-    if (GetIt.instance.isRegistered<DownloadService>()) {
-      _downloadService = GetIt.instance<DownloadService>();
-      _downloadService!.addListener(_onDownloadChanged);
-    }
-    _checkFiles();
-  }
-
-  @override
-  void dispose() {
-    _downloadService?.removeListener(_onDownloadChanged);
-    super.dispose();
-  }
-
-  void _onDownloadChanged() => _checkFiles();
-
-  Future<void> _checkFiles() async {
-    final service = GetIt.instance<DownloadService>();
-    final exists = await service.hasDownloadedFiles(widget.item);
-    if (mounted) {
-      setState(() {
-        _hasFiles = exists;
-        _checking = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_checking || !_hasFiles) return const SizedBox.shrink();
-
-    return _DetailActionButton(
-      label: AppLocalizations.of(context).deleteDownloadedFiles,
-      icon: Icons.delete_outline,
-      onPressed: () => _confirmDelete(
-        context,
-        widget.item,
-        onDeleted: () {
-          if (mounted) {
-            setState(() => _hasFiles = false);
-          }
-        },
-      ),
-      isActive: true,
-      activeColor: const Color(0xFFFF4757),
-      focusNode: widget.focusNode,
-      onFocused: widget.onFocused,
-      onArrowUp: widget.onArrowUp,
-      onArrowDown: widget.onArrowDown,
-      onArrowLeft: widget.onArrowLeft,
-      onArrowRight: widget.onArrowRight,
-      suppressAutoScrollToTop: widget.suppressAutoScrollToTop,
-    );
-  }
-
-  static Future<void> _confirmDelete(
-    BuildContext context,
-    AggregatedItem item, {
-    VoidCallback? onDeleted,
-  }) async {
-    final l10n = AppLocalizations.of(context);
-    final typeLabel = switch (item.type) {
-      'Series' => l10n.deleteSeriesFiles(item.seriesName ?? item.name),
-      'Season' => l10n.deleteSeasonFiles,
-      _ => '"${item.name}"',
-    };
-
-    final confirmed = await showFocusRestoringDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog.adaptive(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: Text(
-          AppLocalizations.of(ctx).deleteDownloadedFiles,
-          style: const TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          AppLocalizations.of(ctx).deleteLocalFilesMessage(typeLabel),
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-        ),
-        actions: [
-          adaptiveDialogAction(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(AppLocalizations.of(ctx).cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFFFF4757),
-            ),
-            child: Text(AppLocalizations.of(ctx).delete),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && context.mounted) {
-      final service = GetIt.instance<DownloadService>();
-      final success = await service.deleteDownloadedFiles(item);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success ? l10n.downloadedFilesDeleted : l10n.failedToDeleteFiles,
-            ),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-        if (success) {
-          onDeleted?.call();
-        }
-      }
-    }
-  }
 }
 
 class _PersonalRatingActionIcon extends StatelessWidget {
@@ -17067,8 +15575,6 @@ class _AlbumActions extends StatelessWidget {
   final bool autofocusPlay;
   final VoidCallback? onPlayDown;
   final bool showAddToPlaylist;
-  final VoidCallback? onDownloadAll;
-  final VoidCallback? onDeleteDownloaded;
   final VoidCallback? onDeletePlaylist;
 
   const _AlbumActions({
@@ -17078,8 +15584,6 @@ class _AlbumActions extends StatelessWidget {
     this.autofocusPlay = false,
     this.onPlayDown,
     this.showAddToPlaylist = true,
-    this.onDownloadAll,
-    this.onDeleteDownloaded,
     this.onDeletePlaylist,
   });
 
@@ -17121,32 +15625,12 @@ class _AlbumActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final manager = GetIt.instance<PlaybackManager>();
-    final offlineRepo = GetIt.instance<OfflineRepository>();
-    final trackIds = tracks.map((track) => track.id).toSet();
-    if (trackIds.isEmpty) {
-      return _buildActions(context, manager, false);
-    }
-
-    return StreamBuilder<List<DownloadedItem>>(
-      stream: offlineRepo.watchItems(),
-      builder: (context, snapshot) {
-        final hasDownloadedTracks =
-            snapshot.data?.any(
-              (row) =>
-                  row.downloadStatus == 2 &&
-                  row.localFilePath != null &&
-                  trackIds.contains(row.itemId),
-            ) ??
-            false;
-        return _buildActions(context, manager, hasDownloadedTracks);
-      },
-    );
+    return _buildActions(context, manager);
   }
 
   Widget _buildActions(
     BuildContext context,
     PlaybackManager manager,
-    bool hasDownloadedTracks,
   ) {
     final l10n = AppLocalizations.of(context);
     final hasPlay = tracks.isNotEmpty;
@@ -17175,20 +15659,6 @@ class _AlbumActions extends StatelessWidget {
             },
           ),
       ],
-      if (onDownloadAll != null && hasPlay)
-        _DetailActionButton(
-          label: l10n.download,
-          icon: Icons.download_for_offline,
-          onArrowDown: onPlayDown,
-          onPressed: onDownloadAll!,
-        ),
-      if (onDeleteDownloaded != null && hasDownloadedTracks)
-        _DetailActionButton(
-          label: l10n.deleteDownloaded,
-          icon: Icons.delete_sweep,
-          onArrowDown: onPlayDown,
-          onPressed: onDeleteDownloaded!,
-        ),
       if (onDeletePlaylist != null)
         _DetailActionButton(
           label: l10n.delete,

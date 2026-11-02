@@ -5,28 +5,16 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:moonfin/auth/repositories/user_repository.dart';
-import 'package:moonfin/data/database/offline_database.dart';
 import 'package:moonfin/data/models/aggregated_item.dart';
-import 'package:moonfin/data/repositories/offline_repository.dart';
-import 'package:moonfin/data/services/download_service.dart';
 import 'package:moonfin/l10n/app_localizations.dart';
 import 'package:moonfin/preference/user_preferences.dart';
 import 'package:moonfin/ui/screens/detail/item_detail_screen.dart';
 import 'package:playback_core/playback_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class _FakeOfflineRepository extends Fake implements OfflineRepository {
-  @override
-  Stream<DownloadedItem?> watchItem(String itemId) => Stream.value(null);
-}
 
-class _FakeDownloadService extends ChangeNotifier implements DownloadService {
-  @override
-  bool isDownloading(String itemId) => false;
 
-  @override
-  dynamic noSuchMethod(Invocation invocation) => null;
-}
+
 
 final _movie = AggregatedItem(
   id: 'movie-1',
@@ -82,8 +70,6 @@ void main() {
     getIt.registerSingleton<UserPreferences>(UserPreferences(store));
     getIt.registerSingleton<UserRepository>(UserRepository());
     getIt.registerSingleton<PlaybackManager>(PlaybackManager());
-    getIt.registerSingleton<OfflineRepository>(_FakeOfflineRepository());
-    getIt.registerSingleton<DownloadService>(_FakeDownloadService());
   });
 
   tearDown(() => GetIt.instance.reset());

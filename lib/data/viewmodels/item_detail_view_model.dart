@@ -549,6 +549,7 @@ class ItemDetailViewModel extends ChangeNotifier {
 
   final String? _serverId;
   bool _isDisposed = false;
+  bool _loadingPrimarySections = false;
 
   /// What the server probed in place of the item's placeholder source, kept so
   /// a reload of the item doesn't put the placeholder back.
@@ -1000,10 +1001,25 @@ class ItemDetailViewModel extends ChangeNotifier {
       _selectedSubtitleIndex = savedSubIndex == -2 ? null : savedSubIndex;
       final savedAudioIndex = prefs.getItemAudioStreamIndex(itemId);
       _selectedAudioIndex = savedAudioIndex == -2 ? null : savedAudioIndex;
+      // Publish the page with its main navigation rows already populated.
+      // Optional ratings/recommendations remain outside this critical path.
+      _loadingPrimarySections = true;
+      try {
+        await switch (_item?.type) {
+          'Series' => Future.wait([_loadSeasons(), _loadNextUp()]),
+          'Season' || 'Episode' => _loadEpisodes(),
+          'BoxSet' => _loadCollectionItems(),
+          'Playlist' => _loadTracks(),
+          _ => Future<void>.value(),
+        };
+      } finally {
+        _loadingPrimarySections = false;
+      }
+      if (_isDisposed) return;
       _state = ItemDetailState.ready;
       notifyListeners();
 
-      _loadSecondary();
+      unawaited(_loadSecondary());
     } catch (e) {
       _error = e;
       _state = ItemDetailState.error;
@@ -1103,8 +1119,7 @@ class ItemDetailViewModel extends ChangeNotifier {
       unawaited(_loadReviews());
       unawaited(_syncSeriesTrackChoices());
       futures.add(_loadRatings());
-      futures.add(_loadSeasons());
-      futures.add(_loadNextUp());
+
       futures.add(_loadSimilar());
       futures.add(_loadFeatures());
       futures.add(_loadParentCollection());
@@ -1112,19 +1127,17 @@ class ItemDetailViewModel extends ChangeNotifier {
     } else if (type == 'Season') {
       unawaited(_syncSeriesTrackChoices());
       futures.add(_loadRatings());
-      futures.add(_loadEpisodes());
       futures.add(_loadFeatures());
     } else if (type == 'Episode') {
       unawaited(_syncSeriesTrackChoices());
       futures.add(_loadRatings());
-      futures.add(_loadEpisodes());
       futures.add(_loadSimilar());
       futures.add(_loadFeatures());
     } else if (type == 'MusicArtist') {
       futures.add(_loadAlbums());
       futures.add(_loadTracks(artistId: itemId));
       futures.add(_loadSimilar());
-    } else if (type == 'MusicAlbum' || type == 'Playlist') {
+    } else if (type == 'MusicAlbum') {
       futures.add(_loadTracks());
     } else if (type == 'AudioBook') {
       futures.add(_loadRatings());
@@ -1132,7 +1145,6 @@ class ItemDetailViewModel extends ChangeNotifier {
     } else if (type == 'Audio') {
       futures.add(_loadLyrics());
     } else if (type == 'BoxSet') {
-      futures.add(_loadCollectionItems());
       // Deliberately not awaited, so a slow Seerr server never holds the
       // collection's own members back.
       unawaited(_loadBoxSetSeerrItems());
@@ -2790,7 +2802,7 @@ class ItemDetailViewModel extends ChangeNotifier {
 
   @override
   void notifyListeners() {
-    if (_isDisposed) return;
+    if (_isDisposed || _loadingPrimarySections) return;
     super.notifyListeners();
   }
 

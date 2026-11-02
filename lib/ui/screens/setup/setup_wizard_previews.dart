@@ -39,7 +39,6 @@ import '../../widgets/bottom_nav/dock_bar.dart';
 import '../../widgets/bottom_nav/split_bar.dart';
 import '../../widgets/bottom_nav/strip_bar.dart';
 import '../../widgets/bounded_network_image.dart';
-import '../../widgets/downloads_nav_slot.dart';
 import '../../widgets/friends_nav_slot.dart';
 import '../../widgets/info_area.dart';
 import '../../widgets/mediabar/gallery_glow.dart';
@@ -1805,10 +1804,6 @@ bool get _seerrAvailable =>
     GetIt.instance.isRegistered<PluginSyncService>() &&
     GetIt.instance<PluginSyncService>().seerrAvailable;
 
-bool get _downloadsAvailable =>
-    GetIt.instance.isRegistered<UserRepository>() &&
-    DownloadsNavSlot.isAvailable();
-
 /// The user's libraries for a navbar that lists them one by one, minus the
 /// ones the real navbar leaves out. Until they've loaded, stand-ins, one per
 /// kind of title the preview has loaded.
@@ -1898,10 +1893,6 @@ List<_NavButton> _navButtons(
         icon(glyph, label)
     else if (libraries)
       asset('assets/icons/clapperboard.png', l10n.libraries),
-    // The real Downloads and Messages buttons also wait for something saved
-    // or posted. The preview leaves that out so their switches show a change.
-    if (on(UserPreferences.showDownloadsButton) && _downloadsAvailable)
-      icon(Icons.download_for_offline, l10n.savedMedia),
     if (on(UserPreferences.showFriendsButton) && FriendsNavSlot.isAvailable())
       icon(Icons.people_alt_rounded, l10n.friends),
     if (on(UserPreferences.showServerMessagesButton))

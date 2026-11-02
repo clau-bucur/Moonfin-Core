@@ -1,13 +1,9 @@
-import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
-import 'package:moonfin/data/database/offline_database.dart';
 import 'package:moonfin/data/models/aggregated_item.dart';
-import 'package:moonfin/data/repositories/offline_repository.dart';
 import 'package:moonfin/preference/preference_constants.dart';
 import 'package:moonfin/preference/user_preferences.dart';
 import 'package:moonfin/ui/screens/detail/item_detail_screen.dart';
@@ -21,7 +17,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  late OfflineDatabase db;
 
   AggregatedItem itemWith({required String videoRangeType}) => AggregatedItem(
     id: 'movie',
@@ -54,9 +49,7 @@ void main() {
       DolbyVisionFallbackBehavior.transcode,
     );
 
-    db = OfflineDatabase(DatabaseConnection(NativeDatabase.memory()));
     GetIt.instance.registerSingleton<UserPreferences>(prefs);
-    GetIt.instance.registerSingleton<OfflineRepository>(OfflineRepository(db));
 
     PlatformDetection.setTvMode(true);
     PlatformDetection.setDisplayHdrTypes(const ['HDR10']);
@@ -67,7 +60,6 @@ void main() {
 
   tearDown(() async {
     await GetIt.instance.reset();
-    await db.close();
     PlatformDetection.setTvMode(false);
     PlatformDetection.setDisplayHdrTypes(null);
     PlatformDetection.setMediaCodecCapabilities(null);

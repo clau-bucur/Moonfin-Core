@@ -3,14 +3,12 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
-import 'package:get_it/get_it.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:server_core/server_core.dart';
 
 import '../../auth/store/client_certificate_store.dart';
 import '../../util/pkcs12_decoder.dart';
 import '../../util/platform_detection.dart';
-import 'background_download_coordinator.dart';
 
 const _media3Control = MethodChannel('moonfin/media3_video_control');
 
@@ -33,10 +31,7 @@ Future<void> installClientCertificates(
       // Playback sends them again on the next open.
     }
   }
-  if (GetIt.instance.isRegistered<BackgroundDownloadCoordinator>()) {
-    await GetIt.instance<BackgroundDownloadCoordinator>()
-        .applyClientCertificates(clientCertificates.toList());
-  }
+
 }
 
 Future<void> removeClientCertificate(

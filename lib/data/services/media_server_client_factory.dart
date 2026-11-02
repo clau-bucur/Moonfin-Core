@@ -7,13 +7,7 @@ import 'package:server_plex/server_plex.dart';
 import 'package:server_silo/server_silo.dart';
 
 import '../../util/platform_detection.dart';
-import '../../util/video_app_profile.dart';
 import '../../util/server_url.dart';
-import '../offline/connectivity_aware_media_server_client.dart';
-import '../offline/offline_catalog.dart';
-import '../repositories/offline_repository.dart';
-import 'pending_rating_store.dart';
-import 'storage_path_service.dart';
 
 class MediaServerClientFactory {
   final DeviceInfo deviceInfo;
@@ -29,22 +23,13 @@ class MediaServerClientFactory {
   /// The server id [client] was created under, or its base URL for a client
   /// this factory did not create.
   ///
-  /// Callers hold either the connectivity wrapper this factory stores or
-  /// the raw client inside it, so both sides are unwrapped before
-  /// comparing. Matching only the wrapper falls through to the base URL,
-  /// which changes whenever the server address is edited.
+  /// Match the client instance so editing its address does not change its id.
   String serverIdOf(MediaServerClient client) {
-    final target = _unwrapped(client);
     for (final entry in _clients.entries) {
-      if (identical(_unwrapped(entry.value), target)) return entry.key;
+      if (identical(entry.value, client)) return entry.key;
     }
     return client.baseUrl;
   }
-
-  static MediaServerClient _unwrapped(MediaServerClient client) =>
-      client is ConnectivityAwareMediaServerClient
-      ? client.onlineClient
-      : client;
 
   MediaServerClient getClient({
     required String serverId,
@@ -91,30 +76,6 @@ class MediaServerClientFactory {
   }
 
   MediaServerClient _createClient({
-    required ServerType serverType,
-    required String baseUrl,
-  }) {
-    final raw = _createRawClient(serverType: serverType, baseUrl: baseUrl);
-    final getIt = GetIt.instance;
-    // Background isolates skip the offline stack, so there's nothing to route
-    // to and the raw client is all they need.
-    if (VideoAppProfile.enabled ||
-        !getIt.isRegistered<OfflineCatalog>() ||
-        !getIt.isRegistered<StoragePathService>() ||
-        !getIt.isRegistered<PendingRatingStore>()) {
-      return raw;
-    }
-    return ConnectivityAwareMediaServerClient(
-      raw,
-      useOffline: shouldUseOfflineCatalog,
-      catalog: getIt<OfflineCatalog>(),
-      storagePath: getIt<StoragePathService>(),
-      pendingRatings: getIt<PendingRatingStore>(),
-      offlineRepo: getIt<OfflineRepository>(),
-    );
-  }
-
-  MediaServerClient _createRawClient({
     required ServerType serverType,
     required String baseUrl,
   }) {

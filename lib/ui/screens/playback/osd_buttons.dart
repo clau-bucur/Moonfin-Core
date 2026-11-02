@@ -15,6 +15,7 @@ import '../../../util/platform_detection.dart';
 /// Ids are what gets stored, so renaming one drops whatever the user had
 /// switched off for it.
 enum OsdButton {
+  restart('restart'),
   syncPlay('syncPlay'),
   favorite('favorite'),
   speed('speed'),
@@ -53,6 +54,7 @@ enum OsdButton {
   };
 
   IconData get icon => switch (this) {
+    OsdButton.restart => Icons.replay_rounded,
     OsdButton.syncPlay => Icons.groups_rounded,
     OsdButton.favorite => Icons.favorite_border,
     OsdButton.speed => Icons.speed_rounded,
@@ -73,6 +75,7 @@ enum OsdButton {
   };
 
   String label(AppLocalizations l10n) => switch (this) {
+    OsdButton.restart => l10n.restart,
     OsdButton.syncPlay => l10n.syncPlay,
     OsdButton.favorite => l10n.favorite,
     OsdButton.speed => l10n.playerTooltipPlaybackSpeed,

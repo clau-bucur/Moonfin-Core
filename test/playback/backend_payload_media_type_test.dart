@@ -182,30 +182,5 @@ void main() {
     );
   });
 
-  test('a downloaded song plays as audio from its saved metadata', () async {
-    const url = '/downloads/song.mp3';
-    final backend = _CapturingBackend();
-    final manager = PlaybackManager()
-      ..setBackend(backend)
-      ..setOfflineMetadataByUrl(<String, Map<String, dynamic>>{
-        url: <String, dynamic>{
-          'Type': 'Audio',
-          'MediaStreams': _audioWithVideoStream,
-        },
-      });
-    await manager.playOffline(url);
-    expect(backend.payload?['mediaType'], 'audio');
-  });
 
-  test('a downloaded film still plays as video', () async {
-    const url = '/downloads/film.mkv';
-    final backend = _CapturingBackend();
-    final manager = PlaybackManager()
-      ..setBackend(backend)
-      ..setOfflineMetadataByUrl(<String, Map<String, dynamic>>{
-        url: <String, dynamic>{'Type': 'Movie', 'MediaStreams': _film},
-      });
-    await manager.playOffline(url);
-    expect(backend.payload?['mediaType'], 'video');
-  });
 }

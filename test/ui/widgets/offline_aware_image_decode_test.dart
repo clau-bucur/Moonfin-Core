@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:moonfin/ui/widgets/image_source.dart';
+import 'package:moonfin/ui/widgets/media_card.dart';
 import 'package:moonfin/ui/widgets/offline_aware_image.dart';
 
 import '../../support/artwork_fixture.dart';
@@ -252,6 +252,55 @@ void main() {
       expect(imageCache.pendingImageCount, 0);
     });
   });
+
+  testWidgets(
+    'a modern card reveals one wide image with one decode while expanding',
+    (tester) async {
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(tester.view.reset);
+      await tester.runAsync(() async {
+        await writeTestPng(temp, width: 800, height: 450);
+        await tester.pumpWidget(host(const SizedBox()));
+        final context = tester.element(find.byType(SizedBox).first);
+        await ArtworkDecode.precache(
+          context,
+          url,
+          layoutWidth: 150,
+          layoutHeight: 225,
+          sourceAspectRatio: 16 / 9,
+          maxWidth: 960,
+        );
+        final provider = ArtworkDecode.provider(url, width: 800);
+        final warmedKey = await provider.obtainKey(ImageConfiguration.empty);
+        for (final width in [150.0, 220.0, 300.0, 400.0]) {
+          await tester.pumpWidget(
+            host(
+              MediaCard(
+                key: const ValueKey('modern-card'),
+                imageUrl: url,
+                itemType: 'Movie',
+                width: width,
+                aspectRatio: width / 225,
+                imageSourceAspectRatio: 16 / 9,
+                showLabel: false,
+                cardFocusExpansion: false,
+              ),
+              width: width,
+              height: 225,
+            ),
+          );
+          await settle(tester);
+          expect(imageCache.containsKey(warmedKey), isTrue);
+          expect(
+            imageCache.currentSize,
+            1,
+            reason: 'a wider card reuses the warm wide decode',
+          );
+        }
+        expect((await decodedImageFor(provider))?.width, 800);
+      });
+    },
+  );
 
   testWidgets('evict drops every size the url was decoded at', (tester) async {
     tester.view.devicePixelRatio = 2.0;

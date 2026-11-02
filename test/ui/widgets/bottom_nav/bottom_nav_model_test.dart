@@ -79,7 +79,6 @@ void main() {
     List<BottomNavHubTile> tiles({
       BottomNavTabGates gates = const BottomNavTabGates(),
       String pins = '',
-      bool saved = false,
       bool shuffle = true,
       bool syncPlay = false,
       bool quickConnect = false,
@@ -90,7 +89,6 @@ void main() {
           gates: gates,
           barItems: resolveBarItems(gates, pins),
           isAvailable: (_) => true,
-          savedAvailable: saved,
           shuffle: shuffle,
           syncPlay: syncPlay,
           quickConnect: quickConnect,
@@ -99,8 +97,7 @@ void main() {
         );
 
     test('holds everything offered that isn\'t on the bar', () {
-      expect(tiles(saved: true, syncPlay: true, quickConnect: true), const [
-        BottomNavHubTile.action(BottomNavHubAction.saved),
+      expect(tiles(syncPlay: true, quickConnect: true), const [
         BottomNavHubTile.tab(BottomNavTab.genres),
         BottomNavHubTile.action(BottomNavHubAction.shuffle),
         BottomNavHubTile.action(BottomNavHubAction.syncPlay),
@@ -125,13 +122,10 @@ void main() {
           showLiveTv: true,
           seerrAvailable: true,
         ),
-        saved: true,
       );
       expect(kids.map((t) => t.tab), isNot(contains(BottomNavTab.libraries)));
       expect(kids.map((t) => t.tab), isNot(contains(BottomNavTab.liveTv)));
       expect(kids.map((t) => t.tab), isNot(contains(BottomNavTab.discover)));
-      expect(kids,
-          contains(const BottomNavHubTile.action(BottomNavHubAction.saved)));
     });
 
     test('Split doesn\'t repeat Search in the hub', () {

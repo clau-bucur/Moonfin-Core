@@ -10,22 +10,13 @@ import 'package:server_core/server_core.dart';
 
 import '../../data/models/aggregated_item.dart';
 import '../../data/models/series_track_preference.dart';
-import '../../data/repositories/offline_repository.dart';
 import '../../data/services/audiobook_bookmarks_service.dart';
 import '../../data/services/audiobook_notes_service.dart';
 import '../../data/services/audiobook_resume_service.dart';
-import '../../data/services/auto_download_service.dart';
-import '../../data/services/connectivity_service.dart';
-import '../../data/services/download_service.dart';
 import '../../data/services/log_service.dart';
 import '../../data/services/blocked_content_gate.dart';
 import '../../data/services/media_server_client_factory.dart';
-import '../../data/services/offline_playback_tracker.dart';
-import '../../data/services/remove_watched_planner.dart';
-import '../../data/services/remove_watched_service.dart';
 import '../../data/services/user_data_sync.dart';
-import '../../playback/local_aware_player_service.dart';
-import '../../playback/local_first_media_stream_resolver.dart';
 
 import '../../playback/hdr_stream_capability.dart';
 import '../../playback/headless_session_bootstrap.dart';
@@ -40,7 +31,6 @@ import '../../playback/auto_bitrate_service.dart';
 import '../../playback/aether_backend.dart';
 import '../../playback/media_kit_player_backend.dart';
 import '../../playback/media3_player_backend.dart';
-import '../../playback/offline_stream_resolver.dart';
 import '../../playback/playback_profile_diagnostics.dart';
 import '../../playback/silo_playback_environment.dart';
 import '../../playback/server_shuffle_queue.dart';
@@ -386,7 +376,7 @@ void registerPlaybackModule() {
     _getIt.registerSingleton<AetherBackend>(iosBackend);
   } else if (PlatformDetection.isIOS || PlatformDetection.isMacOS) {
     // AetherEngine serves main playback on iOS and macOS: video, live TV,
-    // music, audiobooks and offline. The media_kit backend isn't constructed,
+    // inherited playback paths. The media_kit backend isn't constructed,
     // though on macOS media_kit itself stays for trailers and theme music.
     iosBackend = AetherBackend(prefs);
     _getIt.registerSingleton<AetherBackend>(iosBackend);
@@ -802,13 +792,6 @@ void registerPlaybackModule() {
 
   _getIt.registerSingleton<PlaybackManager>(manager);
 
-  _getIt.registerLazySingleton<OfflineStreamResolver>(
-    () => OfflineStreamResolver(_getIt<OfflineRepository>()),
-  );
-  _getIt.registerLazySingleton<OfflinePlaybackTracker>(
-    () => OfflinePlaybackTracker(_getIt<OfflineRepository>()),
-  );
-
   _getIt.registerLazySingleton<SyncPlayManager>(
     () => SyncPlayManager(_getIt<PlaybackManager>(), _getIt<UserPreferences>()),
   );
@@ -881,7 +864,7 @@ void setActiveStreamResolver(MediaServerClient client) {
     }(),
     ServerType.plex => (
       PlexMediaStreamResolver(client),
-      PlexPlaySessionService(client),
+      _RefreshingPlexPlaySessionService(client),
     ),
     ServerType.silo => () {
       final p = siloPluginFor(client, environment: siloPlaybackEnvironment);
@@ -889,32 +872,8 @@ void setActiveStreamResolver(MediaServerClient client) {
     }(),
   };
 
-  // Local-first: completed downloads play from disk instead of streaming,
-  // with progress mirrored to the downloads DB (and to the server when
-  // reachable).
-  final resolver = VideoAppProfile.enabled
-      ? serverResolver
-      : LocalFirstMediaStreamResolver(
-          inner: serverResolver,
-          offline: _getIt<OfflineStreamResolver>(),
-          streamFromServer: () => _getIt<PlaybackManager>().streamsFromServer,
-          restoreSubtitles: (itemId) async {
-            if (_getIt.isRegistered<DownloadService>()) {
-              await _getIt<DownloadService>().restoreMissingSubtitles(itemId);
-            }
-          },
-        );
-  final service = VideoAppProfile.enabled
-      ? serverService
-      : LocalAwarePlayerService(
-          serverService,
-          _getIt<OfflineRepository>(),
-          canReachServer: () =>
-              !_getIt.isRegistered<ConnectivityService>() ||
-              _getIt<ConnectivityService>().canReachServer,
-          onStopped: _onItemStopped,
-        );
-
+  final resolver = serverResolver;
+  final service = serverService;
   _getIt.registerSingleton<MediaStreamResolver>(resolver);
   _getIt.registerSingleton<PlayerService>(service);
 
@@ -925,18 +884,8 @@ void setActiveStreamResolver(MediaServerClient client) {
   _currentActiveResolverClient = client;
 }
 
-/// Smart downloads and the remove-watched rule react as soon as an item
-/// stops, rather than waiting for the server's debounced user data event or
-/// the next reconnect.
 void _onItemStopped(dynamic item) {
   if (item is! AggregatedItem) return;
-  if (item.type == 'Episode' && _getIt.isRegistered<AutoDownloadService>()) {
-    _getIt<AutoDownloadService>().onEpisodeStopped(item.serverId);
-  }
-  if (removeWatchedTypes.contains(item.type) &&
-      _getIt.isRegistered<RemoveWatchedService>()) {
-    _getIt<RemoveWatchedService>().onItemStopped(item.id);
-  }
   // Plex sends no user data events, so the new resume point and watched state
   // have to be asked for. Plex items don't name their server, so one without
   // an id belongs to the active client.
@@ -964,4 +913,19 @@ Future<void> _ensureResolverForItem(dynamic item) async {
   final client = factory.getClientIfExists(item.serverId);
   if (client == null) return;
   setActiveStreamResolver(client);
+}
+
+class _RefreshingPlexPlaySessionService extends PlexPlaySessionService {
+  _RefreshingPlexPlaySessionService(super.client);
+
+  @override
+  Future<void> onPlaybackStop(dynamic item, StreamResolutionResult resolution,
+      Duration position, {bool releaseLiveStream = true}) async {
+    try {
+      await super.onPlaybackStop(item, resolution, position,
+        releaseLiveStream: releaseLiveStream);
+    } finally {
+      _onItemStopped(item);
+    }
+  }
 }

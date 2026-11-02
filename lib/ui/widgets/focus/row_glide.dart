@@ -7,8 +7,8 @@ import '../../../preference/user_preferences.dart';
 /// One focus position for a row whose focused card grows. Every card's width
 /// and the row's scroll come from it, so the two can't pull against each
 /// other. It moves on a critically damped spring, so a press in the middle of
-/// a move keeps its speed instead of starting over. Holding a direction folds
-/// the row back to plain cards until the key comes up.
+/// a move keeps its speed instead of starting over. The expanded width stays constant while a direction repeats, so the row
+/// does not collapse and expand between key events.
 class RowGlide extends ChangeNotifier {
   RowGlide(this._prefs);
 
@@ -32,7 +32,7 @@ class RowGlide extends ChangeNotifier {
   /// Whether the row has focus. Its card only grows while it does.
   set active(bool value) => _active = value;
 
-  /// Set while a direction key repeats, which folds the row.
+  /// Set while a direction key repeats, for faster positional tracking.
   set held(bool value) => _held = value;
 
   void moveTo(int index) => _target = index;
@@ -67,16 +67,19 @@ class RowGlide extends ChangeNotifier {
   /// Moves the springs on by [dt] seconds and returns whether anything is
   /// still moving.
   bool tick(double dt) {
-    final cardSpeed =
-        _prefs.get(UserPreferences.modernCardTransitionSpeed).duration;
-    final navSpeed = _prefs.get(UserPreferences.navigationAnimationSpeed).duration;
-    final settle = (cardSpeed > navSpeed ? cardSpeed : navSpeed) * 1.5;
+    final cardSpeed = _prefs
+        .get(UserPreferences.modernCardTransitionSpeed)
+        .duration;
+    final navSpeed = _prefs
+        .get(UserPreferences.navigationAnimationSpeed)
+        .duration;
+    final settle = (cardSpeed > navSpeed ? cardSpeed : navSpeed);
     // A critically damped spring is within 5% of its target after
     // 4.74 / stiffness seconds.
     final stiffness =
         4.74 * Duration.microsecondsPerSecond / settle.inMicroseconds;
-    final openTarget = _active && !_held ? 1.0 : 0.0;
-    _position.step(_target.toDouble(), stiffness, dt);
+    final openTarget = _active ? 1.0 : 0.0;
+    _position.step(_target.toDouble(), stiffness * (_held ? 1.25 : 1), dt);
     _open.step(
       openTarget,
       cardSpeed == Duration.zero ? double.infinity : stiffness,

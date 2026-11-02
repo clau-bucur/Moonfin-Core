@@ -8,7 +8,6 @@ import 'package:moonfin/auth/repositories/user_repository.dart';
 import 'package:moonfin/data/services/incomplete_recordings_service.dart';
 import 'package:moonfin/preference/user_preferences.dart';
 import 'package:moonfin/ui/screens/detail/detail_buttons.dart';
-import 'package:moonfin/util/download_utils.dart';
 import 'package:moonfin/util/platform_detection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -96,12 +95,12 @@ void main() {
       );
     });
 
-    test('Android TV offers offline controls but not casting', () {
+    test('Android TV excludes download and casting controls', () {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       PlatformDetection.setTvMode(true);
 
-      expect(DetailButton.download.isOffered, isTrue);
-      expect(DetailButton.deleteFiles.isOffered, isTrue);
+      expect(DetailButton.values.map((b) => b.id), isNot(contains('download')));
+      expect(DetailButton.values.map((b) => b.id), isNot(contains('deleteFiles')));
       expect(DetailButton.cast.isOffered, isFalse);
     });
 
@@ -135,30 +134,5 @@ void main() {
     });
   });
 
-  group('showsTvDownloadActions', () {
-    test('TV hides the download actions until the user opts in', () async {
-      PlatformDetection.setTvMode(true);
-      final prefs = await _prefs();
 
-      expect(showsTvDownloadActions(prefs), isFalse);
-
-      await prefs.set(UserPreferences.tvOfflineDownloads, true);
-      expect(showsTvDownloadActions(prefs), isTrue);
-    });
-
-    test('non-TV platforms offer downloads unconditionally', () async {
-      PlatformDetection.setTvMode(false);
-      final prefs = await _prefs();
-      expect(showsTvDownloadActions(prefs), isTrue);
-    });
-
-    test('a saved button order does not opt TV in on its own', () async {
-      PlatformDetection.setTvMode(true);
-      // Moving any row writes the whole arrangement back, download included,
-      // so the order says nothing about whether downloads were asked for.
-      final prefs = await _prefs(order: 'play,download,subtitles');
-
-      expect(showsTvDownloadActions(prefs), isFalse);
-    });
-  });
 }

@@ -257,15 +257,6 @@ class _NavigationCategoryScreenState extends State<_NavigationCategoryScreen> {
                       ),
                       onChanged: _pushPersonalizationSync,
                     ),
-                  // Saved downloads keep the button even after downloading is turned off
-                  if (DownloadsNavSlot.isAvailable() ||
-                      DownloadsNavSlot.hasSavedMedia())
-                    SwitchPreferenceTile(
-                      preference: UserPreferences.showDownloadsButton,
-                      title: l10n.showDownloadsButton,
-                      icon: Icons.download_for_offline,
-                      onChanged: _pushPersonalizationSync,
-                    ),
                   // Server messages come from the Moonfin plugin.
                   if (moonfinPluginOnAnySignedInServer())
                     SwitchPreferenceTile(

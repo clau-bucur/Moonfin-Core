@@ -127,9 +127,7 @@ class ModernCardExpansion {
   }
 }
 
-/// A gliding card fades its poster off the backdrop while it grows, and fades
-/// its details in once there's room for them.
-double modernPosterOpacity(double open) => 1 - _smoothstep(0.1, 0.55, open);
+/// Card details fade in once the widening image leaves enough room.
 
 const double modernDetailsStart = 0.72;
 

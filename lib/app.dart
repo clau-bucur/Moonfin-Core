@@ -17,10 +17,6 @@ import 'data/models/aggregated_item.dart';
 import 'data/services/achievements_service.dart';
 import 'data/services/cast/cast_service.dart';
 import 'data/services/connectivity_service.dart';
-import 'data/services/remove_watched_service.dart';
-import 'data/services/download_service.dart';
-import 'data/services/seerr_notification_service.dart';
-import 'data/services/plugin_sync_service.dart';
 import 'data/services/server_messages_service.dart';
 import 'data/services/retro_artwork/retro_artwork_data_source.dart';
 import 'data/services/theme_music_service.dart';
@@ -47,7 +43,7 @@ import 'ui/widgets/offline_banner.dart';
 import 'ui/widgets/times_up_gate.dart';
 import 'ui/widgets/settings/settings_panel.dart';
 import 'ui/widgets/server_messages_dialog.dart';
-import 'ui/widgets/exit_confirmation_dialog.dart';
+import 'ui/widgets/back_to_exit.dart';
 import 'ui/widgets/keyboard_shortcuts/keyboard_shortcut_reference.dart';
 import 'ui/screensaver/screensaver_controller.dart';
 import 'ui/screensaver/screensaver_host.dart';
@@ -415,7 +411,7 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
   int _routeHistoryIndex = -1;
   DateTime? _lastMouseThumbNavAt;
   String? _pendingRouteHistoryLocation;
-  bool _exitDialogShowing = false;
+  bool _exitInFlight = false;
 
   @override
   void initState() {
@@ -439,6 +435,7 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
   }
 
   void _onRouterStateChanged() {
+    resetBackToExit();
     final location = _currentRouteLocation();
     if (_pendingRouteHistoryLocation != null) {
       final expected = _pendingRouteHistoryLocation!;
@@ -534,9 +531,9 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
 
     if (_leaveAdminArea()) return true;
 
-    if (!_exitDialogShowing) {
-      _exitDialogShowing = true;
-      unawaited(_showExitConfirmation());
+    if (!_exitInFlight) {
+      _exitInFlight = true;
+      unawaited(_requestExit());
       return true;
     }
 
@@ -626,9 +623,9 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
       return true;
     }
     if (!appRouter.canPop()) {
-      if (!_leaveAdminArea() && !_exitDialogShowing) {
-        _exitDialogShowing = true;
-        unawaited(_showExitConfirmation());
+      if (!_leaveAdminArea() && !_exitInFlight) {
+        _exitInFlight = true;
+        unawaited(_requestExit());
       }
       return true;
     }
@@ -774,15 +771,15 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
           return true;
         }
         scheduleRoutePop(appRouter, isMounted: () => mounted);
-      } else if (!_exitDialogShowing) {
+      } else if (!_exitInFlight) {
         // A server remote only navigates, it can't quit the app it's driving.
         if (fromRemote) return true;
         if (PlatformDetection.isAndroid && key == LogicalKeyboardKey.goBack) {
           return true;
         }
         if (_leaveAdminArea()) return true;
-        _exitDialogShowing = true;
-        unawaited(_showExitConfirmation());
+        _exitInFlight = true;
+        unawaited(_requestExit());
       }
       return true;
     }
@@ -818,23 +815,16 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
     return false;
   }
 
-  Future<void> _showExitConfirmation() async {
+  Future<void> _requestExit() async {
     try {
-      final shouldConfirm = GetIt.instance<UserPreferences>().get(
-        UserPreferences.confirmExit,
-      );
-      if (!shouldConfirm) {
-        await AppExit.closeApp();
-        return;
-      }
-      final navContext = appRouter.routerDelegate.navigatorKey.currentContext;
+      final navContext = appRouter.routerDelegate.navigatorKey.currentState?.overlay?.context;
       if (navContext == null || !navContext.mounted) {
         return;
       }
-      await showExitConfirmationDialog(navContext);
+      await requestBackToExit(navContext);
     } catch (_) {
     } finally {
-      _exitDialogShowing = false;
+      _exitInFlight = false;
     }
   }
 
@@ -861,7 +851,7 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
         isAudio = item.isAudioLike;
       } else if (item is String) {
         try {
-          final meta = manager.currentOfflineMetadata;
+          final meta = manager.currentItemMetadata;
           if (meta != null) {
             final type = meta['Type']?.toString();
             final mediaType = meta['MediaType']?.toString();
@@ -950,10 +940,8 @@ class _ConnectivityListenerState extends ConsumerState<_ConnectivityListener>
   bool? _wasOnline;
   bool? _wasServerReachable;
   StreamSubscription<SyncPlayUiEvent>? _syncPlayEventsSub;
-  StreamSubscription<String>? _downloadErrorSub;
   StreamSubscription<ChatThread>? _chatMessageSub;
   StreamSubscription<AchievementUnlocks>? _unlockSub;
-  StreamSubscription<SeerrNotificationEvent>? _seerrNotificationSub;
 
   @override
   void initState() {
@@ -962,31 +950,13 @@ class _ConnectivityListenerState extends ConsumerState<_ConnectivityListener>
     ref.read(syncPlayRuntimeCoordinatorProvider);
     final manager = ref.read(syncPlayManagerProvider);
     _syncPlayEventsSub = manager.uiEvents.listen(_handleSyncPlayEvent);
-    if (GetIt.instance.isRegistered<PluginSyncService>() &&
-        GetIt.instance.isRegistered<SeerrNotificationService>()) {
-      final notificationService = GetIt.instance<SeerrNotificationService>();
-      _seerrNotificationSub = GetIt.instance<PluginSyncService>()
-          .seerrNotifications
-          .listen(
-            (event) => notificationService.show(
-              event.title,
-              event.body,
-              event.route,
-              requestId: event.requestId,
-              isRequest: event.isRequest,
-            ),
-          );
-    }
+
     if (GetIt.instance.isRegistered<ServerMessagesService>()) {
       GetIt.instance<ServerMessagesService>().addListener(
         _handleServerMessagesChanged,
       );
     }
-    if (GetIt.instance.isRegistered<DownloadService>()) {
-      _downloadErrorSub = GetIt.instance<DownloadService>().errors.listen(
-        _handleDownloadError,
-      );
-    }
+
     if (GetIt.instance.isRegistered<AchievementsService>()) {
       final achievements = GetIt.instance<AchievementsService>();
       _chatMessageSub = achievements.incomingMessages.listen(
@@ -1000,10 +970,8 @@ class _ConnectivityListenerState extends ConsumerState<_ConnectivityListener>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _syncPlayEventsSub?.cancel();
-    _downloadErrorSub?.cancel();
     _chatMessageSub?.cancel();
     _unlockSub?.cancel();
-    _seerrNotificationSub?.cancel();
     if (GetIt.instance.isRegistered<ServerMessagesService>()) {
       GetIt.instance<ServerMessagesService>().removeListener(
         _handleServerMessagesChanged,
@@ -1026,11 +994,7 @@ class _ConnectivityListenerState extends ConsumerState<_ConnectivityListener>
       if (GetIt.instance.isRegistered<ConnectivityService>()) {
         GetIt.instance<ConnectivityService>().onAppResumed();
       }
-      if (GetIt.instance.isRegistered<RemoveWatchedService>()) {
-        unawaited(
-          GetIt.instance<RemoveWatchedService>().runForSignedInServer(),
-        );
-      }
+
     }
   }
 
@@ -1081,17 +1045,7 @@ class _ConnectivityListenerState extends ConsumerState<_ConnectivityListener>
     }
   }
 
-  void _handleDownloadError(String message) {
-    if (!mounted) return;
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 5),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
+
 
   bool _onPlayerRoute() {
     final matches = appRouter.routerDelegate.currentConfiguration.matches;
@@ -1186,7 +1140,7 @@ class _ConnectivityListenerState extends ConsumerState<_ConnectivityListener>
   }
 
   /// Fires whenever server reachability flips (either way) so home swaps
-  /// between live rows and offline downloaded-only rows automatically.
+  /// while keeping cached browsing rows visible.
   void _handleServerReachabilityChanged() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       homeRefreshBus.requestNowOrAfterNavigation();

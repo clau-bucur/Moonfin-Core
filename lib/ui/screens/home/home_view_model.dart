@@ -15,7 +15,6 @@ import '../../../data/models/home_row.dart';
 import '../../../data/repositories/multi_server_repository.dart';
 import '../../../data/repositories/user_views_repository.dart';
 import '../../../data/utils/latest_media_row_normalizer.dart';
-import '../../../data/services/connectivity_service.dart';
 import '../../../data/services/home_row_cache_store.dart';
 import '../../../data/services/row_data_source.dart';
 import '../../../data/services/topshelf_service.dart';
@@ -34,7 +33,6 @@ import '../../../data/services/seerr/seerr_api_models.dart';
 import '../../../data/services/seerr/seerr_discover_sliders.dart';
 import '../../../data/utils/bounded_concurrency.dart';
 import '../../../util/game_library.dart';
-import '../../../util/platform_detection.dart';
 import '../../../util/server_url.dart';
 import '../../../preference/seerr_preferences.dart';
 import '../../../data/viewmodels/seerr_discover_view_model.dart';
@@ -111,15 +109,29 @@ class HomeViewModel extends ChangeNotifier {
   String get _serverId => _client.baseUrl;
   MediaBarViewModel get mediaBarViewModel => _mediaBarViewModel;
 
-  // TV can't download, so it never enters offline browsing mode and keeps
-  // rendering its cached rows instead.
-  bool get _isOffline =>
-      !PlatformDetection.isTV &&
-      GetIt.instance.isRegistered<ConnectivityService>() &&
-      !GetIt.instance<ConnectivityService>().canReachServer;
+  bool get _multiServerEnabled => _prefs.get(UserPreferences.enableMultiServerLibraries);
 
-  bool get _multiServerEnabled =>
-      !_isOffline && _prefs.get(UserPreferences.enableMultiServerLibraries);
+  Timer? _rowPublishTimer;
+  bool _disposed = false;
+
+  void _publishRowsSoon() {
+    _rowPublishTimer ??= Timer(const Duration(milliseconds: 16), () {
+      _rowPublishTimer = null;
+      notifyListeners();
+    });
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _rowPublishTimer?.cancel();
+    super.dispose();
+  }
 
   /// Whether a stored address is the server this client is on, ignoring the
   /// harmless ways the two spellings differ, such as a trailing slash or the
@@ -180,11 +192,9 @@ class HomeViewModel extends ChangeNotifier {
     final multiServer = _prefs.get(UserPreferences.enableMultiServerLibraries);
     final merge = _prefs.effectiveMergeContinueWatchingNextUp;
     final blocked = _prefs.get(UserPreferences.blockedParentalRatings);
-    // Offline rows are cached separately so cached online rows never hydrate
-    // an offline home (and vice versa).
-    final offline = _isOffline;
     final shape = RowDataSource.fieldShapeToken;
-    return '$_serverId|$userId|$sections|$multiServer|$merge|$blocked|offline:$offline|fields:$shape';
+    // Preserve the previous online cache key across this cleanup.
+    return '$_serverId|$userId|$sections|$multiServer|$merge|$blocked|offline:false|fields:$shape';
   }
 
   /// Called again when the resume and next up rows refresh on their own, or
@@ -224,26 +234,6 @@ class HomeViewModel extends ChangeNotifier {
       HomeSectionType.audioAlbums ||
       HomeSectionType.audioPlaylists => true,
       _ => false,
-    };
-  }
-
-  /// Sections the offline downloads catalog can answer. Everything else
-  /// (live TV, seerr/tmdb/arr externals, server plugin rows) is skipped when
-  /// the server is unreachable.
-  static bool _isOfflineCapableSection(HomeSectionConfig c) {
-    if (!c.isBuiltin) return false;
-    return switch (c.type) {
-      HomeSectionType.liveTv ||
-      HomeSectionType.onNow ||
-      HomeSectionType.activeRecordings ||
-      HomeSectionType.playlists ||
-      HomeSectionType.audioPlaylists ||
-      HomeSectionType.radarrCalendar ||
-      HomeSectionType.sonarrCalendar ||
-      HomeSectionType.seasonal =>
-        false,
-      final t when _isSeerrSectionType(t) || _isTmdbSectionType(t) => false,
-      _ => true,
     };
   }
 
@@ -452,13 +442,9 @@ class HomeViewModel extends ChangeNotifier {
           (GetIt.instance<PluginSyncService>().pluginAvailable ||
               _client.itemsApi is ServerHomeSectionsApi);
 
-      final offline = _isOffline;
       final visibleConfigsRaw = configs
           .where(
             (c) =>
-                // When offline, only sections the downloads catalog can
-                // answer are shown.
-                (!offline || _isOfflineCapableSection(c)) &&
                 _belongsToThisServer(c) &&
                 (showFavoritesRows || !_isFavoriteSectionType(c.type)) &&
                 (showCollectionsRows ||
@@ -682,7 +668,7 @@ class HomeViewModel extends ChangeNotifier {
           }
         }
         _rows = newRows;
-        notifyListeners();
+        _publishRowsSoon();
       }
 
       // The merged row is the one a viewer checks first, so it doesn't wait
@@ -704,6 +690,8 @@ class HomeViewModel extends ChangeNotifier {
       _tvChannels.update();
     } finally {
       _isLoading = false;
+      _rowPublishTimer?.cancel();
+      _rowPublishTimer = null;
       notifyListeners();
       if (_reloadRequestedWhileLoading) {
         final nextPreserveExisting = _pendingReloadPreserveExisting;

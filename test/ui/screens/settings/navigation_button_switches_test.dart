@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -9,7 +8,6 @@ import 'package:moonfin/auth/repositories/user_repository.dart';
 import 'package:moonfin/data/models/aggregated_library.dart';
 import 'package:moonfin/data/services/achievements_service.dart';
 import 'package:moonfin/data/services/plugin_sync_service.dart';
-import 'package:moonfin/data/services/saved_media_presence.dart';
 import 'package:moonfin/l10n/app_localizations.dart';
 import 'package:moonfin/preference/seerr_preferences.dart';
 import 'package:moonfin/preference/user_preferences.dart';
@@ -32,7 +30,6 @@ class _SyncPlay extends Mock implements SyncPlayManager {}
 
 class _WatchParty extends Mock implements SiloWatchPartyManager {}
 
-class _Saved extends Mock implements SavedMediaPresence {}
 
 // The Navigation Bar screen offers a button's switch wherever the navbar
 // could show that button.
@@ -152,43 +149,5 @@ void main() {
     expect(find.text(l10n.settingsSyncplayButton), findsOneWidget);
   });
 
-  testWidgets('Downloads is offered only where this user can download', (
-    tester,
-  ) async {
-    signIn(canDownload: false);
-    await pump(tester);
-    expect(find.text(l10n.showDownloadsButton), findsNothing);
 
-    await GetIt.instance.unregister<UserRepository>();
-    signIn(canDownload: true);
-    await tester.pumpWidget(const SizedBox());
-    await pump(tester);
-    expect(find.text(l10n.showDownloadsButton), findsOneWidget);
-  });
-
-  testWidgets('Downloads stays offered while something is saved', (
-    tester,
-  ) async {
-    signIn(canDownload: false);
-    final saved = _Saved();
-    when(() => saved.hasSavedMedia).thenReturn(true);
-    GetIt.instance.registerSingleton<SavedMediaPresence>(saved);
-    await pump(tester);
-    expect(find.text(l10n.showDownloadsButton), findsOneWidget);
-  });
-
-  testWidgets('a TV offers Downloads once offline downloads are on', (
-    tester,
-  ) async {
-    debugDefaultTargetPlatformOverride = TargetPlatform.android;
-    PlatformDetection.setInterfaceLayout(InterfaceLayout.tv);
-    signIn(canDownload: true);
-    await pump(tester);
-    expect(find.text(l10n.showDownloadsButton), findsNothing);
-
-    await prefs.set(UserPreferences.tvOfflineDownloads, true);
-    await tester.pumpAndSettle();
-    expect(find.text(l10n.showDownloadsButton), findsOneWidget);
-    debugDefaultTargetPlatformOverride = null;
-  });
 }

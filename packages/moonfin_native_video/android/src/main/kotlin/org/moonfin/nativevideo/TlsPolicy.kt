@@ -21,8 +21,7 @@ import javax.net.ssl.X509ExtendedKeyManager
 import javax.net.ssl.X509TrustManager
 
 /**
- * Owns the process-wide HttpsURLConnection defaults, which media3, the
- * transmuxer, artwork and the download plugin all connect through.
+ * Owns the process-wide HttpsURLConnection defaults used by Media3 and artwork.
  *
  * Two settings feed it: the self-signed opt-in, which media3 otherwise can't
  * see because it skips the Dart client, and the client certificates, each

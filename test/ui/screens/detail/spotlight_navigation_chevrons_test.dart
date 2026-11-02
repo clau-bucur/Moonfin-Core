@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:moonfin/data/models/aggregated_item.dart';
-import 'package:moonfin/data/repositories/offline_repository.dart';
 import 'package:moonfin/auth/repositories/user_repository.dart';
 import 'package:moonfin/data/services/plugin_sync_service.dart';
 import 'package:moonfin/data/viewmodels/item_detail_view_model.dart';
@@ -30,7 +29,6 @@ class _MediaServerClient extends Mock implements MediaServerClient {}
 
 class _UserRepository extends Mock implements UserRepository {}
 
-class _OfflineRepository extends Mock implements OfflineRepository {}
 
 class _PlaybackManager extends Mock implements PlaybackManager {}
 
@@ -58,7 +56,6 @@ void main() {
   late _SeerrPreferences seerrPrefs;
   late _MediaServerClient mediaClient;
   late _UserRepository userRepo;
-  late _OfflineRepository offlineRepo;
   late _PlaybackManager playbackManager;
   late _QueueService queueService;
   late UserPreferences prefs;
@@ -122,15 +119,6 @@ void main() {
     when(() => userRepo.currentUser).thenReturn(null);
     GetIt.instance.registerSingleton<UserRepository>(userRepo);
 
-    offlineRepo = _OfflineRepository();
-    when(
-      () => offlineRepo.getSeriesEpisodes(any()),
-    ).thenAnswer((_) async => []);
-    when(
-      () => offlineRepo.getSeasonEpisodes(any()),
-    ).thenAnswer((_) async => []);
-    when(() => offlineRepo.getItem(any())).thenAnswer((_) async => null);
-    GetIt.instance.registerSingleton<OfflineRepository>(offlineRepo);
 
     playbackManager = _PlaybackManager();
     queueService = _QueueService();

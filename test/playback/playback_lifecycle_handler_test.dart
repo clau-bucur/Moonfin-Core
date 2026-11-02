@@ -48,7 +48,7 @@ void main() {
     when(() => manager.state).thenReturn(playerState);
     when(() => manager.backend).thenReturn(null);
     when(
-      () => manager.currentOfflineMetadata,
+      () => manager.currentItemMetadata,
     ).thenAnswer((_) => offlineMetadata);
     when(() => manager.stopForBackground(any())).thenAnswer((_) async => true);
     when(

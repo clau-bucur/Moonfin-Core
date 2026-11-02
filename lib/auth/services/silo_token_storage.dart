@@ -1,19 +1,14 @@
 import 'package:server_core/server_core.dart';
 import 'package:server_silo/server_silo.dart';
 
-import '../../data/offline/connectivity_aware_media_server_client.dart';
 import '../models/user.dart';
 import '../store/authentication_store.dart';
 
 /// The Silo client behind [client], or null for a Jellyfin or Emby client.
 ///
-/// The client factory wraps every client in the offline-aware
-/// [ConnectivityAwareMediaServerClient], so the Silo client is looked for
-/// inside it too.
+/// The Silo client, when the current server uses Silo.
 SiloMediaServerClient? siloClientOf(MediaServerClient client) {
-  final online = client is ConnectivityAwareMediaServerClient
-      ? client.onlineClient
-      : client;
+  final online = client;
   return online is SiloMediaServerClient ? online : null;
 }
 

@@ -5,7 +5,7 @@ import 'package:moonfin_design/moonfin_design.dart';
 import '../../data/services/seerr/seerr_download_progress.dart';
 import '../../l10n/app_localizations.dart';
 import '../../preference/user_preferences.dart';
-import '../../util/download_utils.dart';
+import '../../util/media_format.dart';
 import '../../util/platform_detection.dart';
 
 /// Progress bar for an active Seerr download. Not focusable, so d-pad

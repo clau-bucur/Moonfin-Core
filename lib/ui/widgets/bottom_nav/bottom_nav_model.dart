@@ -105,7 +105,6 @@ int? activeBarIndex(
 }
 
 enum BottomNavHubAction {
-  saved,
   shuffle,
   syncPlay,
   quickConnect,
@@ -132,9 +131,7 @@ class BottomNavHubTile {
   String toString() => 'BottomNavHubTile(${tab?.name ?? action?.name})';
 }
 
-/// Tiles for the bottom navbar hub, in the order they are drawn: saved media
-/// first because it matters most offline, then every destination that is
-/// offered but not on the bar, then the actions.
+/// Unpinned destinations followed by the actions available in the hub.
 ///
 /// [alsoOnBar] names tabs the bar shows outside its tab row, like Split's
 /// search button.
@@ -142,7 +139,6 @@ List<BottomNavHubTile> resolveHubTiles({
   required BottomNavTabGates gates,
   required List<BottomNavBarItem> barItems,
   required bool Function(BottomNavTab tab) isAvailable,
-  required bool savedAvailable,
   required bool shuffle,
   required bool syncPlay,
   required bool quickConnect,
@@ -155,7 +151,6 @@ List<BottomNavHubTile> resolveHubTiles({
       if (item.tab != null) item.tab!,
   };
   return [
-    if (savedAvailable) const BottomNavHubTile.action(BottomNavHubAction.saved),
     for (final tab in BottomNavTab.values)
       if (!onBar.contains(tab) && gates.offers(tab) && isAvailable(tab))
         BottomNavHubTile.tab(tab),

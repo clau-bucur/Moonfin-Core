@@ -44,12 +44,38 @@ Media3, mpv, subtitle fonts, HDR/audio capability probes, audio focus, media
 buttons, Watch Next and video WebView trailers remain. Removing these would
 change video compatibility, not merely remove unrelated features.
 
-The shared offline database, download/settings types, background downloader and
-local-notification packages still remain behind the disabled feature paths.
-They require a separate extraction from shared item, connectivity and settings
-code. Some non-video pure Dart models/helpers also remain. Transitive plugin
-packages may still describe other platforms even though their app runners and
-direct integrations have been removed. No frame-rate gain is assumed.
+## Third cleanup and browsing changes
+
+- Removed the offline database/catalog, saved-media screens, media storage
+  helpers, download engines, subscriptions, background workers and local
+  notification infrastructure. Playback and clients now use the server directly.
+- Removed Drift, SQLite FFI/native bindings, background_downloader and local
+  notification dependencies, plus the native Media3 Transformer exporter.
+  Artwork/theme/message caches remain; flutter_cache_manager still uses sqflite.
+- Modern Home cards crop the same wide artwork while collapsed, then reveal it
+  as the card expands. The decode size stays fixed through the transition.
+- Held D-pad movement keeps the row expanded. Vertical navigation retargets a
+  spring using its current velocity; reserved focus space keeps row heights fixed.
+- Home coalesces section arrivals within a frame and retains bounded loading.
+  Details publish their seasons/episodes or initial collection/playlist members
+  with the first ready state. Optional recommendations and ratings still load
+  asynchronously, so this does not eliminate every later content update.
+- Root Back shows a two-second “Press back again to exit” toast. A second
+  separate press exits; changing route clears it. The modal exit prompt is gone.
+- Restart is available in the video player's secondary controls for movies and
+  episodes. It seeks the current stream to zero and resumes without replacing
+  its queue or track selections.
+- Media3's initial streaming threshold is 500 ms instead of 1,000 ms. Steady
+  state, rebuffer and HDMI mode-switch settling safeguards remain. Diagnostics
+  record source-to-audio-track and source-to-audio-position-advancing times;
+  these are not a measurement of receiver audibility.
+
+The receiver and perceived-motion improvements remain experimental until tested
+on the Shield. Device installation, launch and testing require the user's next
+explicit OK. Local builds and unit/widget/JVM checks do not access the Shield.
+
+Some non-video shared Dart models/helpers and transitive platform metadata
+remain. No frame-rate or audible-startup improvement is claimed from APK size.
 
 ## Build an isolated test app
 

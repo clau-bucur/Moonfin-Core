@@ -8,7 +8,6 @@ import '../../../preference/preference_constants.dart';
 import '../../../preference/seerr_preferences.dart';
 import '../../navigation/destinations.dart';
 import '../../navigation/home_refresh_bus.dart';
-import '../../screens/downloads/downloads_panel.dart';
 import '../../screens/watch_party/watch_together_route.dart';
 import '../adaptive/sf_symbol.dart';
 import '../remote_control_dialog.dart';
@@ -38,7 +37,6 @@ String bottomNavHubActionLabel(
   bool silo = false,
 }) =>
     switch (action) {
-      BottomNavHubAction.saved => l10n.savedMedia,
       BottomNavHubAction.shuffle => l10n.shuffle,
       BottomNavHubAction.syncPlay => l10n.syncPlay,
       BottomNavHubAction.quickConnect =>
@@ -64,7 +62,6 @@ String bottomNavbarStyleHint(AppLocalizations l10n, BottomNavbarStyle style) =>
     };
 
 IconData bottomNavHubActionIcon(BottomNavHubAction action) => switch (action) {
-      BottomNavHubAction.saved => Icons.download_for_offline,
       BottomNavHubAction.shuffle => Icons.shuffle_rounded,
       BottomNavHubAction.syncPlay => Icons.groups_rounded,
       BottomNavHubAction.quickConnect => Icons.devices,
@@ -171,8 +168,6 @@ void openBottomNavHome(BuildContext context, {required bool alreadyHome}) {
 
 void runBottomNavHubAction(BuildContext context, BottomNavHubAction action) {
   switch (action) {
-    case BottomNavHubAction.saved:
-      showDownloadsDialog(context);
     case BottomNavHubAction.shuffle:
       showShuffleOverlay(context);
     case BottomNavHubAction.syncPlay:

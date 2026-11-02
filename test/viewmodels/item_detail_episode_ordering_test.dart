@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
@@ -69,6 +70,28 @@ void main() {
       },
     );
   }
+
+  test('first ready series state includes its seasons without an intermediate empty page', () async {
+    final seasons = Completer<Map<String, dynamic>>();
+    when(() => itemsApi.getItem('series-1', mediaSourceId: any(named: 'mediaSourceId')))
+      .thenAnswer((_) async => {'Id': 'series-1', 'Type': 'Series'});
+    when(() => itemsApi.getSeasons('series-1', fields: any(named: 'fields')))
+      .thenAnswer((_) => seasons.future);
+    final vm = createViewModel('series-1');
+    addTearDown(vm.dispose);
+    final readyRows = <List<String>>[];
+    vm.addListener(() {
+      if (vm.state == ItemDetailState.ready) readyRows.add(vm.seasons.map((s) => s.id).toList());
+    });
+    final loading = vm.load();
+    await Future<void>.delayed(Duration.zero);
+    expect(vm.state, ItemDetailState.loading);
+    expect(readyRows, isEmpty);
+    seasons.complete({'Items': [{'Id': 'season-1', 'Type': 'Season'}]});
+    await loading;
+    expect(readyRows, isNotEmpty);
+    expect(readyRows.every((rows) => rows.contains('season-1')), isTrue);
+  });
 
   group('ItemDetailViewModel.compareEpisodes', () {
     test('sorts by season first', () {

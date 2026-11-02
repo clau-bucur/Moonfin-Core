@@ -15,12 +15,6 @@ import 'background/watch_next_background.dart' as watch_next_bg;
 import 'data/services/carplay_service.dart';
 import 'data/services/cast/airplay_command_bridge.dart';
 
-import 'background/auto_download_background.dart';
-import 'background/auto_download_background_main.dart' as auto_download_bg;
-import 'data/services/auto_download_service.dart';
-import 'data/services/background_download_coordinator.dart';
-import 'data/services/download_notification_service.dart';
-import 'data/services/seerr_notification_service.dart';
 import 'data/services/media_server_client_factory.dart';
 import 'data/services/crash_report_service.dart';
 import 'data/services/log_service.dart';
@@ -38,7 +32,6 @@ import 'playback/device_capability_cache.dart';
 import 'playback/display_hdr_probe.dart';
 import 'playback/media_browse_service.dart';
 import 'playback/playback_lifecycle_handler.dart';
-import 'platform/background_refresh.dart';
 import 'platform/web_runtime_config.dart';
 import 'preference/preference_constants.dart';
 import 'preference/user_preferences.dart';
@@ -639,17 +632,6 @@ void _sweepImageCache(UserPreferences prefs, {bool throttle = false}) {
   }
 }
 
-/// Runs an auto-download check when the app comes back to the foreground;
-/// the service throttles resumes that follow a recent check.
-class _AutoDownloadResumeObserver with WidgetsBindingObserver {
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state != AppLifecycleState.resumed) return;
-    if (!GetIt.instance.isRegistered<AutoDownloadService>()) return;
-    GetIt.instance<AutoDownloadService>().onAppResumed();
-  }
-}
-
 class _ImageCacheSweepObserver with WidgetsBindingObserver {
   _ImageCacheSweepObserver(this._prefs);
 
@@ -672,12 +654,7 @@ class _ImageCacheSweepObserver with WidgetsBindingObserver {
   }
 }
 
-/// Re-probes display, decoder and audio capabilities when the app comes back
-/// to the foreground, which on a TV covers being woken from standby, the
-/// moment the HDMI chain has just renegotiated, and is also the first moment
-/// an engine that launched without an Activity has a platform channel to ask.
-/// Only answers that carry something are applied here: an empty answer
-/// mid-renegotiation must not clobber a good snapshot.
+
 class _CapabilityRefreshObserver with WidgetsBindingObserver {
   static const _throttle = Duration(seconds: 30);
   DateTime? _lastRefresh;
@@ -763,11 +740,6 @@ class _PreferenceWriteFlushObserver with WidgetsBindingObserver {
 Future<void> watchNextBackgroundMain() =>
     watch_next_bg.watchNextBackgroundMain();
 
-/// Entry for the Android auto-download worker's headless engine.
-@pragma('vm:entry-point')
-Future<void> autoDownloadBackgroundMain() =>
-    auto_download_bg.autoDownloadBackgroundMain();
-
 void main() async {
   configureHttpOverrides();
   ScrollSensitivityBinding.ensureInitialized();
@@ -846,12 +818,6 @@ void main() async {
   await configureDependencies();
   _installCrashHandlers();
   if (PlatformDetection.isAndroid) _startProcessExitReporter();
-  // When the system runs the auto-download refresh task against this
-  // engine, the native side retries its call until this handler is bound.
-  if (AutoDownloadService.isSupportedPlatform) {
-    BackgroundRefresh.instance.bind(runAutoDownloadBackgroundRefresh);
-  }
-
   // Registered before runApp so a CarPlay-only launch (no window scene, no
   // widgets) can browse and start playback.
   if (PlatformDetection.isIOS &&
@@ -870,9 +836,6 @@ void main() async {
   WidgetsBinding.instance.addObserver(_PreferenceWriteFlushObserver(prefs));
   WidgetsBinding.instance.addObserver(_ImageCacheSweepObserver(prefs));
   WidgetsBinding.instance.addObserver(_CapabilityRefreshObserver());
-  if (!VideoAppProfile.enabled) {
-    WidgetsBinding.instance.addObserver(_AutoDownloadResumeObserver());
-  }
   WidgetsBinding.instance.addPostFrameCallback((_) => _sweepImageCache(prefs));
 
   GetIt.instance<PlaybackManager>().queueService.queueChangedStream.listen((_) {
@@ -892,8 +855,7 @@ void main() async {
   await ThemeStoreService(GetIt.instance<StoragePathService>())
       .loadAndRegister();
 
-  // Audio and notification services are only needed once playback or a
-  // download can happen, so they initialize after the first frame.
+  // Playback integrations initialize after the first frame.
   WidgetsBinding.instance.addPostFrameCallback((_) {
     unawaited(_initDeferredStartupServices(prefs));
   });
@@ -947,20 +909,6 @@ Future<void> _initDeferredStartupServices(UserPreferences prefs) async {
 
   await _detectAndApplyAudioCapabilities(prefs);
 
-  if (!VideoAppProfile.enabled) {
-    try {
-      await GetIt.instance<DownloadNotificationService>().initialize();
-    } catch (_) {}
-
-    try {
-      await GetIt.instance<BackgroundDownloadCoordinator>().ensureInitialized();
-    } catch (_) {}
-
-    try {
-      await GetIt.instance<SeerrNotificationService>().initialize();
-      await GetIt.instance<SeerrNotificationService>().handleColdStart();
-    } catch (_) {}
-  }
 
   // Audio session ownership differs per platform:
   // - Android: MoonfinAudioHandler acquires audio focus per playback, and skips

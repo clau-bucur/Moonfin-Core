@@ -42,10 +42,10 @@ class TrackChoices {
     String preferredSecondaryLanguage = '',
   }) async {
     final streamType = audio ? 'Audio' : 'Subtitle';
-    final offlineMeta = manager.currentOfflineMetadata;
+    final itemMetadata = manager.currentItemMetadata;
     final allStreams =
         manager.currentResolution?.mediaStreams ??
-        (offlineMeta?['MediaStreams'] as List?)?.cast<Map<String, dynamic>>() ??
+        (itemMetadata?['MediaStreams'] as List?)?.cast<Map<String, dynamic>>() ??
         const <Map<String, dynamic>>[];
     final streams = allStreams.where((s) => s['Type'] == streamType).toList();
     final optionStreams = audio

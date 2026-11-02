@@ -566,7 +566,7 @@ class _VideoMiniPlayerBarState extends State<_VideoMiniPlayerBar> {
         seriesPage = Destinations.item(seriesId, serverId: item.serverId);
       }
     } else {
-      final meta = item is Map ? item : _manager.currentOfflineMetadata;
+      final meta = item is Map ? item : _manager.currentItemMetadata;
       name = meta?['Name'] as String?;
       series = meta?['SeriesName'] as String?;
       season = meta?['ParentIndexNumber'] as int?;

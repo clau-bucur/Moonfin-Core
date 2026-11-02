@@ -100,7 +100,6 @@ void main() {
       segmentJson(id: 'intro', type: 'Intro', startMs: 5000, endMs: 10000),
     ];
     GetIt.instance.registerSingleton<MediaServerClient>(client);
-    when(() => manager.isOfflinePlayback).thenReturn(false);
     when(() => manager.isTranscodeForced).thenReturn(false);
     when(() => manager.playbackDeferredToExternalPlayer).thenReturn(false);
     when(() => manager.seekTo(any())).thenAnswer((_) async {});

@@ -44,10 +44,9 @@ import '../../../playback/mpv_player_registry.dart';
 import '../../../preference/home_section_config.dart';
 import '../../../preference/preference_constants.dart';
 import '../../../preference/user_preferences.dart';
-import '../../widgets/exit_confirmation_dialog.dart';
+import '../../widgets/back_to_exit.dart';
 import '../../widgets/overlay_sheet.dart';
 import '../../widgets/quick_return_wrapper.dart';
-import '../../../util/app_exit.dart';
 import '../../../util/global_shortcut_focus.dart';
 import '../../widgets/focus/context_menu_sheet.dart';
 import '../../widgets/focus/locked_focus_row.dart';
@@ -89,6 +88,7 @@ import '../../../util/game_library.dart';
 import 'home_row_prefetch.dart';
 import 'home_row_shift.dart';
 import 'home_view_model.dart';
+import '../../widgets/focus/tv_scroll_controller.dart';
 import '../../widgets/seerr/seerr_genre_label.dart';
 import '../../widgets/skeleton/skeleton_home_row.dart';
 import '../../widgets/skeleton/skeleton_shimmer.dart';
@@ -589,7 +589,7 @@ class _HomeShellState extends State<_HomeShell>
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
-        _showExitConfirmation(context);
+        _requestExit(context);
       },
       child: Scaffold(
         backgroundColor: _homeBackground,
@@ -661,13 +661,9 @@ class _HomeShellState extends State<_HomeShell>
     );
   }
 
-  Future<void> _showExitConfirmation(BuildContext context) async {
-    if (!_userPrefs.get(UserPreferences.confirmExit)) {
-      await AppExit.closeApp();
-      return;
-    }
-    final navContext = appRouter.routerDelegate.navigatorKey.currentContext;
-    await showExitConfirmationDialog(navContext ?? context);
+  Future<void> _requestExit(BuildContext context) async {
+    final navContext = appRouter.routerDelegate.navigatorKey.currentState?.overlay?.context;
+    await requestBackToExit(navContext ?? context);
   }
 }
 
@@ -886,10 +882,7 @@ class _ContentRowsState extends State<_ContentRows>
   static const double _kHomeRowLabelInset = 16.0;
   static const double _kHomeRowTrailingInset = 20.0;
   static const double _focusedRowExtraSpacing = 20.0;
-  static const Duration _focusedRowSpacingDuration = Duration(
-    milliseconds: 200,
-  );
-  final _scrollController = ScrollController();
+  final _scrollController = TvScrollController();
   final _mediaBarFocusNode = FocusNode(debugLabel: 'home_media_bar_focus');
   final _playbackManager = GetIt.instance<PlaybackManager>();
   final _audioArbiter = GetIt.instance<PlaybackArbiter>();
@@ -1547,9 +1540,7 @@ class _ContentRowsState extends State<_ContentRows>
     for (var i = 0; i < rowExtents.length; i++) {
       rowTopOffsets.add(currentTop);
       currentTop += rowExtents[i];
-      if (i == _activeFocusedRowIndex) {
-        currentTop += focusedRowSpacing;
-      }
+      currentTop += focusedRowSpacing;
     }
 
     _invalidateRowTargetOffsetCache();
@@ -5104,18 +5095,12 @@ class _ContentRowsState extends State<_ContentRows>
 
                     final itemWidget = Padding(
                       padding: EdgeInsets.only(left: rowLeftInset),
-                      child: ValueListenableBuilder<int?>(
-                        valueListenable: _activeFocusedRowNotifier,
-                        builder: (context, activeRowIndex, _) {
-                          return AnimatedPadding(
-                            duration: _focusedRowSpacingDuration,
-                            curve: Curves.easeOut,
+                      child: Padding(
                             padding: EdgeInsets.symmetric(
                               vertical:
                                   (PlatformDetection.isTV &&
                                       !fullScreenRows &&
-                                      !showInfoOverlay &&
-                                      rowIndex == activeRowIndex)
+                                      !showInfoOverlay)
                                   ? _focusedRowExtraSpacing
                                   : 0,
                             ),
@@ -5132,9 +5117,7 @@ class _ContentRowsState extends State<_ContentRows>
                                 );
                               },
                             ),
-                          );
-                        },
-                      ),
+                          ),
                     );
                     if (lockRowHeight) {
                       return SizedBox(
@@ -5621,7 +5604,7 @@ class _ContentRowsState extends State<_ContentRows>
             late final double ar;
             late final double width;
             late final String? imageUrl;
-            String? v2PosterUrl;
+            double? v2SourceAspect;
             final canUseExpandedV2Card =
                 isRowsV2 &&
                 v2Open > 0 &&
@@ -5650,7 +5633,7 @@ class _ContentRowsState extends State<_ContentRows>
                 ar = !canUseExpandedV2Card
                     ? v2PortraitAspect
                     : (glide == null ? v2FocusedAspect : width / v2ImageHeight);
-                final posterUrl = v2PosterUrl = _cachedRowImageUrl(
+                final posterUrl = _cachedRowImageUrl(
                   item,
                   imageApi,
                   v2ImageHeight,
@@ -5659,16 +5642,13 @@ class _ContentRowsState extends State<_ContentRows>
                   requestScale,
                   isMyMediaRow: row.rowType == HomeRowType.libraryTiles,
                 );
-                imageUrl = canUseExpandedV2Card
-                    ? (_resolveV2FocusedImageUrl(
-                            item,
-                            imageApi,
-                            v2ImageHeight,
-                            useSeriesThumbs,
-                            requestScale,
-                          ) ??
-                          posterUrl)
-                    : posterUrl;
+                // One image and one decode throughout the width animation.
+                // Cover-fit crops it when collapsed and reveals it on focus.
+                final wideUrl = _resolveV2FocusedImageUrl(
+                  item, imageApi, v2ImageHeight, useSeriesThumbs, requestScale,
+                );
+                imageUrl = wideUrl ?? posterUrl;
+                v2SourceAspect = wideUrl != null ? v2FocusedAspect : v2PortraitAspect;
               }
             } else {
               final image = _unfocusedCardImage(
@@ -5826,34 +5806,7 @@ class _ContentRowsState extends State<_ContentRows>
                               ),
                             ]
                           : const <Widget>[],
-                      imageUnderlays: [
-                        if (glide != null &&
-                            canUseExpandedV2Card &&
-                            v2PosterUrl != null &&
-                            v2PosterUrl != imageUrl &&
-                            modernPosterOpacity(v2Open) > 0)
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            bottom: 0,
-                            width: v2PortraitWidth,
-                            child: Opacity(
-                              opacity: modernPosterOpacity(v2Open),
-                              child: BoundedNetworkImage(
-                                imageUrl: v2PosterUrl,
-                                fit: BoxFit.cover,
-                                fadeInDuration: Duration.zero,
-                                maxWidth: MediaCard.decodeMaxWidthFor(
-                                  v2PortraitAspect,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                      imageSourceAspectRatio:
-                          glide != null && canUseExpandedV2Card
-                          ? v2FocusedAspect
-                          : null,
+                      imageSourceAspectRatio: v2SourceAspect,
                       subtitle: cardSubtitle,
                       subtitleWidget: cardSubtitleWidget,
                       imageUrl: imageUrl,
@@ -6629,7 +6582,7 @@ class _ContentRowsState extends State<_ContentRows>
   /// The image an unfocused card in [row] paints for [item], with the width
   /// it paints it at. The item builder and the row prefetch both read this,
   /// so the prefetch always warms the entry the card looks up.
-  ({String? url, double width, double aspectRatio}) _unfocusedCardImage(
+  ({String? url, double width, double aspectRatio, double sourceAspectRatio}) _unfocusedCardImage(
     HomeRow row,
     AggregatedItem item, {
     required UserPreferences prefs,
@@ -6650,7 +6603,11 @@ class _ContentRowsState extends State<_ContentRows>
     if (isRowsV2 && !isModernMyMediaStatic) {
       final v2ImageHeight = modernImageHeight(posterSize, platformScale);
       final aspect = row.isAudio ? 1.0 : 2 / 3;
-      final url = _cachedRowImageUrl(
+      final wideUrl = row.isAudio ? null : _resolveV2FocusedImageUrl(
+        item, imageApi, v2ImageHeight, useSeriesThumbs, requestScale,
+        isPrefetch: true,
+      );
+      final url = wideUrl ?? _cachedRowImageUrl(
         item,
         imageApi,
         v2ImageHeight,
@@ -6659,7 +6616,8 @@ class _ContentRowsState extends State<_ContentRows>
         requestScale,
         isMyMediaRow: isMyMediaRow,
       );
-      return (url: url, width: v2ImageHeight * aspect, aspectRatio: aspect);
+      return (url: url, width: v2ImageHeight * aspect, aspectRatio: aspect,
+        sourceAspectRatio: wideUrl != null ? 16 / 9 : aspect);
     }
     final ar = _aspectRatioForRowItem(item, row, rowImageType);
     final height =
@@ -6676,7 +6634,7 @@ class _ContentRowsState extends State<_ContentRows>
       requestScale,
       isMyMediaRow: isMyMediaRow,
     );
-    return (url: url, width: height * ar, aspectRatio: ar);
+    return (url: url, width: height * ar, aspectRatio: ar, sourceAspectRatio: ar);
   }
 
   void _scheduleRowPrefetch() {
@@ -6734,7 +6692,7 @@ class _ContentRowsState extends State<_ContentRows>
         row.rowType != HomeRowType.liveTv &&
         row.rowType != HomeRowType.libraryTilesSmall;
 
-    ({String? url, double width, double aspectRatio}) imageOf(
+    ({String? url, double width, double aspectRatio, double sourceAspectRatio}) imageOf(
       HomeRow row,
       AggregatedItem item,
     ) => _unfocusedCardImage(
@@ -6774,7 +6732,9 @@ class _ContentRowsState extends State<_ContentRows>
             context,
             url,
             layoutWidth: image.width,
-            maxWidth: MediaCard.decodeMaxWidthFor(image.aspectRatio),
+            layoutHeight: image.width / image.aspectRatio,
+            sourceAspectRatio: image.sourceAspectRatio,
+            maxWidth: MediaCard.decodeMaxWidthFor(image.sourceAspectRatio),
             priority: ImageFetchPriority.low,
           ).whenComplete(() => _rowPrefetchInFlight--).catchError((_) {
             _rowPrefetchedUrls.remove(url);

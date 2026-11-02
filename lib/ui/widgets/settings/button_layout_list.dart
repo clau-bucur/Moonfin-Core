@@ -93,9 +93,6 @@ class _ButtonLayoutListState extends State<ButtonLayoutList> {
     } else if (!ids.contains(entry.id)) {
       ids.add(entry.id);
     }
-    if (entry.id == 'download' && PlatformDetection.isTV) {
-      unawaited(_prefs.set(UserPreferences.tvOfflineDownloads, shown));
-    }
     unawaited(
       _prefs
           .set(widget.layout.hiddenPreference, ids.join(','))

@@ -72,7 +72,7 @@ void main() {
     expect(card(tester, 6).width, 40);
   });
 
-  testWidgets('holding a direction folds the row until the key comes up', (
+  testWidgets('holding a direction keeps a grown card without collapsing the row', (
     tester,
   ) async {
     await pumpRow(tester);
@@ -84,7 +84,7 @@ void main() {
     }
     await tester.pumpAndSettle();
     expect(card(tester, 5).left, 0);
-    expect(card(tester, 5).width, 40);
+    expect(card(tester, 5).width, 120);
 
     await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowRight);
     await tester.pumpAndSettle();

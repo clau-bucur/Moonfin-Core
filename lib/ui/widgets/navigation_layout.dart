@@ -7,7 +7,6 @@ import '../../preference/user_preferences.dart';
 import '../../util/platform_detection.dart';
 import '../../util/overlay_color_palette.dart';
 import 'bottom_nav/bottom_navbar.dart';
-import 'download_progress_bar.dart';
 import 'left_sidebar.dart';
 import 'top_toolbar.dart';
 
@@ -372,7 +371,7 @@ class _NavigationLayoutState extends State<NavigationLayout>
                 header: MediaQuery.removePadding(
                   context: context,
                   removeBottom: true,
-                  child: const DownloadProgressBar(),
+                  child: const SizedBox.shrink(),
                 ),
               ),
             ),
@@ -485,7 +484,7 @@ class _NavigationLayoutState extends State<NavigationLayout>
             ],
           ),
         ),
-        const DownloadProgressBar(),
+        const SizedBox.shrink(),
       ],
     );
   }
@@ -536,7 +535,7 @@ class _NavigationLayoutState extends State<NavigationLayout>
               ],
             ),
           ),
-          const DownloadProgressBar(),
+          const SizedBox.shrink(),
         ],
       );
     }
@@ -553,7 +552,7 @@ class _NavigationLayoutState extends State<NavigationLayout>
             ],
           ),
         ),
-        const DownloadProgressBar(),
+        const SizedBox.shrink(),
       ],
     );
   }

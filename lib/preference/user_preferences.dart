@@ -388,19 +388,6 @@ class UserPreferences extends ChangeNotifier {
   }
 
   static final Set<String> _scopedPreferenceKeys = {
-    // Per account but never synced: the result of this device's last
-    // subscription check, and whether that account has already been told
-    // the device is too full to keep downloading.
-    'auto_download_last_run',
-    'auto_download_storage_notice_shown',
-    // Per account but never synced: smart downloads follows that account's
-    // watch history, so its switch, its number and the markers the checks
-    // keep against that history belong to it.
-    'smart_downloads_enabled',
-    'smart_downloads_keep_ready',
-    'smart_downloads_enabled_at',
-    'smart_downloads_played_since',
-    'smart_downloads_applied_keep_ready',
     // Per account but never synced: the profile this device syncs with.
     'pref_plugin_sync_profile',
     // Newly synced settings. Anything that goes to the server profile has to be stored
@@ -417,14 +404,6 @@ class UserPreferences extends ChangeNotifier {
     'detailMetadataOrderDesktop',
     'detailMetadataOrderMobile',
     'detailMetadataOrderTv',
-    'download_default_quality',
-    'auto_download_enabled',
-    'auto_download_keep_unwatched',
-    'auto_download_delete_after_hours',
-    'auto_download_background_refresh',
-    'download_report_as_activity',
-    'download_storage_limit_mb',
-    'download_wifi_only',
     'hiddenDetailButtonsDesktop',
     'hiddenDetailButtonsMobile',
     'hiddenDetailButtonsTv',
@@ -657,7 +636,6 @@ class UserPreferences extends ChangeNotifier {
     'pref_show_favorites_button',
     'pref_show_live_tv_button',
     'pref_show_syncplay_button',
-    'pref_show_downloads_button',
     'pref_show_libraries_in_toolbar',
     'pref_show_libraries_individually',
     'pref_navbar_always_expanded',
@@ -1985,10 +1963,6 @@ class UserPreferences extends ChangeNotifier {
     defaultValue: false,
   );
 
-  static final showDownloadsButton = Preference(
-    key: 'pref_show_downloads_button',
-    defaultValue: true,
-  );
 
   static final showAlphabeticalFilters = Preference(
     key: 'pref_show_alphabetical_filters',
@@ -3974,222 +3948,11 @@ class UserPreferences extends ChangeNotifier {
     defaultValue: true,
   );
 
-  static final defaultDownloadQuality = Preference(
-    key: 'download_default_quality',
-    defaultValue: 'original',
-  );
-
-  static final downloadWifiOnly = Preference(
-    key: 'download_wifi_only',
-    defaultValue: false,
-  );
-
-  /// Master switch for auto-download subscriptions. Off pauses every
-  /// subscription without forgetting it.
-  static final autoDownloadEnabled = Preference(
-    key: 'auto_download_enabled',
-    defaultValue: true,
-  );
-
-  /// Smart downloads: finishing an episode of a series, streamed or
-  /// downloaded, downloads the next ones, and a downloaded episode is
-  /// deleted once watched.
-  static final smartDownloadsEnabled = Preference(
-    key: 'smart_downloads_enabled',
-    defaultValue: false,
-  );
-
-  /// How many unwatched episodes smart downloads keeps downloaded after the
-  /// furthest one watched.
-  static final smartDownloadsKeepReady = Preference(
-    key: 'smart_downloads_keep_ready',
-    defaultValue: 1,
-  );
-
-  /// ISO time smart downloads was turned on; only watches after it count,
-  /// so turning it on doesn't act on the whole watch history. Empty while
-  /// off. Written by AutoDownloadService.
-  static final smartDownloadsEnabledAt = Preference(
-    key: 'smart_downloads_enabled_at',
-    defaultValue: '',
-  );
-
-  /// ISO time of the latest finished episode a check has acted on, so each
-  /// one tops its series up once. Written by AutoDownloadService.
-  static final smartDownloadsPlayedSince = Preference(
-    key: 'smart_downloads_played_since',
-    defaultValue: '',
-  );
-
-  /// The episodes to keep ready the last check filled series up to, so
-  /// raising it tops up the series being watched without waiting for their
-  /// next watch. 0 while off, read as 1. Written by AutoDownloadService.
-  static final smartDownloadsAppliedKeepReady = Preference(
-    key: 'smart_downloads_applied_keep_ready',
-    defaultValue: 0,
-  );
-
-  /// How many unwatched episodes a subscription keeps downloaded or in
-  /// flight at once. 0 means no cap.
-  static final autoDownloadKeepUnwatched = Preference(
-    key: 'auto_download_keep_unwatched',
-    defaultValue: 3,
-  );
-
-  /// Hours after an auto-downloaded episode was watched before it is
-  /// deleted: 0 right away, -1 never.
-  static final autoDownloadDeleteAfterHours = Preference(
-    key: 'auto_download_delete_after_hours',
-    defaultValue: -1,
-  );
-
-  /// Let the OS wake the app in the background to run subscription checks
-  /// (iOS Background App Refresh).
-  static final autoDownloadBackgroundRefresh = Preference(
-    key: 'auto_download_background_refresh',
-    defaultValue: true,
-  );
-
-  /// JSON summary of the most recent subscription check, for the settings
-  /// screen. Written by AutoDownloadService.
-  static final autoDownloadLastRun = Preference(
-    key: 'auto_download_last_run',
-    defaultValue: '',
-  );
-
-  /// Whether the "not enough storage" notice is out: set when a check
-  /// first holds episodes back, cleared by a check that fits everything,
-  /// so a full phone is announced once rather than every few hours.
-  /// Written by AutoDownloadService.
-  static final autoDownloadStorageNoticeShown = Preference(
-    key: 'auto_download_storage_notice_shown',
-    defaultValue: false,
-  );
-
-  // Android TV only: the detail page keeps its download, delete, and
-  // download-all actions hidden until the user opts in from
-  // Settings -> Playback -> Offline Downloads. Other platforms offer
-  // downloads unconditionally, and nothing about existing downloads or the
-  // management screens is gated by this.
-  static final tvOfflineDownloads = Preference(
-    key: 'tv_offline_downloads',
-    defaultValue: false,
-  );
-
-  // JSON-encoded list of server base URLs whose TLS certificate the native
-  // download engine rejected (typically self-signed). Downloads for these
-  // servers run on the legacy in-process engine, which accepts any cert.
-  static final legacyDownloadEngineServers = Preference(
-    key: 'download_legacy_engine_servers',
-    defaultValue: '',
-  );
-
-  static final downloadStorageLimitMb = Preference(
-    key: 'download_storage_limit_mb',
-    defaultValue: 0,
-  );
-
-  /// Hours after an episode or movie the user downloaded by hand was watched
-  /// before it is removed: 0 right away, -1 never. Smart downloads and
-  /// followed series remove what they queued by their own settings. One
-  /// setting for the device, like the downloads themselves.
-  static final downloadRemoveWatchedAfterHours = Preference(
-    key: 'download_remove_watched_after_hours',
-    defaultValue: -1,
-  );
-
-  /// When the remove-watched setting was last turned on. Only what is watched
-  /// after it is removed, so turning it on never empties the downloads the
-  /// user already watched and kept.
-  static final downloadRemoveWatchedSince = Preference(
-    key: 'download_remove_watched_since',
-    defaultValue: '',
-  );
-
-  /// Sets the remove-watched delay, stamping when it was turned on.
-  Future<void> setRemoveWatchedAfterHours(int hours) async {
-    final wasOff = get(downloadRemoveWatchedAfterHours) < 0;
-    if (wasOff && hours >= 0) {
-      await set(
-        downloadRemoveWatchedSince,
-        DateTime.now().toUtc().toIso8601String(),
-      );
-    }
-    await set(downloadRemoveWatchedAfterHours, hours);
-  }
-
-  /// Downloads the remove-watched rules leave alone, as `serverId:itemId`
-  /// entries. A series id keeps all of its episodes. Per server like the
-  /// downloads, not per account.
-  static final downloadKeptIds = Preference<List<String>>(
-    key: 'download_kept_ids',
-    defaultValue: const [],
-  );
-
-  static String _downloadKeptKey(String serverId, String itemId) =>
-      '$serverId:$itemId';
-
-  /// The kept item and series ids of [serverId].
-  Set<String> downloadKeptIdsFor(String serverId) {
-    final prefix = '$serverId:';
-    return {
-      for (final key in get(downloadKeptIds))
-        if (key.startsWith(prefix)) key.substring(prefix.length),
-    };
-  }
-
-  bool isDownloadKept(String serverId, String itemId) =>
-      get(downloadKeptIds).contains(_downloadKeptKey(serverId, itemId));
-
-  Future<void> setDownloadKept(
-    String serverId,
-    String itemId, {
-    required bool keep,
-  }) async {
-    final keys = get(downloadKeptIds).toSet();
-    final key = _downloadKeptKey(serverId, itemId);
-    final changed = keep ? keys.add(key) : keys.remove(key);
-    if (changed) await set(downloadKeptIds, keys.toList()..sort());
-  }
-
-  /// Drops [itemId] of [serverId] from the Keep list once its download is
-  /// deleted, so the list does not outgrow what is on disk.
-  Future<void> forgetDownloadKept(String serverId, String itemId) =>
-      setDownloadKept(serverId, itemId, keep: false);
-
-  static final downloadConcurrentCount = Preference(
-    key: 'download_concurrent_count',
-    defaultValue: 2,
-  );
-
-  /// The user's download concurrency, clamped to the supported range. The
-  /// app-level scheduler and the native engine's holding queue must both use
-  /// this single resolver so their limits can never drift apart.
-  int get effectiveDownloadConcurrentCount =>
-      get(downloadConcurrentCount).clamp(1, 8).toInt();
-
-  static final reportDownloadsAsActivity = Preference(
-    key: 'download_report_as_activity',
-    defaultValue: true,
-  );
-
   // Byte budget for the on-disk image cache, in megabytes. 0 disables the
   // budget and falls back to the cache manager's object-count cap.
   static final imageCacheLimitMb = Preference(
     key: 'image_cache_limit_mb',
     defaultValue: 350,
-  );
-
-  static final customDownloadPath = Preference(
-    key: 'download_custom_path',
-    defaultValue: '',
-  );
-
-  // macOS only: base64 security-scoped bookmark for the custom download folder,
-  // so the sandboxed app can regain write access to it across launches.
-  static final customDownloadPathBookmark = Preference(
-    key: 'download_custom_path_bookmark',
-    defaultValue: '',
   );
 
   static final windowWidth = Preference(key: 'window_width', defaultValue: 0.0);

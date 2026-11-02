@@ -6,7 +6,7 @@ import 'package:server_core/server_core.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../util/error_message.dart';
-import '../../../../util/download_utils.dart';
+import '../../../../util/media_format.dart';
 import '../../../navigation/destinations.dart';
 import '../widgets/admin_form_styles.dart';
 

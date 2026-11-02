@@ -33,8 +33,6 @@ import '../navigation/home_refresh_bus.dart';
 import '../navigation/route_lifecycle_observer.dart';
 import 'navigation_layout.dart';
 import 'settings/settings_panel.dart';
-import '../screens/downloads/downloads_panel.dart';
-import 'downloads_nav_slot.dart';
 import 'friends_nav_slot.dart';
 import '../screens/watch_party/watch_together_route.dart';
 import '../screens/settings/settings_side_panel.dart';
@@ -873,27 +871,6 @@ class _LeftSidebarState extends State<LeftSidebar> with RouteAware {
     );
   }
 
-  /// The downloads row, or nothing while there is nothing saved. The nav
-  /// colour is passed in so the caller decides which palette slot it takes.
-  Widget _downloadsSidebarItem({
-    required Color? navColor,
-    required String label,
-  }) {
-    return DownloadsNavSlot(
-      builder: (context) => _SidebarItem(
-        key: const ValueKey('sidebar-downloads'),
-        icon: Icons.download_for_offline,
-        label: label,
-        baseColor: navColor,
-        showLabel: _showLabels,
-        onPressed: () {
-          _onNavigate();
-          showDownloadsDialog(context);
-        },
-      ),
-    );
-  }
-
   /// The messages row, or nothing when there is nothing to show. The nav colour
   /// is passed in so the caller decides which palette slot it takes.
   Widget _serverMessagesSidebarItem({
@@ -1200,14 +1177,6 @@ class _LeftSidebarState extends State<LeftSidebar> with RouteAware {
                         : const SizedBox.shrink(),
                   ),
                 ],
-                // The slot is taken here rather than inside the builder, so
-                // the rows below keep their colour whether or not anything is
-                // saved right now.
-                if (DownloadsNavSlot.isOffered())
-                  _downloadsSidebarItem(
-                    navColor: nextMainSidebarColor(),
-                    label: l10n.savedMedia,
-                  ),
                 // Only taken where the plugin has friends on, so on every
                 // other server the rows after it keep their color.
                 if (FriendsNavSlot.isOffered() && _friendsAvailable)

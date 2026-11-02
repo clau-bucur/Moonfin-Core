@@ -19,7 +19,6 @@ import 'package:moonfin/auth/repositories/user_repository.dart';
 import 'package:moonfin/auth/store/authentication_preferences.dart';
 import 'package:moonfin/auth/store/authentication_store.dart';
 import 'package:moonfin/auth/store/credential_store.dart';
-import 'package:moonfin/data/services/download_notification_service.dart';
 import 'package:moonfin/data/services/media_server_client_factory.dart';
 import 'package:moonfin/data/services/plugin_sync_service.dart';
 import 'package:moonfin/data/services/socket_handler.dart';
@@ -73,16 +72,6 @@ class _NativeApplePlayerBackend extends Fake implements NativeApplePlayerBackend
   bool get isPlayerPresented => !dismissed;
   @override
   Future<void> dismissPlayer() async => dismissed = true;
-}
-
-class _FakeNotifications extends Fake implements DownloadNotificationService {
-  final List<String> messages = [];
-
-  @override
-  Future<bool> showRemoteMessage({required String text, String? header}) async {
-    messages.add(text);
-    return true;
-  }
 }
 
 /// Records what the remote command asked playback to do.
@@ -144,7 +133,6 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late _RecordingManager manager;
-  late _FakeNotifications notifications;
   late SessionRepository repository;
 
   setUp(() async {
@@ -154,12 +142,8 @@ void main() {
     await store.init();
 
     manager = _RecordingManager();
-    notifications = _FakeNotifications();
     GetIt.instance.registerSingleton<PlaybackManager>(manager);
     GetIt.instance.registerSingleton<UserPreferences>(UserPreferences(store));
-    GetIt.instance.registerSingleton<DownloadNotificationService>(
-      notifications,
-    );
 
     repository = SessionRepository(
       _FakeAuthStore(),
@@ -1043,16 +1027,27 @@ void main() {
     expect(manager.reportedVolumes, [0, 40, 50, 1]);
   });
 
-  test('a message from another client is shown', () async {
+  testWidgets('a remote message appears as an in-app banner', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      navigatorKey: appRouter.routerDelegate.navigatorKey,
+      home: const Scaffold(),
+    ));
     await sendGeneral('DisplayMessage', args: {'Text': 'dinner is ready'});
-
-    expect(notifications.messages, ['dinner is ready']);
+    await tester.pump();
+    expect(find.text('dinner is ready'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 8));
+    await tester.pumpAndSettle();
+    expect(find.text('dinner is ready'), findsNothing);
   });
 
-  test("an empty message isn't shown at all", () async {
+  testWidgets('an empty remote message is ignored', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      navigatorKey: appRouter.routerDelegate.navigatorKey,
+      home: const Scaffold(),
+    ));
     await sendGeneral('DisplayMessage', args: {'Text': '   '});
-
-    expect(notifications.messages, isEmpty);
+    await tester.pumpAndSettle();
+    expect(find.text('   '), findsNothing);
   });
 
   // The control surfaces sent names the receiver had no case for, so every

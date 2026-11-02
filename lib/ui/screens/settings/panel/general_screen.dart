@@ -131,19 +131,6 @@ class _GeneralScreenState extends State<_GeneralScreen> {
                 ],
               ),
             ],
-            if (!PlatformDetection.isWeb) ...[
-              _SectionHeader(l10n.behavior),
-              adaptiveListSection(
-                children: [
-                  SwitchPreferenceTile(
-                    preference: UserPreferences.confirmExit,
-                    title: l10n.confirmExit,
-                    subtitle: l10n.showConfirmationBeforeExiting,
-                    icon: Icons.exit_to_app,
-                  ),
-                ],
-              ),
-            ],
             if (PlatformDetection.isAndroid) ...[
               _SectionHeader(l10n.performanceMode),
               adaptiveListSection(
