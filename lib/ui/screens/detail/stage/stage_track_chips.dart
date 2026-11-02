@@ -8,7 +8,7 @@ import '../item_detail_screen.dart';
 
 /// The audio, subtitle and version pickers as a row of chips, each showing
 /// what it's set to. Select opens the same picker the button row would.
-class StageTrackChips extends StatelessWidget {
+class StageTrackChips extends StatefulWidget {
   final List<DetailTrackChoice> choices;
   final FocusNode firstFocusNode;
   final ValueChanged<DetailButton> onOpen;
@@ -29,6 +29,26 @@ class StageTrackChips extends StatelessWidget {
   });
 
   @override
+  State<StageTrackChips> createState() => _StageTrackChipsState();
+}
+
+class _StageTrackChipsState extends State<StageTrackChips> {
+  final Map<int, FocusNode> _nodes = {};
+  FocusNode node(int index) => index == 0
+      ? widget.firstFocusNode
+      : _nodes.putIfAbsent(
+          index,
+          () => FocusNode(debugLabel: 'StageTrack:$index'),
+        );
+  @override
+  void dispose() {
+    for (final node in _nodes.values) {
+      node.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final textTheme = Theme.of(context).textTheme;
@@ -39,13 +59,25 @@ class StageTrackChips extends StatelessWidget {
       spacing: 10,
       runSpacing: 10,
       children: [
-        for (final (index, choice) in choices.indexed)
+        for (final (index, choice) in widget.choices.indexed)
           FocusableButton(
-            focusNode: index == 0 ? firstFocusNode : null,
-            onPressed: () => onOpen(choice.kind),
-            onNavigateUp: onNavigateUp,
-            onNavigateDown: onNavigateDown,
-            onNavigateLeft: index == 0 ? onLeftEdge : null,
+            focusNode: node(index),
+            autoScroll: true,
+            onPressed: () => widget.onOpen(choice.kind),
+            onNavigateUp: widget.onNavigateUp,
+            onNavigateDown: widget.onNavigateDown,
+            onNavigateLeft: () {
+              if (index == 0) {
+                widget.onLeftEdge?.call();
+              } else {
+                node(index - 1).requestFocus();
+              }
+            },
+            onNavigateRight: () {
+              if (index + 1 < widget.choices.length) {
+                node(index + 1).requestFocus();
+              }
+            },
             borderRadius: 20,
             padding: EdgeInsets.zero,
             semanticLabel: '${choice.kind.label(l10n)}: ${choice.current}',

@@ -902,6 +902,7 @@ class _ContentRowsState extends State<_ContentRows>
   // trailing row's state, killing focus if it lived there.
   final Map<String, GlobalKey> _rowKeys = {};
   final Map<String, GlobalKey> _rowContainerKeys = {};
+  final Map<String, GlobalKey> _rowSlotKeys = {};
   final Map<String, ScrollController> _rowHorizontalControllers = {};
   final Map<String, double> _rowHorizontalOffsetsById = {};
   List<HomeRow>? _cachedExtentRows;
@@ -3141,6 +3142,18 @@ class _ContentRowsState extends State<_ContentRows>
     );
   }
 
+  GlobalKey _rowSlotKey(int rowIndex) => _rowSlotKeys.putIfAbsent(
+    _rowIdForIndex(rowIndex),
+    () => GlobalKey(),
+  );
+
+  double _rowTopOffset(int rowIndex) {
+    final slot = _rowSlotKey(rowIndex).currentContext?.findRenderObject();
+    return slot is RenderBox && slot.attached && slot.hasSize
+        ? RenderAbstractViewport.of(slot).getOffsetToReveal(slot, 0).offset
+        : _rowTopOffsets[rowIndex];
+  }
+
   String _rowIdForIndex(int rowIndex) {
     final rows = widget.viewModel.rows;
     if (rowIndex >= 0 && rowIndex < rows.length) return rows[rowIndex].id;
@@ -3402,7 +3415,8 @@ class _ContentRowsState extends State<_ContentRows>
     final targetTop = useTvBand
         ? _tvTargetTopForRow(rowIndex)
         : _desktopRowFocusTargetTop();
-    return (_rowTopOffsets[rowIndex] - targetTop).clamp(
+    final top = _rowTopOffset(rowIndex);
+    return (top - targetTop).clamp(
       0.0,
       _scrollController.position.maxScrollExtent,
     );
@@ -3783,6 +3797,17 @@ class _ContentRowsState extends State<_ContentRows>
           );
         },
       );
+      // A lazy destination can only be measured once scrolling mounts it.
+      if (isCurrent()) {
+        final measured = _restingOffsetForRow(targetIndex());
+        if (measured != null && (measured - _scrollController.offset).abs() > 1) {
+          await _scrollController.animateTo(
+            measured,
+            duration: _modernRowScrollDuration,
+            curve: _focusHandoffCurve,
+          );
+        }
+      }
     } finally {
       if (generation == _verticalNavGeneration) _verticalNavInFlight = false;
     }
@@ -4052,13 +4077,7 @@ class _ContentRowsState extends State<_ContentRows>
       targets.add(0.0);
     }
     for (var i = 0; i < _rowTopOffsets.length; i++) {
-      final targetTop = _tvTargetTopForRow(i);
-      targets.add(
-        (_rowTopOffsets[i] - targetTop).clamp(
-          0.0,
-          _scrollController.position.maxScrollExtent,
-        ),
-      );
+      targets.add(_restingOffsetForRow(i)!);
     }
 
     for (var i = 0; i < targets.length; i++) {
@@ -5017,6 +5036,7 @@ class _ContentRowsState extends State<_ContentRows>
                       );
                       if (lockRowHeight) {
                         return SizedBox(
+                          key: _rowSlotKey(rowIndex),
                           height: rowExtents[rowIndex],
                           child: itemWidget,
                         );
@@ -5052,6 +5072,7 @@ class _ContentRowsState extends State<_ContentRows>
                     );
                     if (lockRowHeight) {
                       return SizedBox(
+                        key: _rowSlotKey(rowIndex),
                         height: rowExtents[rowIndex],
                         child: itemWidget,
                       );

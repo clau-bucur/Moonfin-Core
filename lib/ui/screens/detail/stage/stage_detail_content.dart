@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:moonfin_design/moonfin_design.dart';
@@ -22,6 +24,10 @@ import '../../../widgets/horizontal_scroll_section.dart';
 import '../../../widgets/live_tv/incomplete_recording.dart';
 import '../../../widgets/logo_view.dart';
 import '../../../widgets/media_card.dart';
+import '../../../widgets/offline_aware_image.dart';
+import '../../../widgets/bounded_network_image.dart';
+import '../../../widgets/skeleton/skeleton_detail_screen.dart';
+import '../../../../util/artwork_request_size.dart';
 import '../../../widgets/navigation_layout.dart';
 import '../../../widgets/rating_display.dart';
 import '../../../widgets/seerr/seerr_image_urls.dart';
@@ -108,6 +114,78 @@ class _StageDetailContentState extends State<StageDetailContent> {
   List<FocusNode> _beside = const [];
   List<FocusNode> _below = const [];
   bool _landscape = true;
+  String? _preparingItem;
+  bool _presentationReady = false;
+
+  void _preparePresentation(
+    AggregatedItem item,
+    double width,
+    DetailSectionVisibility sections,
+  ) {
+    if (_preparingItem == item.id) return;
+    _preparingItem = item.id;
+    _presentationReady = false;
+    // Mount the action state behind the loader, so its track choices are
+    // available on the first visible frame as well as the hero artwork.
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final shown = _posterItem(item);
+      final height = shown.type == 'Episode' || shown.type == 'Video'
+          ? width * 9 / 16
+          : width * 1.5;
+      final pending = <Future<void>>[];
+      if (shown.primaryImageTag != null) {
+        final url = _vm.imageApi.getPrimaryImageUrl(
+          shown.id,
+          maxHeight: artworkRequestWidth(
+            height,
+            MediaQuery.devicePixelRatioOf(context),
+            ArtworkShape.poster,
+          ),
+          tag: shown.primaryImageTag,
+        );
+        pending.add(
+          precacheImage(
+            ArtworkDecode.provider(
+              url,
+              width: BoundedNetworkImage.cacheWidthFor(
+                width,
+                MediaQuery.devicePixelRatioOf(context),
+              ),
+            ),
+            context,
+            onError: (_, _) {},
+          ),
+        );
+      }
+      final partOfShow = item.type == 'Episode' || item.type == 'Season';
+      final tag = sections.shows(DetailSection.logo)
+          ? item.logoImageTag ?? (partOfShow ? item.seriesLogoImageTag : null)
+          : null;
+      final logoId = item.logoImageTag != null ? item.id : item.seriesId;
+      if (tag != null && logoId != null) {
+        pending.add(
+          precacheImage(
+            offlineAwareImageProvider(
+              _vm.imageApi.getLogoImageUrl(logoId, maxWidth: 700, tag: tag),
+            ),
+            context,
+            onError: (_, _) {},
+          ),
+        );
+      }
+      // Failed or unreachable artwork must still let the user open the item.
+      await Future.wait(pending)
+          .timeout(const Duration(seconds: 6), onTimeout: () => <void>[]);
+      if (!mounted || _preparingItem != item.id) return;
+      setState(() => _presentationReady = true);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && ModalRoute.of(context)?.isCurrent != false) {
+          widget.initialFocusNode?.requestFocus();
+        }
+      });
+    });
+  }
 
   ItemDetailViewModel get _vm => widget.viewModel;
 
@@ -134,8 +212,13 @@ class _StageDetailContentState extends State<StageDetailContent> {
 
   void _trackActionFocus() {
     final node = FocusManager.instance.primaryFocus;
-    if (node == null || node == _upProxy || !_focusIsInActions()) return;
-    _lastActionFocus = node;
+    if (node == null || node == _upProxy) return;
+    final target = node.context;
+    if (target != null &&
+        target.findAncestorStateOfType<_StageDetailContentState>() == this) {
+      _reveal(target);
+    }
+    if (_focusIsInActions()) _lastActionFocus = node;
   }
 
   /// Up from a circle goes to the button above it. Up from Play goes to the
@@ -202,6 +285,7 @@ class _StageDetailContentState extends State<StageDetailContent> {
       MediaQuery.sizeOf(context),
       landscape: landscape,
     );
+    _preparePresentation(item, posterWidth, sections);
     final poster = _buildPoster(item, posterWidth);
     final actions = _buildActions(landscape, posterWidth);
     final header = _buildHeader(item, landscape, sections);
@@ -282,7 +366,27 @@ class _StageDetailContentState extends State<StageDetailContent> {
 
     return Stack(
       fit: StackFit.expand,
-      children: [_buildBackdrop(item, landscape), page],
+      children: [
+        Opacity(
+          opacity: _presentationReady ? 1 : 0,
+          child: IgnorePointer(
+            ignoring: !_presentationReady,
+            child: Focus(
+              descendantsAreFocusable: _presentationReady,
+              canRequestFocus: false,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [_buildBackdrop(item, landscape), page],
+              ),
+            ),
+          ),
+        ),
+        if (!_presentationReady)
+          DetailScreenSkeleton(
+            style: widget.prefs.effectiveDetailScreenStyle,
+            prefs: widget.prefs,
+          ),
+      ],
     );
   }
 
@@ -311,9 +415,11 @@ class _StageDetailContentState extends State<StageDetailContent> {
   /// fight whatever it scrolls itself.
   int _offScreen(BuildContext target) {
     if (!_scroll.hasClients) return 0;
-    final page = _scroll.position.context.storageContext.findRenderObject();
     final box = target.findRenderObject();
-    if (page is! RenderBox || box is! RenderBox) return 0;
+    if (box is! RenderBox) return 0;
+    final viewport = RenderAbstractViewport.of(box);
+    if (viewport is! RenderBox) return 0;
+    final page = viewport as RenderBox;
     if (!page.attached || !box.attached) return 0;
     // In the page's own units. The app draws at its own scale inside the
     // window, so screen positions don't compare with the page's height.
@@ -434,6 +540,9 @@ class _StageDetailContentState extends State<StageDetailContent> {
     final r = _below.indexOf(node);
     if (r > 0) return _go(_below[r - 1]);
     if (r == 0) {
+      if (_landscape && _node('more').context?.mounted == true) {
+        return _go(_node('more'));
+      }
       if (_beside.isNotEmpty) return _go(_beside.last);
       _toActions();
     }
@@ -552,7 +661,7 @@ class _StageDetailContentState extends State<StageDetailContent> {
 
   /// An episode's still is wide, so it keeps its own shape instead of being
   /// cropped into a poster.
-  Widget _buildPoster(AggregatedItem item, double width) {
+  AggregatedItem _posterItem(AggregatedItem item) {
     // With series thumbnails on, an episode keeps its still out of sight and
     // shows its show's poster, with the episode's own progress on it.
     final seriesId = item.seriesId;
@@ -562,7 +671,7 @@ class _StageDetailContentState extends State<StageDetailContent> {
         widget.prefs.effectiveDetailUseSeriesThumbnails &&
         seriesId != null &&
         seriesTag != null;
-    final shown = spoilerFree
+    return spoilerFree
         ? AggregatedItem(
             id: seriesId,
             serverId: item.serverId,
@@ -573,8 +682,11 @@ class _StageDetailContentState extends State<StageDetailContent> {
             },
           )
         : item;
-    final wide =
-        !spoilerFree && (item.type == 'Episode' || item.type == 'Video');
+  }
+
+  Widget _buildPoster(AggregatedItem item, double width) {
+    final shown = _posterItem(item);
+    final wide = shown.type == 'Episode' || shown.type == 'Video';
     return DetailPosterImage(
       key: const ValueKey('stage-poster'),
       item: shown,
@@ -608,6 +720,7 @@ class _StageDetailContentState extends State<StageDetailContent> {
       selectedMediaSourceId: widget.selectedMediaSourceId,
       onSelectedMediaSourceChanged: widget.onSelectedMediaSourceChanged,
       tvPlayFocusNode: widget.initialFocusNode,
+      actionRowRightFocusNode: _node('more'),
       upTarget: _upProxy,
       downTarget: downProxy,
       onRequestFocus: (target) {
@@ -752,14 +865,18 @@ class _StageDetailContentState extends State<StageDetailContent> {
 
     final showName = partOfShow ? (item.seriesName ?? item.name) : item.name;
     final Widget mark = logoTag != null && logoId != null && logoId.isNotEmpty
-        ? LogoView(
-            imageUrl: _vm.imageApi.getLogoImageUrl(
-              logoId,
-              maxWidth: 700,
-              tag: logoTag,
+        ? SizedBox(
+            width: landscape ? 360 : 240,
+            height: landscape ? math.min(110.0, size.height * 0.16) : 90,
+            child: LogoView(
+              imageUrl: _vm.imageApi.getLogoImageUrl(
+                logoId,
+                maxWidth: 700,
+                tag: logoTag,
+              ),
+              maxWidth: landscape ? 360 : 240,
+              maxHeight: landscape ? math.min(110.0, size.height * 0.16) : 90,
             ),
-            maxWidth: landscape ? 360 : 240,
-            maxHeight: landscape ? math.min(110.0, size.height * 0.16) : 90,
           )
         : Text(
             showName,

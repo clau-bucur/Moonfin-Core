@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
@@ -16,6 +17,8 @@ import 'package:moonfin/preference/user_preferences.dart';
 import 'package:moonfin/auth/repositories/session_repository.dart';
 import 'package:moonfin/ui/screens/detail/stage/stage_detail_content.dart';
 import 'package:moonfin/ui/screens/detail/stage/stage_track_chips.dart';
+import 'package:moonfin/ui/screens/detail/item_detail_screen.dart';
+import 'package:moonfin/ui/widgets/focus/focusable_button.dart';
 import 'package:moonfin/ui/screens/detail/modern/modern_detail_content.dart';
 import 'package:moonfin/ui/theme/app_theme.dart';
 import 'package:moonfin_design/moonfin_design.dart';
@@ -36,7 +39,6 @@ class _PluginSync extends Mock implements PluginSyncService {}
 class _SessionRepository extends Mock implements SessionRepository {}
 
 class _PlaybackManager extends Mock implements PlaybackManager {}
-
 
 class _QueueService extends Mock implements QueueService {}
 
@@ -232,6 +234,66 @@ void main() {
 
     expect(find.byType(StageTrackChips), findsOneWidget);
     expect(find.text('English TrueHD 7.1'), findsOneWidget);
+  });
+
+  testWidgets('remote reaches Version and returns through every track chip', (
+    tester,
+  ) async {
+    final raw = movieWithTracks();
+    (raw['MediaSources'] as List).add({'Id': 'source-2', 'Name': '1080p'});
+    await pumpContent(tester, viewModel('Movie', data: raw));
+    await tester.pumpAndSettle();
+    final chips = tester
+        .widgetList<FocusableButton>(
+          find.descendant(
+            of: find.byType(StageTrackChips),
+            matching: find.byType(FocusableButton),
+          ),
+        )
+        .toList();
+    expect(chips, hasLength(3));
+    chips.first.focusNode!.requestFocus();
+    await tester.pump();
+    for (var i = 1; i < chips.length; i++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      expect(chips[i].focusNode!.hasPrimaryFocus, isTrue);
+    }
+    for (var i = chips.length - 2; i >= 0; i--) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      expect(chips[i].focusNode!.hasPrimaryFocus, isTrue);
+    }
+  });
+
+  testWidgets('Up from first actor returns to visible More, not Directors', (
+    tester,
+  ) async {
+    final raw = movieWithTracks();
+    raw['People'] = [
+      {'Id': 'actor-1', 'Name': 'First actor', 'Type': 'Actor'},
+      {'Id': 'director-1', 'Name': 'Director', 'Type': 'Director'},
+    ];
+    await pumpContent(
+      tester,
+      viewModel('Movie', data: raw),
+      size: const Size(1280, 720),
+    );
+    await tester.pumpAndSettle();
+    final cast = tester.widget<DetailCastRow>(find.byType(DetailCastRow));
+    cast.firstItemFocusNode!.requestFocus();
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pumpAndSettle();
+    final actions = tester.widget<DetailActionButtons>(
+      find.byType(DetailActionButtons),
+    );
+    final more = actions.actionRowRightFocusNode!;
+    expect(more.hasPrimaryFocus, isTrue);
+    final box = more.context!.findRenderObject() as RenderBox;
+    final top = box.localToGlobal(Offset.zero).dy;
+    expect(top, greaterThanOrEqualTo(0));
+    expect(top + box.size.height, lessThanOrEqualTo(720));
   });
 
   testWidgets('hiding the Audio button hides its chip too', (tester) async {

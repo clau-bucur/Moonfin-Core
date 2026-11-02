@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
@@ -67,30 +69,66 @@ void main() {
       tmdbRepository: tmdb,
     );
     await vm.load();
-    // load() starts the extras without waiting for them, so give them a moment.
-    for (var i = 0; i < 100 && vm.features.isEmpty; i++) {
-      await Future<void>.delayed(const Duration(milliseconds: 5));
-    }
     return vm;
   }
 
-  test('a multi-part movie lists its other parts first, under their own heading',
-      () async {
-    final vm = await loadMovie(
-      {'Id': 'movie-1', 'Type': 'Movie', 'Name': 'Metallica', 'PartCount': 2},
+  test('details stay loading until secondary content is ready', () async {
+    final extras = Completer<List<Map<String, dynamic>>>();
+    when(() => itemsApi.getSpecialFeatures('movie-1'))
+        .thenAnswer((_) => extras.future);
+    when(
+      () => itemsApi.getItem(
+        'movie-1',
+        mediaSourceId: any(named: 'mediaSourceId'),
+      ),
+    ).thenAnswer(
+      (_) async => {'Id': 'movie-1', 'Type': 'Movie', 'Name': 'Cold item'},
     );
-
-    expect(vm.features.map((f) => f.id), ['part-2', 'bts']);
-    expect(vm.features.map(getExtraCategory), [
-      'additionalParts',
-      'behindTheScenes',
+    final tmdb = TmdbRepository(client);
+    final vm = ItemDetailViewModel(
+      itemId: 'movie-1',
+      client: client,
+      mutations: ItemMutationRepository(client),
+      mdbListRepository: MdbListRepository(client, tmdb),
+      tmdbRepository: tmdb,
+    );
+    addTearDown(vm.dispose);
+    final loading = vm.load();
+    await Future<void>.delayed(Duration.zero);
+    verify(() => itemsApi.getSpecialFeatures('movie-1')).called(1);
+    expect(vm.state, ItemDetailState.loading);
+    extras.complete([
+      {'Id': 'extra', 'Type': 'Video'},
     ]);
+    await loading;
+    expect(vm.state, ItemDetailState.ready);
+    expect(vm.features.single.id, 'extra');
   });
 
+  test(
+    'a multi-part movie lists its other parts first, under their own heading',
+    () async {
+      final vm = await loadMovie({
+        'Id': 'movie-1',
+        'Type': 'Movie',
+        'Name': 'Metallica',
+        'PartCount': 2,
+      });
+
+      expect(vm.features.map((f) => f.id), ['part-2', 'bts']);
+      expect(vm.features.map(getExtraCategory), [
+        'additionalParts',
+        'behindTheScenes',
+      ]);
+    },
+  );
+
   test('a single-file movie never asks for parts', () async {
-    final vm = await loadMovie(
-      {'Id': 'movie-1', 'Type': 'Movie', 'Name': 'Metallica'},
-    );
+    final vm = await loadMovie({
+      'Id': 'movie-1',
+      'Type': 'Movie',
+      'Name': 'Metallica',
+    });
 
     expect(vm.features.map((f) => f.id), ['bts']);
     verifyNever(() => itemsApi.getAdditionalParts(any()));

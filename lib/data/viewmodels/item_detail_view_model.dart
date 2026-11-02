@@ -1001,25 +1001,24 @@ class ItemDetailViewModel extends ChangeNotifier {
       _selectedSubtitleIndex = savedSubIndex == -2 ? null : savedSubIndex;
       final savedAudioIndex = prefs.getItemAudioStreamIndex(itemId);
       _selectedAudioIndex = savedAudioIndex == -2 ? null : savedAudioIndex;
-      // Publish the page with its main navigation rows already populated.
-      // Optional ratings/recommendations remain outside this critical path.
+      // Prepare the page as one layout instead of revealing new sections
+      // and moving focused controls while the user is already navigating.
       _loadingPrimarySections = true;
       try {
-        await switch (_item?.type) {
+        final primary = switch (_item?.type) {
           'Series' => Future.wait([_loadSeasons(), _loadNextUp()]),
           'Season' || 'Episode' => _loadEpisodes(),
           'BoxSet' => _loadCollectionItems(),
           'Playlist' => _loadTracks(),
           _ => Future<void>.value(),
         };
+        await Future.wait([primary, _loadSecondary()]);
       } finally {
         _loadingPrimarySections = false;
       }
       if (_isDisposed) return;
       _state = ItemDetailState.ready;
       notifyListeners();
-
-      unawaited(_loadSecondary());
     } catch (e) {
       _error = e;
       _state = ItemDetailState.error;
@@ -1108,7 +1107,7 @@ class ItemDetailViewModel extends ChangeNotifier {
   Future<void> _loadSecondary() async {
     final type = _item?.type;
     final futures = <Future>[];
-    unawaited(_loadProbedMediaSources());
+    futures.add(_loadProbedMediaSources());
     // Deliberately outside the Future.wait below, so a slow Seerr server never
     // holds up library content that is already here.
     unawaited(_loadSeerrOverlay());
@@ -1116,20 +1115,20 @@ class ItemDetailViewModel extends ChangeNotifier {
       futures.add(_loadFilmography());
       futures.add(_loadPersonAccounts());
     } else if (type == 'Series') {
-      unawaited(_loadReviews());
-      unawaited(_syncSeriesTrackChoices());
+      futures.add(_loadReviews());
+      futures.add(_syncSeriesTrackChoices());
       futures.add(_loadRatings());
 
       futures.add(_loadSimilar());
       futures.add(_loadFeatures());
       futures.add(_loadParentCollection());
-      unawaited(_loadUpcomingEpisode());
+      futures.add(_loadUpcomingEpisode());
     } else if (type == 'Season') {
-      unawaited(_syncSeriesTrackChoices());
+      futures.add(_syncSeriesTrackChoices());
       futures.add(_loadRatings());
       futures.add(_loadFeatures());
     } else if (type == 'Episode') {
-      unawaited(_syncSeriesTrackChoices());
+      futures.add(_syncSeriesTrackChoices());
       futures.add(_loadRatings());
       futures.add(_loadSimilar());
       futures.add(_loadFeatures());
@@ -1159,7 +1158,7 @@ class ItemDetailViewModel extends ChangeNotifier {
       if (type != 'MusicVideo') {
         futures.add(_loadParentCollection());
       }
-      if (type == 'Movie') unawaited(_loadReviews());
+      if (type == 'Movie') futures.add(_loadReviews());
     } else {
       futures.add(_loadRatings());
       futures.add(_loadSimilar());
