@@ -1,0 +1,521 @@
+{
+  "SourceRevision": "87dd6fa67c318e216a58113695aedb817f26824b",
+  "ArtifactName": "moonfin-video-experiment.apk",
+  "ArtifactBytes": 80459967,
+  "ArtifactSha256": "bd8b06280162249415ca284c5a93aeabc211555903522882366d3bac2ba9b1a9",
+  "MeasuredAtUtc": "2026-11-02T16:42:37.1063622Z",
+  "Groups": [
+    {
+      "Group": "lib/arm64-v8a",
+      "Files": 18,
+      "Bytes": 84418536.0,
+      "CompressedBytes": 36160263.0
+    },
+    {
+      "Group": "assets/fonts",
+      "Files": 14,
+      "Bytes": 18328974.0,
+      "CompressedBytes": 14495865.0
+    },
+    {
+      "Group": "lib/x86_64",
+      "Files": 15,
+      "Bytes": 26908672.0,
+      "CompressedBytes": 11060188.0
+    },
+    {
+      "Group": "lib/armeabi-v7a",
+      "Files": 15,
+      "Bytes": 19674664.0,
+      "CompressedBytes": 9319726.0
+    },
+    {
+      "Group": "classes.dex",
+      "Files": 1,
+      "Bytes": 8519932.0,
+      "CompressedBytes": 4087650.0
+    },
+    {
+      "Group": "assets",
+      "Files": 32,
+      "Bytes": 3624714.0,
+      "CompressedBytes": 1406925.0
+    },
+    {
+      "Group": "assets/subtitle_fonts",
+      "Files": 22,
+      "Bytes": 2774276.0,
+      "CompressedBytes": 1238594.0
+    },
+    {
+      "Group": "resources.arsc",
+      "Files": 1,
+      "Bytes": 745068.0,
+      "CompressedBytes": 745068.0
+    },
+    {
+      "Group": "assets/icons",
+      "Files": 29,
+      "Bytes": 703510.0,
+      "CompressedBytes": 700636.0
+    },
+    {
+      "Group": "res",
+      "Files": 751,
+      "Bytes": 661616.0,
+      "CompressedBytes": 470928.0
+    },
+    {
+      "Group": "assets/reader",
+      "Files": 6,
+      "Bytes": 440991.0,
+      "CompressedBytes": 129332.0
+    },
+    {
+      "Group": "assets/licenses",
+      "Files": 17,
+      "Bytes": 340706.0,
+      "CompressedBytes": 117544.0
+    },
+    {
+      "Group": "org",
+      "Files": 128,
+      "Bytes": 233815.0,
+      "CompressedBytes": 99342.0
+    },
+    {
+      "Group": "assets/images",
+      "Files": 3,
+      "Bytes": 84005.0,
+      "CompressedBytes": 84007.0
+    },
+    {
+      "Group": "classes2.dex",
+      "Files": 1,
+      "Bytes": 191056.0,
+      "CompressedBytes": 80259.0
+    },
+    {
+      "Group": "okhttp3",
+      "Files": 2,
+      "Bytes": 41612.0,
+      "CompressedBytes": 41558.0
+    },
+    {
+      "Group": "META-INF",
+      "Files": 109,
+      "Bytes": 82178.0,
+      "CompressedBytes": 29470.0
+    },
+    {
+      "Group": "kotlin",
+      "Files": 8,
+      "Bytes": 53396.0,
+      "CompressedBytes": 12350.0
+    },
+    {
+      "Group": "AndroidManifest.xml",
+      "Files": 1,
+      "Bytes": 31860.0,
+      "CompressedBytes": 6368.0
+    },
+    {
+      "Group": "client_analytics.proto",
+      "Files": 1,
+      "Bytes": 2982.0,
+      "CompressedBytes": 1367.0
+    },
+    {
+      "Group": "messaging_event.proto",
+      "Files": 1,
+      "Bytes": 2381.0,
+      "CompressedBytes": 1127.0
+    },
+    {
+      "Group": "DebugProbesKt.bin",
+      "Files": 1,
+      "Bytes": 1728.0,
+      "CompressedBytes": 777.0
+    },
+    {
+      "Group": "messaging_event_extension.proto",
+      "Files": 1,
+      "Bytes": 883.0,
+      "CompressedBytes": 512.0
+    },
+    {
+      "Group": "kotlin-tooling-metadata.json",
+      "Files": 1,
+      "Bytes": 625.0,
+      "CompressedBytes": 283.0
+    },
+    {
+      "Group": "play-services-cloud-messaging.properties",
+      "Files": 1,
+      "Bytes": 96.0,
+      "CompressedBytes": 61.0
+    },
+    {
+      "Group": "firebase-measurement-connector.properties",
+      "Files": 1,
+      "Bytes": 98.0,
+      "CompressedBytes": 61.0
+    },
+    {
+      "Group": "play-services-cast-framework.properties",
+      "Files": 1,
+      "Bytes": 94.0,
+      "CompressedBytes": 60.0
+    },
+    {
+      "Group": "firebase-encoders-proto.properties",
+      "Files": 1,
+      "Bytes": 84.0,
+      "CompressedBytes": 54.0
+    },
+    {
+      "Group": "firebase-encoders-json.properties",
+      "Files": 1,
+      "Bytes": 82.0,
+      "CompressedBytes": 53.0
+    },
+    {
+      "Group": "play-services-basement.properties",
+      "Files": 1,
+      "Bytes": 82.0,
+      "CompressedBytes": 53.0
+    },
+    {
+      "Group": "firebase-iid-interop.properties",
+      "Files": 1,
+      "Bytes": 78.0,
+      "CompressedBytes": 52.0
+    },
+    {
+      "Group": "play-services-flags.properties",
+      "Files": 1,
+      "Bytes": 76.0,
+      "CompressedBytes": 51.0
+    },
+    {
+      "Group": "play-services-stats.properties",
+      "Files": 1,
+      "Bytes": 76.0,
+      "CompressedBytes": 51.0
+    },
+    {
+      "Group": "play-services-tasks.properties",
+      "Files": 1,
+      "Bytes": 76.0,
+      "CompressedBytes": 51.0
+    },
+    {
+      "Group": "play-services-cast.properties",
+      "Files": 1,
+      "Bytes": 74.0,
+      "CompressedBytes": 50.0
+    },
+    {
+      "Group": "play-services-base.properties",
+      "Files": 1,
+      "Bytes": 74.0,
+      "CompressedBytes": 50.0
+    },
+    {
+      "Group": "firebase-encoders.properties",
+      "Files": 1,
+      "Bytes": 72.0,
+      "CompressedBytes": 48.0
+    }
+  ],
+  "NativeLibraries": [
+    {
+      "Path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 10096,
+      "CompressedBytes": 4386
+    },
+    {
+      "Path": "lib/arm64-v8a/libapp.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 43910024,
+      "CompressedBytes": 17656957
+    },
+    {
+      "Path": "lib/arm64-v8a/libass.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 3042280,
+      "CompressedBytes": 1208016
+    },
+    {
+      "Path": "lib/arm64-v8a/libasskt.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 16904,
+      "CompressedBytes": 6129
+    },
+    {
+      "Path": "lib/arm64-v8a/libc++_shared.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 1253544,
+      "CompressedBytes": 397503
+    },
+    {
+      "Path": "lib/arm64-v8a/libdartjni.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 124744,
+      "CompressedBytes": 23711
+    },
+    {
+      "Path": "lib/arm64-v8a/libdatastore_shared_counter.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 7112,
+      "CompressedBytes": 2630
+    },
+    {
+      "Path": "lib/arm64-v8a/libdav1dJNI.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 1094800,
+      "CompressedBytes": 466053
+    },
+    {
+      "Path": "lib/arm64-v8a/libdovi.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 743736,
+      "CompressedBytes": 356279
+    },
+    {
+      "Path": "lib/arm64-v8a/libffmpegJNI.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 1462200,
+      "CompressedBytes": 723891
+    },
+    {
+      "Path": "lib/arm64-v8a/libflutter.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 11747864,
+      "CompressedBytes": 5478898
+    },
+    {
+      "Path": "lib/arm64-v8a/libmediakitandroidhelper.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 386696,
+      "CompressedBytes": 123829
+    },
+    {
+      "Path": "lib/arm64-v8a/libmoonfin_dovi.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 5472,
+      "CompressedBytes": 2052
+    },
+    {
+      "Path": "lib/arm64-v8a/libmoonfin_libretro.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 76584,
+      "CompressedBytes": 34112
+    },
+    {
+      "Path": "lib/arm64-v8a/libmpv.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 12373704,
+      "CompressedBytes": 5599167
+    },
+    {
+      "Path": "lib/arm64-v8a/libpdfium.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 6386696,
+      "CompressedBytes": 3179206
+    },
+    {
+      "Path": "lib/arm64-v8a/librar_native.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 249544,
+      "CompressedBytes": 116268
+    },
+    {
+      "Path": "lib/arm64-v8a/libsqlite3.so",
+      "Group": "lib/arm64-v8a",
+      "Bytes": 1526536,
+      "CompressedBytes": 781176
+    },
+    {
+      "Path": "lib/armeabi-v7a/libandroidx.graphics.path.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 7252,
+      "CompressedBytes": 4064
+    },
+    {
+      "Path": "lib/armeabi-v7a/libass.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 2121864,
+      "CompressedBytes": 1047289
+    },
+    {
+      "Path": "lib/armeabi-v7a/libasskt.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 11476,
+      "CompressedBytes": 5311
+    },
+    {
+      "Path": "lib/armeabi-v7a/libc++_shared.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 850380,
+      "CompressedBytes": 345923
+    },
+    {
+      "Path": "lib/armeabi-v7a/libdartjni.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 76816,
+      "CompressedBytes": 21907
+    },
+    {
+      "Path": "lib/armeabi-v7a/libdatastore_shared_counter.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 4416,
+      "CompressedBytes": 2033
+    },
+    {
+      "Path": "lib/armeabi-v7a/libdav1dJNI.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 914236,
+      "CompressedBytes": 435191
+    },
+    {
+      "Path": "lib/armeabi-v7a/libdovi.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 517788,
+      "CompressedBytes": 321882
+    },
+    {
+      "Path": "lib/armeabi-v7a/libffmpegJNI.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 1360588,
+      "CompressedBytes": 712835
+    },
+    {
+      "Path": "lib/armeabi-v7a/libmediakitandroidhelper.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 286812,
+      "CompressedBytes": 107799
+    },
+    {
+      "Path": "lib/armeabi-v7a/libmoonfin_dovi.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 3936,
+      "CompressedBytes": 1904
+    },
+    {
+      "Path": "lib/armeabi-v7a/libmoonfin_libretro.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 56004,
+      "CompressedBytes": 30064
+    },
+    {
+      "Path": "lib/armeabi-v7a/libmpv.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 11752280,
+      "CompressedBytes": 5386490
+    },
+    {
+      "Path": "lib/armeabi-v7a/librar_native.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 185972,
+      "CompressedBytes": 104018
+    },
+    {
+      "Path": "lib/armeabi-v7a/libsqlite3.so",
+      "Group": "lib/armeabi-v7a",
+      "Bytes": 1524844,
+      "CompressedBytes": 793016
+    },
+    {
+      "Path": "lib/x86_64/libandroidx.graphics.path.so",
+      "Group": "lib/x86_64",
+      "Bytes": 10760,
+      "CompressedBytes": 4614
+    },
+    {
+      "Path": "lib/x86_64/libass.so",
+      "Group": "lib/x86_64",
+      "Bytes": 3106968,
+      "CompressedBytes": 1243181
+    },
+    {
+      "Path": "lib/x86_64/libasskt.so",
+      "Group": "lib/x86_64",
+      "Bytes": 16360,
+      "CompressedBytes": 6021
+    },
+    {
+      "Path": "lib/x86_64/libc++_shared.so",
+      "Group": "lib/x86_64",
+      "Bytes": 1229808,
+      "CompressedBytes": 413399
+    },
+    {
+      "Path": "lib/x86_64/libdartjni.so",
+      "Group": "lib/x86_64",
+      "Bytes": 108616,
+      "CompressedBytes": 25292
+    },
+    {
+      "Path": "lib/x86_64/libdatastore_shared_counter.so",
+      "Group": "lib/x86_64",
+      "Bytes": 6224,
+      "CompressedBytes": 2320
+    },
+    {
+      "Path": "lib/x86_64/libdav1dJNI.so",
+      "Group": "lib/x86_64",
+      "Bytes": 1982888,
+      "CompressedBytes": 772131
+    },
+    {
+      "Path": "lib/x86_64/libdovi.so",
+      "Group": "lib/x86_64",
+      "Bytes": 808888,
+      "CompressedBytes": 371471
+    },
+    {
+      "Path": "lib/x86_64/libffmpegJNI.so",
+      "Group": "lib/x86_64",
+      "Bytes": 1554928,
+      "CompressedBytes": 734877
+    },
+    {
+      "Path": "lib/x86_64/libmediakitandroidhelper.so",
+      "Group": "lib/x86_64",
+      "Bytes": 367528,
+      "CompressedBytes": 123812
+    },
+    {
+      "Path": "lib/x86_64/libmoonfin_dovi.so",
+      "Group": "lib/x86_64",
+      "Bytes": 5440,
+      "CompressedBytes": 2063
+    },
+    {
+      "Path": "lib/x86_64/libmoonfin_libretro.so",
+      "Group": "lib/x86_64",
+      "Bytes": 76760,
+      "CompressedBytes": 34393
+    },
+    {
+      "Path": "lib/x86_64/libmpv.so",
+      "Group": "lib/x86_64",
+      "Bytes": 15820880,
+      "CompressedBytes": 6386846
+    },
+    {
+      "Path": "lib/x86_64/librar_native.so",
+      "Group": "lib/x86_64",
+      "Bytes": 262584,
+      "CompressedBytes": 119654
+    },
+    {
+      "Path": "lib/x86_64/libsqlite3.so",
+      "Group": "lib/x86_64",
+      "Bytes": 1550040,
+      "CompressedBytes": 820114
+    }
+  ]
+}

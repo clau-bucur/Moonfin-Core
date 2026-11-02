@@ -14,7 +14,7 @@ try {
         $group = if ($parts[0] -eq 'lib') { "lib/$($parts[1])" }
                  elseif ($_.FullName -like 'assets/flutter_assets/assets/*') { "assets/$($parts[3])" }
                  else { $parts[0] }
-        [ordered]@{
+        [pscustomobject][ordered]@{
             Path = $_.FullName
             Group = $group
             Bytes = $_.Length
@@ -22,7 +22,7 @@ try {
         }
     })
     $groups = @($entries | Group-Object Group | ForEach-Object {
-        [ordered]@{
+        [pscustomobject][ordered]@{
             Group = $_.Name
             Files = $_.Count
             Bytes = ($_.Group | Measure-Object Bytes -Sum).Sum

@@ -40,10 +40,15 @@ Use the pinned Flutter SDK (3.47.2), Android SDK/NDK and JDK. This branch fixes
 .\build-android-tv-video.ps1
 ```
 
-The default is an ARM64 release APK, application id
+The default builds the ARM64 Flutter release, application id
 `org.moonfin.androidtv.videoexperiment`, named **Moonfin Video Experiment**.
 It installs alongside the regular/beta applications. Outputs and APK size JSON
 go under the ignored `artifacts/android-tv-video` directory.
+
+The inherited Gradle ABI filters still package support JNI libraries for
+ARM64, ARMv7 and x86_64. `--target-platform=android-arm64` selects Flutter's
+AOT output; it does not yet make this an ARM64-only archive. Both measured
+APKs use the same ABI policy. Other architecture builds are not yet validated.
 
 For other supported Android userspace architectures or Flutter profiling:
 
@@ -82,6 +87,9 @@ leave the generated Android registrant referencing the dev-only integration
 test plugin, although Gradle correctly excludes that plugin from release.
 
 ## Measurements
+
+See [the first-round results](../benchmarks/android-tv/README.md) for the
+measured APK sizes, device smoke checks and unresolved validation work.
 
 ```powershell
 .\scripts\measure-apk.ps1 -ApkPath <apk> -SourceRevision <commit> `
