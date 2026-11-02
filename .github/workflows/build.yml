@@ -31,6 +31,7 @@ jobs:
           test/preference/video_app_profile_preference_test.dart
           test/data/repositories/user_views_repository_test.dart
           test/data/services/plugin_sync_service_loop_test.dart
+          test/util/focus/android_tv_navigation_scope_test.dart
       - uses: actions/upload-artifact@v4
         with:
           name: android-tv-video

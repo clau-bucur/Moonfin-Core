@@ -33,6 +33,8 @@ migrate_working_dir/
 .pub/
 /build/
 /artifacts/
+# Flutter's native-assets preparation can regenerate Apple environment files.
+/ios/Flutter/
 # windows generated code (CMakeLists.txt is a static project file and must stay tracked)
 windows/flutter/generated_plugin_registrant.cc
 windows/flutter/generated_plugin_registrant.h

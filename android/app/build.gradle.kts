@@ -168,6 +168,9 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    // The app's AudioServiceState bridge calls AudioService directly. Cast
+    // previously exposed this superclass on the app's compile classpath.
+    implementation("androidx.media:media:1.7.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20240303")
     implementation("eu.simonbinder:sqlite3-native-library:3.52.0")
