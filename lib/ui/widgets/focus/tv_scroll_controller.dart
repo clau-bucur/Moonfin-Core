@@ -1,10 +1,8 @@
-import 'dart:math' as math;
-
-import 'package:flutter/physics.dart';
 import 'package:flutter/widgets.dart';
 
-/// Retargets D-pad scrolling from its current position and velocity. Repeated
-/// row changes therefore do not restart an ease-in animation at zero speed.
+/// Continuous, bounded D-pad row motion. Repeats retain forward velocity;
+/// reversals move toward the new row immediately and settle within the requested
+/// duration. The supplied curve is replaced by the monotonic row simulation.
 class TvScrollController extends ScrollController {
   @override
   ScrollPosition createScrollPosition(
@@ -33,37 +31,101 @@ class _TvScrollPosition extends ScrollPositionWithSingleContext {
 
   @override
   Future<void> animateTo(
-    double to, {
+    double offset, {
     required Duration duration,
     required Curve curve,
   }) {
-    final target = to.clamp(minScrollExtent, maxScrollExtent);
-    if (duration == Duration.zero || (target - pixels).abs() < 0.5) {
+    final target = offset.clamp(minScrollExtent, maxScrollExtent);
+    if (duration == Duration.zero || (target - pixels).abs() < 0.01) {
       jumpTo(target);
-      return Future<void>.value();
+      return Future.value();
     }
-    final omega =
-        4.74 / (duration.inMicroseconds / Duration.microsecondsPerSecond);
-    // Cap inherited velocity after a reversal so it cannot run far away from
-    // the newly selected row before turning around.
-    final limit = math.max(1.0, (target - pixels).abs()) * omega;
-    final velocity = (activity?.velocity ?? 0).clamp(-limit, limit);
-    final scroll = DrivenScrollActivity.simulation(
+    final motion = _RowScrollActivity(
       this,
-      ScrollSpringSimulation(
-        SpringDescription(
-          mass: 1,
-          stiffness: omega * omega,
-          damping: 2 * omega,
-        ),
-        pixels,
-        target,
-        velocity,
-        tolerance: const Tolerance(distance: 0.25, velocity: 1),
+      _RowScrollSimulation(
+        from: pixels,
+        to: target,
+        velocity: activity?.velocity ?? 0,
+        duration: duration,
       ),
       vsync: context.vsync,
     );
-    beginActivity(scroll);
-    return scroll.done;
+    beginActivity(motion);
+    return motion.done;
   }
+}
+
+class _RowScrollActivity extends DrivenScrollActivity {
+  _RowScrollActivity(
+    ScrollPositionWithSingleContext super.position,
+    super.simulation, {
+    required super.vsync,
+  }) : super.simulation();
+
+  @override
+  bool applyMoveTo(double value) {
+    final position = delegate as ScrollPosition;
+    // Clamp against bounds that may change while rows load or disappear.
+    return super.applyMoveTo(
+      value.clamp(position.minScrollExtent, position.maxScrollExtent),
+    );
+  }
+
+  @override
+  double get velocity {
+    final position = delegate as ScrollPosition;
+    final speed = super.velocity;
+    if ((position.pixels <= position.minScrollExtent && speed < 0) ||
+        (position.pixels >= position.maxScrollExtent && speed > 0)) {
+      return 0;
+    }
+    return speed;
+  }
+}
+
+/// A direct, monotonic shift that eases into its destination.
+/// Keeps forward momentum on repeats, but follows a reversal immediately.
+class _RowScrollSimulation extends Simulation {
+  _RowScrollSimulation({
+    required double from,
+    required double to,
+    required double velocity,
+    required Duration duration,
+  }) : _from = from,
+       _to = to,
+       _seconds = duration.inMicroseconds / Duration.microsecondsPerSecond {
+    final distance = to - from;
+    final incomingSlope = distance == 0 ? 0.0 : velocity * _seconds / distance;
+    // At rest (or on reversal), start with easeOutCubic's prompt response.
+    // A same-direction handoff preserves speed unless that would overshoot
+    // a nearer destination. Slopes in [0, 3] make this Hermite curve monotonic.
+    final slope = incomingSlope > 0 ? incomingSlope.clamp(0.0, 3.0) : 3.0;
+    _initial = slope * distance;
+    _quadratic = 3 * distance - 2 * _initial;
+    _cubic = _initial - 2 * distance;
+  }
+
+  final double _from;
+  final double _to;
+  final double _seconds;
+  late final double _initial;
+  late final double _quadratic;
+  late final double _cubic;
+
+  @override
+  double x(double time) {
+    if (time >= _seconds) return _to;
+    final t = (time / _seconds).clamp(0.0, 1.0);
+    return _from + t * (_initial + t * (_quadratic + t * _cubic));
+  }
+
+  @override
+  double dx(double time) {
+    if (time >= _seconds) return 0;
+    final t = (time / _seconds).clamp(0.0, 1.0);
+    return (_initial + t * (2 * _quadratic + t * 3 * _cubic)) / _seconds;
+  }
+
+  @override
+  bool isDone(double time) => time >= _seconds;
 }

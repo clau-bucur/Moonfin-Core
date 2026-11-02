@@ -202,6 +202,68 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  for (final type in ['Movie', 'Episode']) {
+    testWidgets('TV Restart leads the entire transport row for $type', (
+      tester,
+    ) async {
+      PlatformDetection.setTvMode(true);
+      addTearDown(() => PlatformDetection.setTvMode(false));
+      manager.queueService.setQueue([
+        AggregatedItem(
+          id: 'video',
+          serverId: 'server',
+          rawData: {'Id': 'video', 'Type': type, 'RunTimeTicks': 36000000000},
+        ),
+      ]);
+      await mountPlayer(tester);
+      final restart = find.byIcon(Icons.replay_rounded);
+      final previous = find.byIcon(Icons.skip_previous_rounded);
+      expect(restart, findsOneWidget);
+      expect(
+        tester.getCenter(restart).dx,
+        lessThan(tester.getCenter(previous).dx),
+      );
+      expect(tester.getCenter(restart).dy, tester.getCenter(previous).dy);
+
+      // Enter the row at Play/Pause, then walk left through Seek and Previous.
+      Focus.of(tester.element(find.byIcon(Icons.play_arrow_rounded)))
+          .requestFocus();
+      await tester.pump();
+      for (var i = 0; i < 3; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+        await tester.pump();
+      }
+      expect(Focus.of(tester.element(restart)).hasPrimaryFocus, isTrue);
+      await tester.sendKeyEvent(LogicalKeyboardKey.select);
+      await tester.pump();
+      expect(manager.seeks, [Duration.zero]);
+      expect(manager.transport, contains('resume'));
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
+
+  testWidgets('TV Restart still respects its visibility preference', (
+    tester,
+  ) async {
+    PlatformDetection.setTvMode(true);
+    addTearDown(() => PlatformDetection.setTvMode(false));
+    await GetIt.instance<UserPreferences>().set(
+      UserPreferences.hiddenOsdButtonsTv,
+      'restart',
+    );
+    manager.queueService.setQueue([
+      AggregatedItem(
+        id: 'video',
+        serverId: 'server',
+        rawData: const {'Id': 'video', 'Type': 'Movie'},
+      ),
+    ]);
+    await mountPlayer(tester);
+    expect(find.byIcon(Icons.replay_rounded), findsNothing);
+    expect(find.byIcon(Icons.skip_previous_rounded), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('desktop Escape and Cinema Skip dismiss keys', (tester) async {
     var fullscreen = true;
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(

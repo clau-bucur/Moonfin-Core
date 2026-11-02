@@ -171,6 +171,11 @@ behavior until that compatibility matrix passes.
 
 ## Checks
 
+The original Modern motion has been recovered and adapted for the video branch;
+see [restored motion validation](../benchmarks/android-tv/restored-motion/README.md).
+Home uses coordinated finite card transitions and exact row widths rather than
+RowGlide springs. Device testing of this revision is gated on the user's OK.
+
 The new video-profile tests run with the default profile. The inherited suite
 can also exercise the retained shared implementation with its compatibility
 profile, because many inherited tests deliberately assert reader/game/preview

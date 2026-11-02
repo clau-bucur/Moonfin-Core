@@ -5514,23 +5514,60 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     );
   }
 
+  Widget? _buildRestartButton({
+    required double size,
+    required double extent,
+    FocusNode? focusNode,
+  }) {
+    final item = _queue.currentItem;
+    if (osdButtonLayout.hidden(_prefs).contains(OsdButton.restart.id) ||
+        item is! AggregatedItem ||
+        !const {'Movie', 'Episode', 'Video'}.contains(item.type) ||
+        _isPrerollQueueItem(item)) {
+      return null;
+    }
+    return _controlButton(
+      Icons.replay_rounded,
+      onPressed: () async {
+        _showControls();
+        _dropScrubSession(resume: false);
+        _suppressSeekPrompts();
+        await restartCurrentVideo(_manager);
+      },
+      size: size,
+      extent: extent,
+      focusNode: focusNode,
+      tooltip: AppLocalizations.of(context).restart,
+    );
+  }
+
   Widget _buildDockedTransportRow() {
     final l10n = AppLocalizations.of(context);
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
+
+    final rowSize = osdRowButtonSize(landscape: isLandscape);
+    final restart = PlatformDetection.isTV
+        ? _buildRestartButton(
+            size: rowSize.icon * _osdButtonScale,
+            extent: rowSize.extent * _osdButtonScale,
+            focusNode: _tvTransportFirstFocus,
+          )
+        : null;
 
     return FocusTraversalGroup(
       policy: ReadingOrderTraversalPolicy(),
       child: osdDockedTransport(
         landscape: isLandscape,
         scale: _osdButtonScale,
+        leading: restart,
         build: (button, size, extent) => switch (button) {
           OsdTransportButton.previous => _controlButton(
             Icons.skip_previous_rounded,
             onPressed: _manager.previous,
             size: size,
             extent: extent,
-            focusNode: _tvTransportFirstFocus,
+            focusNode: restart == null ? _tvTransportFirstFocus : null,
             tooltip: l10n.playerTooltipPrevious,
           ),
           OsdTransportButton.seekBack => _controlButton(
@@ -5722,19 +5759,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         }
 
         final byButton = <OsdButton, Widget>{
-          if (shows(OsdButton.restart) && item is AggregatedItem &&
-              const {'Movie', 'Episode', 'Video'}.contains(item.type) &&
-              !_isPrerollQueueItem(item))
-            OsdButton.restart: _controlButton(
-              Icons.replay_rounded,
-              onPressed: () async {
-                _showControls();
-                _dropScrubSession(resume: false);
-                _suppressSeekPrompts();
-                await restartCurrentVideo(_manager);
-              },
-              size: secondaryIconSize, extent: secondaryExtent,
-              tooltip: l10n.restart,
+          if (!PlatformDetection.isTV)
+            OsdButton.restart: ?_buildRestartButton(
+              size: secondaryIconSize,
+              extent: secondaryExtent,
             ),
           if (shows(OsdButton.syncPlay) &&
               _syncPlayManager?.state.enabled == true)

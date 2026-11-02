@@ -50,7 +50,10 @@ import '../../widgets/quick_return_wrapper.dart';
 import '../../../util/global_shortcut_focus.dart';
 import '../../widgets/focus/context_menu_sheet.dart';
 import '../../widgets/focus/locked_focus_row.dart';
-import '../../widgets/focus/row_glide.dart';
+import '../../widgets/focus/modern_row_navigation.dart';
+import '../../widgets/modern_card_transition.dart';
+import '../../widgets/modern_card_frame.dart';
+import '../../widgets/modern_row_visibility.dart';
 import '../../../util/focus/dpad_keys.dart';
 import '../../../util/focus/input_mode_tracker.dart';
 import '../../../util/focus/scroll_utils.dart';
@@ -900,7 +903,6 @@ class _ContentRowsState extends State<_ContentRows>
   final Map<String, GlobalKey> _rowKeys = {};
   final Map<String, GlobalKey> _rowContainerKeys = {};
   final Map<String, ScrollController> _rowHorizontalControllers = {};
-  final Map<String, RowGlide> _rowGlides = {};
   final Map<String, double> _rowHorizontalOffsetsById = {};
   List<HomeRow>? _cachedExtentRows;
   PosterSize? _cachedExtentPosterSize;
@@ -997,6 +999,7 @@ class _ContentRowsState extends State<_ContentRows>
   // _verticalNavInFlight or finishes a media bar handoff. That way a press
   // during a scroll takes over instead of being dropped.
   int _verticalNavGeneration = 0;
+  final _rowNavigation = ModernRowNavigation();
   bool _windowHasFocus = true;
   bool _holdMediaBarWhileSidebarFocused = false;
 
@@ -1104,6 +1107,17 @@ class _ContentRowsState extends State<_ContentRows>
   static Duration get _focusHandoffDuration => navigationAnimationDuration;
   // Ease out so the scroll starts moving as soon as the key is pressed.
   static const _focusHandoffCurve = Curves.easeOutCubic;
+  Duration get _modernRowMotionDuration =>
+      MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : widget.prefs.get(UserPreferences.modernCardTransitionSpeed).duration;
+  Duration get _modernRowScrollDuration {
+    final duration = _modernRowMotionDuration;
+    if (duration == Duration.zero) return duration;
+    const minimum = Duration(milliseconds: 220);
+    return duration < minimum ? minimum : duration;
+  }
+
   static const _mediaBarFadeDuration = Duration(milliseconds: 220);
   static const double _activeRowRecalcDistance = 48.0;
 
@@ -1565,6 +1579,7 @@ class _ContentRowsState extends State<_ContentRows>
     HardwareKeyboard.instance.removeHandler(_handleGlobalHardwareKey);
     _rowPrefetchDebounce?.cancel();
     _v2Expansion.dispose();
+    _rowNavigation.dispose();
     _audioArbiter.unregister(this);
     appRouter.routerDelegate.removeListener(_onRouteChanged);
     _resizeCheckDebounce?.cancel();
@@ -1607,10 +1622,6 @@ class _ContentRowsState extends State<_ContentRows>
       controller.dispose();
     }
     _rowHorizontalControllers.clear();
-    for (final glide in _rowGlides.values) {
-      glide.dispose();
-    }
-    _rowGlides.clear();
     _disposeSharedPreview();
     super.dispose();
   }
@@ -3013,6 +3024,7 @@ class _ContentRowsState extends State<_ContentRows>
     // This path scrolls to the top on its own, so drop the return anchor
     // rather than let the delayed realign pull back down.
     _returnScrollRowId = null;
+    _rowNavigation.cancel();
     final generation = ++_verticalNavGeneration;
     _verticalNavInFlight = true;
     try {
@@ -3153,11 +3165,6 @@ class _ContentRowsState extends State<_ContentRows>
     });
   }
 
-  RowGlide _rowGlide(int rowIndex) => _rowGlides.putIfAbsent(
-    _rowIdForIndex(rowIndex),
-    () => RowGlide(widget.prefs),
-  );
-
   static const double _loadMoreTriggerDistance = 600.0;
 
   Timer? _resizeCheckDebounce;
@@ -3215,10 +3222,6 @@ class _ContentRowsState extends State<_ContentRows>
   LockedFocusRowState? _rowStateOf(int rowIndex) {
     return _rowKeys[_rowIdForIndex(rowIndex)]?.currentState
         as LockedFocusRowState?;
-  }
-
-  BuildContext? _rowContextOf(int rowIndex) {
-    return _rowKeys[_rowIdForIndex(rowIndex)]?.currentContext;
   }
 
   double _staticRowHeight(int rowIndex) {
@@ -3391,19 +3394,6 @@ class _ContentRowsState extends State<_ContentRows>
     }
 
     return defaultTop;
-  }
-
-  Future<void> _scrollTvRowIntoOverlayBand(int rowIndex) async {
-    if (!mounted) return;
-    final targetOffset = _restingOffsetForRow(rowIndex);
-    if (targetOffset == null) return;
-    if ((targetOffset - _scrollController.offset).abs() <= 1.0) return;
-
-    await _scrollController.animateTo(
-      targetOffset,
-      duration: _focusHandoffDuration,
-      curve: _focusHandoffCurve,
-    );
   }
 
   /// The offset [rowIndex] comes to rest at. Picks its band the same way
@@ -3742,7 +3732,10 @@ class _ContentRowsState extends State<_ContentRows>
     // The user is moving rows, so the delayed realign on return must not
     // drag them back to the row they arrived on.
     _returnScrollRowId = null;
-    var target = fromRowIndex + direction;
+    final pendingIndex = _rowNavigation.isActive
+        ? rows.indexWhere((row) => row.id == _rowNavigation.targetKey)
+        : -1;
+    var target = (pendingIndex >= 0 ? pendingIndex : fromRowIndex) + direction;
     while (target >= 0 &&
         target < rows.length &&
         !_rowHasFocusableItems(rows[target])) {
@@ -3755,6 +3748,7 @@ class _ContentRowsState extends State<_ContentRows>
         } else {
           // Focus leaves the rows, so a scroll the last step still has queued
           // shouldn't pull the list back down.
+          _rowNavigation.cancel();
           _verticalNavGeneration++;
           _verticalNavInFlight = false;
           _navigateFromMediaBarToNavbar();
@@ -3762,96 +3756,36 @@ class _ContentRowsState extends State<_ContentRows>
       }
       return;
     }
-    // A row the list hasn't built yet can't take focus. Returning before a new
-    // step starts leaves the last step's scroll running, and that scroll
-    // builds the row for the next press.
-    final targetState = _rowStateOf(target);
-    if (targetState == null) return;
-
+    final targetId = rows[target].id;
     final generation = ++_verticalNavGeneration;
     _verticalNavInFlight = true;
+    bool isCurrent() =>
+        mounted && generation == _verticalNavGeneration && _mayRestoreHomeFocus();
+    int targetIndex() => widget.viewModel.rows.indexWhere((r) => r.id == targetId);
     try {
-      targetState.requestFocusAt(0);
-
-      final navComplete = Completer<void>();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || generation != _verticalNavGeneration) {
-          if (!navComplete.isCompleted) navComplete.complete();
-          return;
-        }
-        final rowCtx = _rowContextOf(target);
-        if (rowCtx == null) {
-          if (!navComplete.isCompleted) navComplete.complete();
-          return;
-        }
-
-        final fullScreenRows =
-            !PlatformDetection.useMobileUi &&
-            widget.prefs.get(UserPreferences.fullScreenRows);
-        if (fullScreenRows && _scrollController.hasClients) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!mounted || !_scrollController.hasClients) {
-              if (!navComplete.isCompleted) navComplete.complete();
-              return;
-            }
-            final innerCtx = _rowContextOf(target);
-            if (innerCtx == null) {
-              if (!navComplete.isCompleted) navComplete.complete();
-              return;
-            }
-            final renderObj = innerCtx.findRenderObject();
-            if (renderObj is! RenderBox || !renderObj.hasSize) {
-              if (!navComplete.isCompleted) navComplete.complete();
-              return;
-            }
-            _scrollTvRowIntoOverlayBand(target).whenComplete(() {
-              if (!navComplete.isCompleted) navComplete.complete();
-            });
-          });
-          return;
-        }
-
-        if (_scrollController.hasClients) {
-          final rowObj = _rowContainerKey(target).currentContext
-              ?.findRenderObject();
-          final viewportObj = context.findRenderObject();
-          if (rowObj is RenderBox &&
-              rowObj.attached &&
-              viewportObj is RenderBox &&
-              viewportObj.attached) {
-            final rowTopInViewport = rowObj
-                .localToGlobal(Offset.zero, ancestor: viewportObj)
-                .dy;
-            final targetOffset =
-                (_scrollController.offset +
-                        rowTopInViewport -
-                        _desktopRowFocusTargetTop())
-                    .clamp(0.0, _scrollController.position.maxScrollExtent);
-            _scrollController
-                .animateTo(
-                  targetOffset,
-                  duration: _focusHandoffDuration,
-                  curve: _focusHandoffCurve,
-                )
-                .whenComplete(() {
-                  if (!navComplete.isCompleted) navComplete.complete();
-                });
-            return;
-          }
-        }
-
-        Scrollable.ensureVisible(
-          rowCtx,
-          alignment: 0.12,
-          duration: _focusHandoffDuration,
-          curve: _focusHandoffCurve,
-        ).whenComplete(() {
-          if (!navComplete.isCompleted) navComplete.complete();
-        });
-      });
-      await navComplete.future.timeout(
-        const Duration(milliseconds: 450),
-        onTimeout: () {},
+      await _rowNavigation.move(
+        targetKey: targetId,
+        requestFocus: () {
+          if (!isCurrent()) return false;
+          final index = targetIndex();
+          if (index < 0) return false;
+          final state = _rowStateOf(index);
+          if (state == null) return false;
+          state.requestFocusFromMemory();
+          return true;
+        },
+        scroll: () async {
+          if (!isCurrent()) return;
+          final offset = _restingOffsetForRow(targetIndex());
+          if (offset == null) return;
+          // Geometry for every row is known even outside the lazy cache.
+          // Start alongside focus, then retry focus once scrolling mounts it.
+          await _scrollController.animateTo(
+            offset,
+            duration: _isHomeRowsStyleV2() ? _modernRowScrollDuration : _focusHandoffDuration,
+            curve: _focusHandoffCurve,
+          );
+        },
       );
     } finally {
       if (generation == _verticalNavGeneration) _verticalNavInFlight = false;
@@ -3864,19 +3798,7 @@ class _ContentRowsState extends State<_ContentRows>
     required bool isUp,
   }) {
     _markUserGesture();
-    if (isUp) {
-      if (rowIndex == 0) {
-        if (_isMediaBarIncluded()) {
-          unawaited(_moveFocusFromRowsToMediaBar());
-        } else {
-          _navigateFromMediaBarToNavbar();
-        }
-      } else {
-        unawaited(_focusAdjacentRowItem(rows, rowIndex, -1));
-      }
-    } else {
-      unawaited(_focusAdjacentRowItem(rows, rowIndex, 1));
-    }
+    unawaited(_focusAdjacentRowItem(rows, rowIndex, isUp ? -1 : 1));
     return true;
   }
 
@@ -3885,7 +3807,12 @@ class _ContentRowsState extends State<_ContentRows>
         widget.prefs.get(UserPreferences.navbarPosition) == NavbarPosition.left;
     if (!navbarIsLeft) return;
     final focusNavbar = NavigationLayout.focusNavbarNotifier.value;
-    if (focusNavbar != null) focusNavbar();
+    if (focusNavbar != null) {
+      _rowNavigation.cancel();
+      _verticalNavGeneration++;
+      _verticalNavInFlight = false;
+      focusNavbar();
+    }
   }
 
   void _onRowFocusTracked(int rowIndex, bool focused) {
@@ -4475,6 +4402,14 @@ class _ContentRowsState extends State<_ContentRows>
     final overlayActive = showInfoOverlay && _infoRevealed;
     final fullScreenV2 = isRowsV2 && fullScreenRows;
     final rowExtent = rowExtents[rowIndex];
+    if (fullScreenV2) {
+      final focused = _focusedRowIndex(FocusManager.instance.primaryFocus) ?? 0;
+      return ModernRowVisibility(
+        visible: rowIndex == focused,
+        duration: _modernRowMotionDuration,
+        child: child,
+      );
+    }
 
     var shift = HomeRowShift.none;
     if (overlayActive || fullScreenV2) {
@@ -5466,24 +5401,30 @@ class _ContentRowsState extends State<_ContentRows>
     }
 
     final itemSpacing = _rowItemSpacing(firstCardWidth, cardExpansion);
-    // A tap grows a card on touch screens, so the glide is for remotes and
-    // keyboards only.
-    final glide =
+    final coordinateExpansion =
         isRowsV2 &&
-            !row.isAudio &&
-            !isModernMyMediaStatic &&
-            !PlatformDetection.useMobileUi
-        ? (_rowGlide(rowIndex)..growth = v2FocusedWidth - v2PortraitWidth)
-        : null;
+        !row.isAudio &&
+        !isModernMyMediaStatic &&
+        !PlatformDetection.useMobileUi;
+    final modernDuration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : prefs.get(UserPreferences.modernCardTransitionSpeed).duration;
+    final expansionDelay =
+        prefs.get(UserPreferences.delayCardExpansionOnRapidScroll)
+        ? modernCardExpansionDwell
+        : Duration.zero;
+    Object motionKey(AggregatedItem item) =>
+        (item.serverId, item.type, item.id);
+    Widget buildRow(ModernCardRowController? rowMotion) {
+      void selectForMotion(AggregatedItem item, {Duration? delay}) {
+        rowMotion?.select(
+          motionKey(item),
+          delay: delay,
+          immediateExpansion: _verticalNavInFlight,
+        );
+      }
 
-    return _buildTitledRow(
-      key: _rowContainerKey(rowIndex),
-      title: _localizedRowTitle(row, l10n),
-      subtitle: subtitle,
-      rowIndex: rowIndex,
-      hasItems: row.items.isNotEmpty,
-      height: rowTotalHeight,
-      child: LockedFocusRow<AggregatedItem>(
+      return LockedFocusRow<AggregatedItem>(
         key: _rowKey(rowIndex),
         items: row.items,
         itemKey: _rowItemIdentity,
@@ -5493,7 +5434,15 @@ class _ContentRowsState extends State<_ContentRows>
         itemExtent: firstCardWidth,
         itemSpacing: itemSpacing,
         leadingPadding: isRowsV2 ? _kHomeRowLabelInset : 0,
-        glide: glide,
+        scrollDuration: isRowsV2 ? modernDuration : null,
+        scrollCurve: isRowsV2 ? modernCardMotionCurve : Curves.easeOut,
+        itemExtentBuilder: rowMotion == null
+            ? null
+            : (index) =>
+                  v2PortraitWidth +
+                  (v2FocusedWidthForCurrentViewport - v2PortraitWidth) *
+                      rowMotion.progressOf(motionKey(row.items[index])),
+        itemExtentListenable: rowMotion,
         clipBehavior: (isRowsV2 || cardExpansion) ? Clip.none : Clip.hardEdge,
         padding: EdgeInsets.fromLTRB(
           _kHomeRowLabelInset,
@@ -5501,7 +5450,10 @@ class _ContentRowsState extends State<_ContentRows>
           _kHomeRowTrailingInset,
           rowPadding,
         ),
-        onFocusChange: (has) => _onRowFocusTracked(rowIndex, has),
+        onFocusChange: (has) {
+          _onRowFocusTracked(rowIndex, has);
+          if (!has) rowMotion?.select(null);
+        },
         onVerticalNavigation: (isUp) => _onRowVerticalNavigation(
           rowIndex: rowIndex,
           rows: rows,
@@ -5509,6 +5461,7 @@ class _ContentRowsState extends State<_ContentRows>
         ),
         onLeftEdge: _onRowLeftEdge,
         onIndexChanged: (index, item) {
+          selectForMotion(item);
           final forceReveal = _forceRevealOnNextRowFocusFromMediaBar;
           _forceRevealOnNextRowFocusFromMediaBar = false;
           widget.onItemSelected(item);
@@ -5594,7 +5547,7 @@ class _ContentRowsState extends State<_ContentRows>
             UserPreferences.delayCardExpansionOnRapidScroll,
           );
           // How far the card has grown, from 0 to 1, and whether it shows as
-          // focused. Without a glide a card is only ever all or nothing.
+          // focused. Geometry and scroll use the same finite easing curve.
           Widget buildCard(
             BuildContext ctx,
             double v2Open,
@@ -5632,7 +5585,7 @@ class _ContentRowsState extends State<_ContentRows>
                 // A growing card keeps its height while it widens.
                 ar = !canUseExpandedV2Card
                     ? v2PortraitAspect
-                    : (glide == null ? v2FocusedAspect : width / v2ImageHeight);
+                    : width / v2ImageHeight;
                 final posterUrl = _cachedRowImageUrl(
                   item,
                   imageApi,
@@ -5645,10 +5598,16 @@ class _ContentRowsState extends State<_ContentRows>
                 // One image and one decode throughout the width animation.
                 // Cover-fit crops it when collapsed and reveals it on focus.
                 final wideUrl = _resolveV2FocusedImageUrl(
-                  item, imageApi, v2ImageHeight, useSeriesThumbs, requestScale,
+                  item,
+                  imageApi,
+                  v2ImageHeight,
+                  useSeriesThumbs,
+                  requestScale,
                 );
                 imageUrl = wideUrl ?? posterUrl;
-                v2SourceAspect = wideUrl != null ? v2FocusedAspect : v2PortraitAspect;
+                v2SourceAspect = wideUrl != null
+                    ? v2FocusedAspect
+                    : v2PortraitAspect;
               }
             } else {
               final image = _unfocusedCardImage(
@@ -5851,6 +5810,7 @@ class _ContentRowsState extends State<_ContentRows>
                       suppressImageFocusBorder: showPreviewVideo,
                       suppressFocusGlow: suppressFocusGlow,
                       onHoverStart: () {
+                        selectForMotion(item, delay: Duration.zero);
                         unawaited(
                           _revealAndScrollToPinnedInfo(fromMouseHover: true),
                         );
@@ -5875,6 +5835,14 @@ class _ContentRowsState extends State<_ContentRows>
                         if (isRowsV2) {
                           if (_v2Expansion.hoveredKey.value == previewKey) {
                             _v2Expansion.hoveredKey.value = null;
+                            final state = _rowStateOf(rowIndex);
+                            if (state != null &&
+                                state.hasFocusedItem &&
+                                state.focusedIndex < row.items.length) {
+                              selectForMotion(row.items[state.focusedIndex]);
+                            } else {
+                              rowMotion?.select(null);
+                            }
                           }
                           _finishSharedPreview();
                         } else {
@@ -5926,11 +5894,12 @@ class _ContentRowsState extends State<_ContentRows>
 
                     if (isRowsV2) {
                       final rowController = _rowHorizontalController(rowIndex);
-                      return ModernExpandingCard(
+                      return ModernCardFrame(
                         card: previewWrappedCard,
-                        prefs: prefs,
-                        open: glide != null ? v2Open : null,
-                        details: v2Open >= modernDetailsStart
+                        width: width,
+                        height: maxCardHeight,
+                        progress: v2Open,
+                        details: v2Open > 0.65
                             ? ModernHoverBuilder(
                                 expansion: _v2Expansion,
                                 cardKey: previewKey,
@@ -5948,9 +5917,9 @@ class _ContentRowsState extends State<_ContentRows>
                                         itemCount: row.items.length,
                                         itemExtent: firstCardWidth,
                                         itemSpacing: itemSpacing,
-                                        // A gliding card is still growing here, so
+                                        // A transitioning card is still growing here, so
                                         // the details are sized for the full card.
-                                        focusedWidth: glide != null
+                                        focusedWidth: rowMotion != null
                                             ? v2FocusedWidthForCurrentViewport
                                             : width,
                                         maxWidth: v2ExtendedWidth,
@@ -5972,15 +5941,11 @@ class _ContentRowsState extends State<_ContentRows>
             );
           }
 
-          if (glide != null) {
-            return ModernGlideBuilder(
-              glide: glide,
-              expansion: _v2Expansion,
-              cardKey: previewKey,
-              index: idx,
-              prefs: prefs,
-              builder: (ctx, open, hovered) =>
-                  buildCard(ctx, open, isFocused || hovered),
+          if (rowMotion != null) {
+            return ValueListenableBuilder<double>(
+              valueListenable: rowMotion.progressFor(motionKey(item)),
+              builder: (ctx, progress, _) =>
+                  buildCard(ctx, progress, isFocused),
             );
           }
           return SelectorBuilder<bool>(
@@ -5994,11 +5959,37 @@ class _ContentRowsState extends State<_ContentRows>
                         delayExpansion && !PlatformDetection.useMobileUi,
                   )
                 : isFocused,
-            builder: (ctx, effectiveV2Focused) =>
-                buildCard(ctx, effectiveV2Focused ? 1 : 0, effectiveV2Focused),
+            builder: (ctx, effectiveV2Focused) => isRowsV2
+                ? ModernCardTransition(
+                    expanded: effectiveV2Focused,
+                    duration: modernDuration,
+                    builder: (ctx, progress) =>
+                        buildCard(ctx, progress, effectiveV2Focused),
+                  )
+                : buildCard(
+                    ctx,
+                    effectiveV2Focused ? 1 : 0,
+                    effectiveV2Focused,
+                  ),
           );
         },
-      ),
+      );
+    }
+
+    return _buildTitledRow(
+      key: _rowContainerKey(rowIndex),
+      title: _localizedRowTitle(row, l10n),
+      subtitle: subtitle,
+      rowIndex: rowIndex,
+      hasItems: row.items.isNotEmpty,
+      height: rowTotalHeight,
+      child: coordinateExpansion
+          ? ModernCardRowTransition(
+              duration: modernDuration,
+              expansionDelay: expansionDelay,
+              builder: (_, motion) => buildRow(motion),
+            )
+          : buildRow(null),
     );
   }
 

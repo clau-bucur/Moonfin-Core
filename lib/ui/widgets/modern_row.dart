@@ -7,12 +7,9 @@ import 'package:moonfin_design/moonfin_design.dart';
 
 import '../../preference/preference_constants.dart';
 import '../../preference/user_preferences.dart';
-import '../../util/focus/input_mode_tracker.dart';
 import '../../util/overview_text.dart';
 import '../../util/platform_detection.dart';
-import 'focus/row_glide.dart';
 import 'rating_display.dart';
-import 'selector_builder.dart';
 
 /// A Modern poster is the same height as a classic portrait card at the same
 /// card size.
@@ -137,53 +134,6 @@ double modernDetailsOpacity(double open) =>
 double _smoothstep(double from, double to, double x) {
   final t = ((x - from) / (to - from)).clamp(0.0, 1.0);
   return t * t * (3 - 2 * t);
-}
-
-/// Rebuilds a Modern card as the row's glide or a mouse hover grows it, and
-/// hands [builder] how far it has grown. A hover only counts while the mouse
-/// is in use, so cards that glide under a parked pointer don't grow.
-class ModernGlideBuilder extends StatelessWidget {
-  const ModernGlideBuilder({
-    super.key,
-    required this.glide,
-    required this.expansion,
-    required this.cardKey,
-    required this.index,
-    required this.prefs,
-    required this.builder,
-  });
-
-  final RowGlide glide;
-  final ModernCardExpansion expansion;
-  final String cardKey;
-  final int index;
-  final UserPreferences prefs;
-  final Widget Function(BuildContext context, double open, bool hovered)
-      builder;
-
-  @override
-  Widget build(BuildContext context) {
-    final pointerLive = InputModeTracker.pointerIsLive(context);
-    return SelectorBuilder<bool>(
-      listenable: expansion.hoveredKey,
-      select: () => expansion.hoveredKey.value == cardKey,
-      builder: (context, hovered) {
-        final hoverOpen = hovered && pointerLive;
-        return TweenAnimationBuilder<double>(
-          tween: Tween(end: hoverOpen ? 1.0 : 0.0),
-          duration:
-              prefs.get(UserPreferences.modernCardTransitionSpeed).duration,
-          curve: Curves.easeInOutCubic,
-          builder: (context, hover, _) => SelectorBuilder<double>(
-            listenable: glide,
-            select: () => glide.openness(index),
-            builder: (context, open) =>
-                builder(context, math.max(open, hover), hoverOpen),
-          ),
-        );
-      },
-    );
-  }
 }
 
 /// Builds a grown card's details knowing whether the pointer is on it. The

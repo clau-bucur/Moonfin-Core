@@ -1062,6 +1062,7 @@ class _PlayerControls extends StatelessWidget {
           // SyncPlay only joins the row in a group.
           if (osd.isOffered &&
               osd != OsdButton.syncPlay &&
+              !(tv && osd == OsdButton.restart) &&
               !hidden.contains(osd.id))
             switch (osd) {
               OsdButton.speed => SizedBox.square(
@@ -1293,6 +1294,9 @@ class _PlayerControls extends StatelessWidget {
                             landscape: landscape,
                             scale: scale,
                             build: transport,
+                            leading: tv && !hidden.contains(OsdButton.restart.id)
+                                ? button(OsdButton.restart.icon, iconSize, extent)
+                                : null,
                           ),
                           const SizedBox(width: AppSpacing.spaceXs),
                           Expanded(child: extras),

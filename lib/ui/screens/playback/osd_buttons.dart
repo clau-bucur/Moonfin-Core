@@ -168,6 +168,7 @@ Widget osdDockedTransport({
   required bool landscape,
   required double scale,
   required OsdTransportBuilder build,
+  Widget? leading,
 }) {
   final size = osdRowButtonSize(landscape: landscape);
   Widget button(OsdTransportButton button) =>
@@ -178,6 +179,7 @@ Widget osdDockedTransport({
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
+        if (leading != null) ...[leading, const SizedBox(width: 4)],
         button(OsdTransportButton.previous),
         const SizedBox(width: 4),
         button(OsdTransportButton.seekBack),
