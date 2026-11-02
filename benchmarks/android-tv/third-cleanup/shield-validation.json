@@ -1,0 +1,152 @@
+{
+  "SourceRevision": "eefa0a9f73d07fbe178b850a37afabc766be661d",
+  "MeasuredAtUtc": "2026-11-02T19:16:00.877Z",
+  "UserApprovedDeviceTests": true,
+  "ApkSha256": "19e6105f252200a976e9598e0a37202affbae4e2f00707cedcbd578bf607420d",
+  "PackageName": "org.moonfin.androidtv.videoexperiment",
+  "Device": {
+    "Model": "NVIDIA SHIELD Android TV",
+    "Android": "11",
+    "PhysicalResolution": "3840x2160",
+    "LogicalSizeOverride": "1920x1080"
+  },
+  "Installation": {
+    "Result": "Success",
+    "Mode": "In-place update of separate experiment package",
+    "ApplicationDataCleared": false,
+    "SignInPreserved": true,
+    "SettingsChanged": false
+  },
+  "FunctionalChecks": [
+    {
+      "Check": "Signed-in Home and video artwork/rows",
+      "Result": "Passed"
+    },
+    {
+      "Check": "Same artwork cropped before focus and revealed on expansion",
+      "Result": "Passed visual inspection"
+    },
+    {
+      "Check": "Horizontal eight-right/eight-left sequence, long press, three-row down/up sequence",
+      "Result": "Focus retained, no crash or stuck navigation observed"
+    },
+    {
+      "Check": "Movie and episode details",
+      "Result": "Loaded, playback controls available"
+    },
+    {
+      "Check": "1080p HEVC/AAC stereo episode, SRT subtitles, seek, pause/resume, Back to details",
+      "Result": "Played; subtitle rendering observed"
+    },
+    {
+      "Check": "720p H.264/DTS 5.1 movie with SubRip subtitles",
+      "Result": "Played; direct DTS output confirmed by active AudioFlinger track"
+    },
+    {
+      "Check": "1080p H.264/E-AC-3 5.1 episode",
+      "Result": "Played; direct E-AC-3 output confirmed by active AudioFlinger track"
+    },
+    {
+      "Check": "D-pad Restart on paused episode",
+      "Result": "Same episode resumed near zero; position observed 5983 ms after capture/pull"
+    },
+    {
+      "Check": "D-pad Restart on paused movie",
+      "Result": "Same movie resumed at zero; screenshot then showed 0:02 and playing"
+    },
+    {
+      "Check": "Root first Back toast, expiry, subsequent Back pair",
+      "Result": "Toast visible and no modal; expiry reset; fresh pair returned to launcher"
+    },
+    {
+      "Check": "Video search: movie, series and episode groups",
+      "Result": "Passed; a series result opened successfully"
+    },
+    {
+      "Check": "Series details and season switching",
+      "Result": "Passed; season selector and episode cards populated; switching from first to second season changed the episode row"
+    }
+  ],
+  "Audio": {
+    "AndroidEncodedOutputs": [
+      {
+        "Format": "DTS",
+        "Channels": 6,
+        "SampleRateHz": 48000
+      },
+      {
+        "Format": "E_AC3",
+        "Channels": 6,
+        "SampleRateHz": 48000
+      }
+    ],
+    "UserFeedback": {
+      "AAC": "Startup seemed prompt",
+      "DTS": "Played, but startup less prompt than Netflix",
+      "EAC3": "About the same as DTS; audio takes 1–2 seconds after pause/resume"
+    },
+    "ControlledDolbyResume": {
+      "PauseSeconds": 3,
+      "PostResumeWaitBeforeFirstDumpMs": 300,
+      "Phases": {
+        "before": {
+          "TrackId": 160,
+          "Active": true,
+          "SessionId": 529,
+          "PortId": 222,
+          "State": "A",
+          "OutputStandby": false,
+          "LastWriteMs": 17
+        },
+        "paused": {
+          "TrackId": 160,
+          "Active": false,
+          "SessionId": 529,
+          "PortId": 222,
+          "State": "P",
+          "OutputStandby": true,
+          "LastWriteMs": 3527
+        },
+        "after": {
+          "TrackId": 160,
+          "Active": true,
+          "SessionId": 529,
+          "PortId": 222,
+          "State": "A",
+          "OutputStandby": false,
+          "LastWriteMs": 24
+        },
+        "settled": {
+          "TrackId": 160,
+          "Active": true,
+          "SessionId": 529,
+          "PortId": 222,
+          "State": "A",
+          "OutputStandby": false,
+          "LastWriteMs": 6
+        }
+      },
+      "SameTrackSessionAndPortRetained": true
+    },
+    "Finding": "Resume delay remains unresolved. Output entered standby while paused and was writing again in the first post-resume snapshot. Evidence points toward output/HDMI/receiver wake-up, but does not isolate the full cause or demonstrate Netflix internal behavior.",
+    "InitialBufferChange": "500 ms initial startup threshold does not establish an improvement in already-buffered pause/resume.",
+    "ReceiverAudibilityTiming": "User observation only; no acoustic timing capture",
+    "RegressionAttribution": "Not established; no matched before/after baseline pause/resume measurement was made."
+  },
+  "PerformanceLimits": {
+    "HwuiGfxinfo": "Only one HWUI frame recorded; not a measurement of Flutter frame pacing",
+    "SurfaceFlingerLatency": "Refresh interval returned without frame timestamps; no FPS/jank claim",
+    "FirstPostInstallActivityTimeMs": 1574,
+    "FirstLaunchLog": "One Skipped 42 frames startup warning observed; not a sustained navigation trace"
+  },
+  "NotCovered": [
+    "Quantified Flutter scrolling/frame-time comparison",
+    "HDR/Dolby Vision playback",
+    "TrueHD, DTS-HD and Atmos",
+    "Live TV",
+    "mpv fallback",
+    "Receiver channel-isolation/codec-display verification"
+  ],
+  "Privacy": "Titles, server addresses, credentials and screenshots are excluded. Raw diagnostic captures remain local.",
+  "FinalState": "Updated experiment left signed in on Home, playback stopped. Baseline force-stopped by the paired measurement. Device test screenshots removed from /data/local/tmp; local captures remain private."
+}

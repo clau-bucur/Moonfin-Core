@@ -46,5 +46,6 @@
     "Installed": false,
     "Launched": false,
     "Tested": false
-  }
+  },
+  "RecordScope": "Local validation before the subsequent explicit device-test approval; see shield-validation.json for the approved follow-up."
 }

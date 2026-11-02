@@ -25,13 +25,13 @@ removing the separate offline SQLite bindings does not remove Android's cache DB
 
 | Request | Implemented behavior | Shield status |
 | --- | --- | --- |
-| Smooth modern card transitions | Faster critically damped motion; held navigation keeps the row expanded | Awaiting OK |
-| Smooth row changes | Retargetable scroll spring preserves velocity; row focus space no longer changes row height | Awaiting OK |
-| Keep the same artwork on focus | Collapsed cards crop the same wide image revealed by expansion; prefetch and card reuse one decode | Awaiting OK |
-| Improve Home/details loading | Home coalesces arrivals within a frame; details publish main seasons/episodes or initial collection/playlist members with the first ready state | Awaiting OK |
-| Improve receiver audio startup | Initial Media3 streaming buffer reduced from 1,000 to 500 ms; source-to-AudioTrack/advancing diagnostics added | Awaiting OK |
-| Double-Back exit toast | Two-second toast at root; separate second press exits, route changes reset it, duplicate dispatch is ignored | Awaiting OK |
-| Restart for movies/episodes | Secondary player control seeks the current stream to zero then resumes, retaining queue/source/tracks and cancelling stale scrub state | Awaiting OK |
+| Smooth modern card transitions | Faster critically damped motion; held navigation keeps the row expanded | Exercised on Shield; see results below |
+| Smooth row changes | Retargetable scroll spring preserves velocity; row focus space no longer changes row height | Exercised on Shield; see results below |
+| Keep the same artwork on focus | Collapsed cards crop the same wide image revealed by expansion; prefetch and card reuse one decode | Exercised on Shield; see results below |
+| Improve Home/details loading | Home coalesces arrivals within a frame; details publish main seasons/episodes or initial collection/playlist members with the first ready state | Exercised on Shield; see results below |
+| Improve receiver audio startup | Initial Media3 streaming buffer reduced from 1,000 to 500 ms; source-to-AudioTrack/advancing diagnostics added | Audio output works; resume delay unresolved |
+| Double-Back exit toast | Two-second toast at root; separate second press exits, route changes reset it, duplicate dispatch is ignored | Exercised on Shield; see results below |
+| Restart for movies/episodes | Secondary player control seeks the current stream to zero then resumes, retaining queue/source/tracks and cancelling stale scrub state | Exercised on Shield; see results below |
 
 Optional ratings/recommendations still load asynchronously. No Netflix-equivalent
 frame pacing or audible receiver startup result is claimed. HDMI mode-switch settling,
@@ -87,12 +87,75 @@ See [artifact-audit.json](artifact-audit.json) and [experiment-apk.json](experim
 Local APK: `artifacts/android-tv-video/release-android-arm64/moonfin-video-experiment.apk`.
 SHA-256: `19e6105f252200a976e9598e0a37202affbae4e2f00707cedcbd578bf607420d`.
 
-## Shield gate
+## Approved Shield follow-up
 
-**Ready, awaiting explicit user OK.** No ADB calls, installation, launch or Shield
-checks were performed for this round. The existing separate test app's data was not
-cleared. After approval, validate startup, sustained D-pad/card and row movement,
-movie/series details, movie and episode Restart, root Back behavior, subtitles,
-seek/resume, HDR/passthrough and audio-startup timing against the prior build.
+After explicit user approval, the audited APK was installed over the separate
+experiment package without clearing app data. It opened signed in. The installed
+APK hash matches the build audit above; no application code changed during this
+follow-up. Main remains untouched.
 
-APK size is a static footprint result; runtime performance still needs those checks.
+Home artwork cropping/expansion, repeated horizontal movement, a held-key input,
+row changes, search, movie/episode/series details, season switching, subtitles,
+seek, pause/resume and Back navigation were exercised. Movie and episode Restart
+were reached using D-pad navigation while paused: both returned the current title
+to the beginning and resumed without advancing the queue. The first-Back toast,
+expiry and a subsequent pair of Back presses returned to the launcher correctly.
+
+Video coverage included a 1080p HEVC/AAC stereo episode, a 720p H.264/DTS 5.1 movie
+and a 1080p H.264/E-AC-3 (DD+) 5.1 episode. Active Android audio tracks confirmed
+encoded DTS and E-AC-3 output, six channels at 48 kHz. This confirms the Android
+output path, not an independently measured receiver channel test. Existing movie
+and episode resume points were returned near their earlier minute positions after
+Restart checks. The additional Dolby episode was returned to its starting point.
+
+### Audio finding: pause/resume remains delayed
+
+The user reported prompt AAC startup, slower DTS startup than Netflix, and similar
+DD+/DTS behavior with **1–2 seconds before audible audio after resuming**.
+
+In a controlled DD+ pause/resume, the same track, audio session and port remained
+allocated. Android's direct HDMI output entered standby while paused, then was
+active and writing again in the first snapshot after a 300 ms post-resume wait
+(plus command/dump overhead). The last write was 24 ms before that snapshot.
+This points toward output/HDMI/receiver wake-up as a candidate; it does not isolate
+the complete cause or prove how Netflix handles its output. A codec change alone
+has not solved the observed gap. The smaller initial startup buffer does not
+establish a pause/resume improvement. No baseline resume comparison was performed,
+so this is not attributed to the cleanup as a regression.
+
+The audio issue needs further investigation rather than removal of HDMI recovery
+safeguards based on this observation. [Device validation](shield-validation.json)
+records the controlled track states and the user feedback without media titles.
+
+### Startup and memory, five paired samples
+
+Both separate apps retained the same signed-in account, existing caches and their
+default renderer policy. Both test packages were force-stopped before each launch;
+PSS was captured after 15 seconds. Pair order was reversed on even pairs.
+
+| Signed-in Home | Original runtime baseline | Third cleanup |
+| --- | ---: | ---: |
+| Median Activity launch | 998 ms | 868 ms |
+| Activity launch range | 953–1,394 ms | 835–946 ms |
+| Median settled process PSS | 328.6 MiB | 295.3 MiB |
+| PSS range | 321.1–334.4 MiB | 293.3–315.3 MiB |
+
+[Baseline samples](baseline-startup-signed-in.json),
+[experiment samples](experiment-startup-signed-in.json) and
+[summary](startup-summary.json) preserve the observations. This compares the whole
+experiment with the original runtime baseline, not the isolated effect of round
+three. The apps now load different poster/wide-artwork decodes and retain separate
+caches. One small run does not establish a general performance improvement.
+Activity launch time is not time to usable Home; PSS is one settled process sample,
+not peak/playback memory or frame pacing.
+
+The HWUI capture reported only one frame and SurfaceFlinger returned no presentation
+history for the Flutter surface, so those captures cannot supply a scrolling FPS or
+jank percentage. One startup warning about 42 skipped frames appeared on the first
+post-install launch. No crash or stuck navigation was observed in the exercised flows.
+HDR/Dolby Vision, TrueHD/DTS-HD/Atmos, live TV and mpv fallback remain outside this
+follow-up's playback coverage.
+
+The experiment was left signed in on Home with playback stopped. No settings or
+caches were reset. Screenshots and raw playback/audio diagnostics remain local and
+are not committed. Temporary test screenshots on the Shield were removed.

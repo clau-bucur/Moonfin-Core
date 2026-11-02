@@ -1,0 +1,29 @@
+{
+  "Baseline": {
+    "Samples": 5,
+    "MedianActivityMs": 998,
+    "ActivityRangeMs": [
+      953,
+      1394
+    ],
+    "MedianPssMiB": 328.6,
+    "PssRangeMiB": [
+      321.1,
+      334.4
+    ]
+  },
+  "Experiment": {
+    "Samples": 5,
+    "MedianActivityMs": 868,
+    "ActivityRangeMs": [
+      835,
+      946
+    ],
+    "MedianPssMiB": 295.3,
+    "PssRangeMiB": [
+      293.3,
+      315.3
+    ]
+  },
+  "Note": "Whole experiment versus original runtime baseline. Not an isolated round-three comparison; different artwork/cache contents and one small device run. Activity time is not time to usable Home or scrolling frame pacing."
+}

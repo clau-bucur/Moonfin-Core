@@ -73,5 +73,5 @@
     "libasskt.so"
   ],
   "AbiPolicy": "Unchanged: ARM64 Flutter AOT; support JNI libraries for ARM64, ARMv7, x86_64",
-  "ShieldAccess": "None; awaiting explicit user OK"
+  "ShieldAccess": "None at build/audit time. Subsequent user-approved device tests are recorded in shield-validation.json."
 }

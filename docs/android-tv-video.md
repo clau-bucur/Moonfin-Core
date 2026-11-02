@@ -70,9 +70,10 @@ change video compatibility, not merely remove unrelated features.
   record source-to-audio-track and source-to-audio-position-advancing times;
   these are not a measurement of receiver audibility.
 
-The receiver and perceived-motion improvements remain experimental until tested
-on the Shield. Device installation, launch and testing require the user's next
-explicit OK. Local builds and unit/widget/JVM checks do not access the Shield.
+Approved Shield checks are recorded in the third-cleanup report below. Browsing,
+Restart and exit checks passed. DTS/DD+ playback works, but a user-observed 1–2
+second audio gap after resume remains unresolved. Scrolling FPS and audible-startup
+improvements have not been established by a controlled frame/acoustic measurement.
 
 Some non-video shared Dart models/helpers and transitive platform metadata
 remain. No frame-rate or audible-startup improvement is claimed from APK size.
