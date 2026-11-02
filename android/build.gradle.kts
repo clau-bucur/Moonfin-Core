@@ -26,6 +26,14 @@ subprojects {
         plugins.withId("com.android.library") {
             pluginManager.apply("org.jetbrains.kotlin.android")
         }
+        plugins.withId("org.jetbrains.kotlin.android") {
+            tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+                // file_picker sets Java 17 but omits kotlinOptions on AGP 9.
+                // With built-in Kotlin disabled, the applied plugin otherwise
+                // defaults to the host JDK (21 on this machine).
+                compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            }
+        }
     }
 }
 
