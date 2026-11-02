@@ -48,6 +48,15 @@ is not written to disk across app restarts.
 
 ## Shield gate
 
+The combined Android TV ARM64 release build passed for source commit
+`31bce8df1f79b323e5185981d1b69391b3edfde9`. APK signature verification and package
+identity checks passed. The APK at
+`artifacts/android-tv-video/release-android-arm64/moonfin-video-experiment.apk`
+contains 66,372,384 bytes (63.30 MiB). SHA-256:
+`07d5a11ae7c06cdd1800b55bf2456891a14a314ba4f054d86efef098a3450a5c`.
+
+See [validation results](local-validation.json) and [APK inventory](experiment-apk.json).
+
 The combined revision has not been installed or tested on the Shield. Wait for
 the user's next OK, then check card bounce, text anchoring, row transitions,
 selection restoration, details loading, and Movie/Episode Restart.

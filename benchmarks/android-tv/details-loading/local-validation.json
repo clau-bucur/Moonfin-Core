@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-02",
+  "sourceRevision": "31bce8df1f79b323e5185981d1b69391b3edfde9",
+  "branch": "experiment/android-tv-video",
+  "mainRevision": "f95909b13187c0d7168c96ac0e3e09982b2ac96b",
+  "prs": {
+    "detailsLoading": {
+      "number": 1541,
+      "source": "d047833b43753800fe3d996c80070b60819803cc",
+      "verifiedHead": "e3d49e2945c3d5a1b6ffcdeb0bc90a3192a930a1"
+    },
+    "motion": {
+      "number": 1542,
+      "verifiedHead": "769a9b64a1c142bcb429f94e1608cbc8bf874711",
+      "matchingSourceFiles": [
+        "lib/ui/widgets/modern_card_transition.dart",
+        "lib/ui/widgets/focus/modern_row_navigation.dart",
+        "lib/ui/widgets/modern_row_visibility.dart"
+      ]
+    }
+  },
+  "localChecks": {
+    "additionalPassed": 44,
+    "precedingMotionPassed": 173,
+    "files": [
+      {
+        "file": "test/skeleton/detail_loading_test.dart",
+        "passed": 14
+      },
+      {
+        "file": "test/skeleton/skeleton_widgets_test.dart",
+        "passed": 29
+      },
+      {
+        "file": "test/ui/screens/detail/nouveau/nouveau_detail_content_test.dart",
+        "passed": 1,
+        "filter": "TV loading avoids a placeholder hero and reveals ready content immediately"
+      }
+    ],
+    "analyzer": {
+      "errors": 0,
+      "warnings": 0,
+      "infos": 0
+    },
+    "diffCheck": "passed",
+    "fullSuiteClaimed": false
+  },
+  "selectionMemory": {
+    "duringSession": true,
+    "acrossAppRestarts": false
+  },
+  "build": {
+    "status": "passed",
+    "signatureVerification": "passed",
+    "package": "org.moonfin.androidtv.videoexperiment",
+    "target": "android-arm64",
+    "apkBytes": 66372384,
+    "apkSha256": "07d5a11ae7c06cdd1800b55bf2456891a14a314ba4f054d86efef098a3450a5c"
+  },
+  "shield": {
+    "installedThisRevision": false,
+    "testedThisRevision": false,
+    "gate": "Await user OK"
+  },
+  "preservedUncommittedFiles": [
+    "lib/l10n/app_localizations_fi.dart",
+    "lib/l10n/app_localizations_it.dart",
+    "lib/l10n/app_localizations_zh.dart"
+  ]
+}
