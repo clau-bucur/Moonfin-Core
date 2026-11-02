@@ -65,6 +65,7 @@ import 'util/focus/input_mode_tracker.dart';
 import 'util/idiom/app_ui_idiom.dart';
 import 'util/idiom/glass_capability.dart';
 import 'util/platform_detection.dart';
+import 'util/video_app_profile.dart';
 import 'util/tv_ui_scale.dart';
 import 'ui/widgets/overlay_sheet.dart';
 import 'package:moonfin_design/moonfin_design.dart';
@@ -313,7 +314,7 @@ class _MoonfinAppState extends State<MoonfinApp> {
                                 ],
                               ),
                             ),
-                            if (!hidePlayer)
+                            if (!hidePlayer && !VideoAppProfile.enabled)
                               const RepaintBoundary(child: CastMiniPlayer()),
                             if (!hidePlayer) const VideoMiniPlayer(),
                           ],

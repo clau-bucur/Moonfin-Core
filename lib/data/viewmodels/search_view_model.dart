@@ -6,6 +6,7 @@ import 'package:server_core/server_core.dart';
 
 import '../../l10n/current_app_localizations.dart';
 import '../../util/accent_folding.dart';
+import '../../util/video_app_profile.dart';
 import '../models/aggregated_item.dart';
 import '../repositories/multi_server_repository.dart';
 import '../repositories/search_repository.dart';
@@ -24,7 +25,11 @@ class SearchResultGroup {
   });
 
   SearchResultGroup copyWith({List<AggregatedItem>? items}) =>
-      SearchResultGroup(title: title, itemTypes: itemTypes, items: items ?? this.items);
+      SearchResultGroup(
+        title: title,
+        itemTypes: itemTypes,
+        items: items ?? this.items,
+      );
 }
 
 /// A single retro game that matched the query. Games live behind the Moonbase
@@ -55,10 +60,9 @@ class SearchViewModel extends ChangeNotifier {
     MultiServerRepository? multiServerRepository,
   }) : _seerrRepository = seerrRepository,
        _multiServerRepository = multiServerRepository,
-       _scopedParentId =
-           (scopedParentId != null && scopedParentId.isNotEmpty)
-               ? scopedParentId
-               : null;
+       _scopedParentId = (scopedParentId != null && scopedParentId.isNotEmpty)
+           ? scopedParentId
+           : null;
 
   void setSeerrRepository(SeerrRepository repo) {
     _seerrRepository = repo;
@@ -126,7 +130,10 @@ class SearchViewModel extends ChangeNotifier {
       SearchResultGroup(title: l10n.seasons, itemTypes: const ['Season']),
       SearchResultGroup(title: l10n.episodes, itemTypes: const ['Episode']),
       SearchResultGroup(title: l10n.videos, itemTypes: const ['Video']),
-      SearchResultGroup(title: l10n.musicVideos, itemTypes: const ['MusicVideo']),
+      SearchResultGroup(
+        title: l10n.musicVideos,
+        itemTypes: const ['MusicVideo'],
+      ),
       SearchResultGroup(title: l10n.trailers, itemTypes: const ['Trailer']),
       SearchResultGroup(title: l10n.programs, itemTypes: const ['Program']),
       SearchResultGroup(
@@ -140,7 +147,10 @@ class SearchViewModel extends ChangeNotifier {
       ),
       SearchResultGroup(title: l10n.albums, itemTypes: const ['MusicAlbum']),
       SearchResultGroup(title: l10n.songs, itemTypes: const ['Audio']),
-      SearchResultGroup(title: l10n.photoAlbums, itemTypes: const ['PhotoAlbum']),
+      SearchResultGroup(
+        title: l10n.photoAlbums,
+        itemTypes: const ['PhotoAlbum'],
+      ),
       SearchResultGroup(title: l10n.photos, itemTypes: const ['Photo']),
       SearchResultGroup(title: l10n.collections, itemTypes: const ['BoxSet']),
       SearchResultGroup(title: l10n.people, itemTypes: const ['Person']),
@@ -191,9 +201,12 @@ class SearchViewModel extends ChangeNotifier {
     final run = ++_searchRun;
 
     try {
-        final activeGroups = _scopedParentId != null
-          ? _bookSearchGroups()
-          : _searchGroups();
+      final activeGroups =
+          (_scopedParentId != null ? _bookSearchGroups() : _searchGroups())
+              .where(
+                (group) => group.itemTypes.any(VideoAppProfile.allowsItemType),
+              )
+              .toList();
       final seerrFuture = _fetchSeerrResults(query);
       final gamesFuture = _scopedParentId != null
           ? Future.value(const <GameSearchResult>[])
@@ -264,7 +277,10 @@ class SearchViewModel extends ChangeNotifier {
     // instead of looking the servers up again.
     final sessions = await _multiServerRepository?.getLoggedInServers();
     _serverNames = sessions != null && sessions.length > 1
-        ? {for (final session in sessions) session.server.id: session.server.name}
+        ? {
+            for (final session in sessions)
+              session.server.id: session.server.name,
+          }
         : const {};
     final peopleFuture = _searchEachServer(
       (repository) => repository
@@ -327,7 +343,9 @@ class SearchViewModel extends ChangeNotifier {
 
   /// Takes one result from each server in turn, so every server keeps its own
   /// ranking and none crowds the others out of a capped group.
-  static List<AggregatedItem> _interleave(List<List<AggregatedItem>> perServer) {
+  static List<AggregatedItem> _interleave(
+    List<List<AggregatedItem>> perServer,
+  ) {
     final longest = perServer.fold(0, (most, items) => max(most, items.length));
     return [
       for (var i = 0; i < longest; i++)
@@ -364,6 +382,7 @@ class SearchViewModel extends ChangeNotifier {
   }
 
   Future<List<SeerrDiscoverItem>> _fetchSeerrResults(String query) async {
+    if (VideoAppProfile.enabled) return const [];
     if (_scopedParentId != null) return const [];
     if (query.trim().toLowerCase().startsWith('studio:')) return const [];
     final repo = _seerrRepository;
@@ -379,6 +398,7 @@ class SearchViewModel extends ChangeNotifier {
   }
 
   Future<List<GameSearchResult>> _fetchGameResults(String query) async {
+    if (VideoAppProfile.enabled) return const [];
     // Games have no search endpoint, so the whole set is matched here and the
     // folding is this side's to do.
     final q = foldForSearch(query.trim());

@@ -172,12 +172,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   static const _scrubSeekConvergeTimeout = Duration(seconds: 2);
 
   final _manager = GetIt.instance<PlaybackManager>();
-  // media_kit isn't registered on platforms that run a different backend, so
-  // ask the container rather than listing them.
-  final MediaKitPlayerBackend? _backend =
-      GetIt.instance.isRegistered<MediaKitPlayerBackend>()
-      ? GetIt.instance<MediaKitPlayerBackend>()
-      : null;
   final _prefs = GetIt.instance<UserPreferences>();
   // App lifetime and shared with the mini player, so minimizing does not
   // flip the display out of HDR while the video carries on in the bar.
@@ -227,10 +221,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   /// The backend whose mpv statistics overlay this screen can toggle, or null
   /// where that libmpv build has none. Resolved like [_hdrBackend].
   MediaKitPlayerBackend? get _mpvStatsBackend {
-    final backend = _activeMediaKitBackend ?? _backend;
-    return backend is MediaKitPlayerBackend && backend.supportsMpvStats
-        ? backend
-        : null;
+    final backend = _activeMediaKitBackend;
+    return backend?.supportsMpvStats == true ? backend : null;
   }
 
   Media3PlayerBackend? get _activeMedia3Backend {
@@ -269,7 +261,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   /// without the native window.
   MediaKitPlayerBackend? get _hdrBackend =>
       PlatformDetection.supportsNativeHdrWindow
-      ? (_activeMediaKitBackend ?? _backend)
+      ? _activeMediaKitBackend
       : null;
 
   /// Whether mpv currently renders into its own native window.
@@ -4229,7 +4221,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       );
     }
 
-    final mediaKitBackend = _activeMediaKitBackend ?? _backend;
+    final mediaKitBackend = _activeMediaKitBackend;
     if (mediaKitBackend == null) {
       return const Positioned.fill(child: ColoredBox(color: Colors.black));
     }

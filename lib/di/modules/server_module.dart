@@ -25,6 +25,7 @@ import '../../playback/server_transcode_capabilities.dart';
 import '../../util/download_grouping.dart' show downloadNotificationLabel;
 import '../../util/download_utils.dart' show formatBytes;
 import '../../preference/user_preferences.dart';
+import '../../util/video_app_profile.dart';
 
 final _getIt = GetIt.instance;
 
@@ -41,7 +42,8 @@ void registerServerModule() {
     ),
   );
 
-  if (!_getIt.isRegistered<DownloadNotificationService>()) {
+  if (!VideoAppProfile.enabled &&
+      !_getIt.isRegistered<DownloadNotificationService>()) {
     _getIt.registerLazySingleton<DownloadNotificationService>(
       () => DownloadNotificationService(),
     );
@@ -49,19 +51,22 @@ void registerServerModule() {
 
   // App-lifetime: owns the background_downloader singleton across server
   // switches, while DownloadService instances attach/detach to it.
-  if (!_getIt.isRegistered<BackgroundDownloadCoordinator>()) {
+  if (!VideoAppProfile.enabled &&
+      !_getIt.isRegistered<BackgroundDownloadCoordinator>()) {
     _getIt.registerLazySingleton<BackgroundDownloadCoordinator>(
       () => BackgroundDownloadCoordinator(_getIt<UserPreferences>()),
     );
   }
 
-  if (!_getIt.isRegistered<SeerrNotificationService>()) {
+  if (!VideoAppProfile.enabled &&
+      !_getIt.isRegistered<SeerrNotificationService>()) {
     _getIt.registerLazySingleton<SeerrNotificationService>(
       () => SeerrNotificationService(),
     );
   }
 
-  if (!_getIt.isRegistered<PushMessagingService>()) {
+  if (!VideoAppProfile.enabled &&
+      !_getIt.isRegistered<PushMessagingService>()) {
     _getIt.registerLazySingleton<PushMessagingService>(
       () => PushMessagingService(),
     );
@@ -86,14 +91,16 @@ void setActiveServerClient(
   final rawClient = client is ConnectivityAwareMediaServerClient
       ? client.onlineClient
       : client;
-  final wrapped = ConnectivityAwareMediaServerClient(
-    rawClient,
-    useOffline: shouldUseOfflineCatalog,
-    catalog: _getIt<OfflineCatalog>(),
-    storagePath: _getIt<StoragePathService>(),
-    pendingRatings: _getIt<PendingRatingStore>(),
-    offlineRepo: _getIt<OfflineRepository>(),
-  );
+  final wrapped = VideoAppProfile.enabled
+      ? rawClient
+      : ConnectivityAwareMediaServerClient(
+          rawClient,
+          useOffline: shouldUseOfflineCatalog,
+          catalog: _getIt<OfflineCatalog>(),
+          storagePath: _getIt<StoragePathService>(),
+          pendingRatings: _getIt<PendingRatingStore>(),
+          offlineRepo: _getIt<OfflineRepository>(),
+        );
 
   if (_getIt.isRegistered<MediaServerClient>()) {
     _getIt.unregister<MediaServerClient>();
@@ -111,27 +118,29 @@ void setActiveServerClient(
     _getIt<DownloadService>().detachFromGlobalState();
     _getIt.unregister<DownloadService>();
   }
-  final downloadService = DownloadService(
-    rawClient,
-    _getIt<DownloadNotificationService>(),
-  );
-  _getIt.registerSingleton<DownloadService>(downloadService);
-
-  // Absent on the background isolates, which never draw a nav bar.
-  if (_getIt.isRegistered<OfflineRepository>()) {
-    _getIt.registerSingleton<SavedMediaPresence>(
-      SavedMediaPresence(_getIt<OfflineRepository>(), downloadService),
-    );
-  }
-
-  if (AutoDownloadService.isSupportedPlatform) {
-    _replaceAutoDownloadService(
+  if (!VideoAppProfile.enabled) {
+    final downloadService = DownloadService(
       rawClient,
-      downloadService,
-      background: background,
+      _getIt<DownloadNotificationService>(),
     );
-  } else {
-    downloadService.recoverIncompleteDownloads();
+    _getIt.registerSingleton<DownloadService>(downloadService);
+
+    // Absent on the background isolates, which never draw a nav bar.
+    if (_getIt.isRegistered<OfflineRepository>()) {
+      _getIt.registerSingleton<SavedMediaPresence>(
+        SavedMediaPresence(_getIt<OfflineRepository>(), downloadService),
+      );
+    }
+
+    if (AutoDownloadService.isSupportedPlatform) {
+      _replaceAutoDownloadService(
+        rawClient,
+        downloadService,
+        background: background,
+      );
+    } else {
+      downloadService.recoverIncompleteDownloads();
+    }
   }
 
   // Fire and forget: device profiles read the cached result and fall back to

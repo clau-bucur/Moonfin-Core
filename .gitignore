@@ -32,6 +32,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+/artifacts/
 # windows generated code (CMakeLists.txt is a static project file and must stay tracked)
 windows/flutter/generated_plugin_registrant.cc
 windows/flutter/generated_plugin_registrant.h

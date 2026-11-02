@@ -25,6 +25,7 @@ import '../../data/repositories/user_views_repository.dart';
 import '../../data/repositories/search_repository.dart';
 import '../../data/repositories/item_mutation_repository.dart';
 import '../../util/game_library.dart';
+import '../../util/video_app_profile.dart';
 import '../../data/services/background_service.dart';
 import '../../data/services/access_schedule_service.dart';
 import '../../data/services/app_update_service.dart';
@@ -167,26 +168,31 @@ void registerAppModule() {
     ),
     dispose: (controller) => controller.dispose(),
   );
-  _getIt.registerLazySingleton(() {
-    final users = _getIt<UserRepository>();
-    final service = AccessScheduleService(
-      loadSchedules: _loadAccessSchedules,
-      onBlocked: _stopPlaybackForAccessSchedule,
-      serverRefuses: _serverRefusesUser,
-    );
-    // An administrator has no schedule to enforce.
-    String? watched(User? user) =>
-        user == null || user.isAdministrator ? null : user.id;
-    service.setUser(watched(users.currentUser));
-    _accessScheduleUserSubscription = users.currentUserStream.listen(
-      (user) => service.setUser(watched(user)),
-    );
-    return service;
-  }, dispose: (service) {
-    unawaited(_accessScheduleUserSubscription?.cancel());
-    service.dispose();
-  });
-  _getIt.registerLazySingleton(() => SetupWizardGate(_getIt<UserPreferences>()));
+  _getIt.registerLazySingleton(
+    () {
+      final users = _getIt<UserRepository>();
+      final service = AccessScheduleService(
+        loadSchedules: _loadAccessSchedules,
+        onBlocked: _stopPlaybackForAccessSchedule,
+        serverRefuses: _serverRefusesUser,
+      );
+      // An administrator has no schedule to enforce.
+      String? watched(User? user) =>
+          user == null || user.isAdministrator ? null : user.id;
+      service.setUser(watched(users.currentUser));
+      _accessScheduleUserSubscription = users.currentUserStream.listen(
+        (user) => service.setUser(watched(user)),
+      );
+      return service;
+    },
+    dispose: (service) {
+      unawaited(_accessScheduleUserSubscription?.cancel());
+      service.dispose();
+    },
+  );
+  _getIt.registerLazySingleton(
+    () => SetupWizardGate(_getIt<UserPreferences>()),
+  );
   _getIt.registerLazySingleton(() => const NativeCastChannel());
   _getIt.registerLazySingleton(() => const NativeDlnaChannel());
   _getIt.registerLazySingleton(() => const NativeAirPlayChannel());
@@ -224,10 +230,12 @@ void registerAppModule() {
   _getIt.registerLazySingleton(
     () => PluginSyncService(_getIt<UserPreferences>(), _getIt()),
   );
-  _getIt.registerLazySingleton(
-    () => AchievementsService(),
-    dispose: (service) => service.dispose(),
-  );
+  if (!VideoAppProfile.enabled) {
+    _getIt.registerLazySingleton(
+      () => AchievementsService(),
+      dispose: (service) => service.dispose(),
+    );
+  }
   _getIt.registerLazySingleton(
     () => ServerPinService(deviceInfo: _getIt<DeviceInfo>()),
   );
@@ -249,40 +257,45 @@ void registerAppModule() {
       _getIt<SessionRepository>(),
     ),
   );
-  _getIt.registerLazySingleton<SyncService>(
-    () => SyncService(_getIt<OfflineRepository>(), _getIt<PendingRatingStore>()),
-  );
-  _getIt.registerLazySingleton(
-    () => RemoveWatchedService(
-      repository: _getIt<OfflineRepository>(),
-      prefs: _getIt<UserPreferences>(),
-      // Resolved per delete: the download service is replaced on every
-      // server or account switch.
-      deleteDownload: (item, {required serverId}) async =>
-          _getIt.isRegistered<DownloadService>() &&
-          await _getIt<DownloadService>().deleteServerDownload(
-            item,
-            serverId: serverId,
-          ),
-      signedInServer: () {
-        if (!_getIt.isRegistered<MediaServerClient>()) return null;
-        if (_getIt.isRegistered<ConnectivityService>() &&
-            !_getIt<ConnectivityService>().canReachServer) {
-          return null;
-        }
-        final client = _getIt<MediaServerClient>();
-        return (
-          client: client,
-          serverId: _getIt<MediaServerClientFactory>().serverIdOf(client),
-        );
-      },
-      syncInFlight: () =>
-          _getIt.isRegistered<ConnectivityService>() &&
-          _getIt<ConnectivityService>().isSyncing,
-      playingItemId: currentPlayingItemId,
-    )..start(),
-    dispose: (service) => service.dispose(),
-  );
+  if (!VideoAppProfile.enabled) {
+    _getIt.registerLazySingleton<SyncService>(
+      () => SyncService(
+        _getIt<OfflineRepository>(),
+        _getIt<PendingRatingStore>(),
+      ),
+    );
+    _getIt.registerLazySingleton(
+      () => RemoveWatchedService(
+        repository: _getIt<OfflineRepository>(),
+        prefs: _getIt<UserPreferences>(),
+        // Resolved per delete: the download service is replaced on every
+        // server or account switch.
+        deleteDownload: (item, {required serverId}) async =>
+            _getIt.isRegistered<DownloadService>() &&
+            await _getIt<DownloadService>().deleteServerDownload(
+              item,
+              serverId: serverId,
+            ),
+        signedInServer: () {
+          if (!_getIt.isRegistered<MediaServerClient>()) return null;
+          if (_getIt.isRegistered<ConnectivityService>() &&
+              !_getIt<ConnectivityService>().canReachServer) {
+            return null;
+          }
+          final client = _getIt<MediaServerClient>();
+          return (
+            client: client,
+            serverId: _getIt<MediaServerClientFactory>().serverIdOf(client),
+          );
+        },
+        syncInFlight: () =>
+            _getIt.isRegistered<ConnectivityService>() &&
+            _getIt<ConnectivityService>().isSyncing,
+        playingItemId: currentPlayingItemId,
+      )..start(),
+      dispose: (service) => service.dispose(),
+    );
+  }
   _getIt.registerLazySingleton(() => const ExternalPlayerService());
 
   _registerUserScopedSingletons();

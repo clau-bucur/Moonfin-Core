@@ -4196,6 +4196,7 @@ class _DownloadedBadgeState extends State<_DownloadedBadge> {
   void _onDownloadChanged() => _check();
 
   Future<void> _check() async {
+    if (!PlatformDetection.supportsOfflineDownloads) return;
     final repo = GetIt.instance<OfflineRepository>();
     final available = await repo.isAvailableOffline(widget.itemId);
     if (mounted && available != _downloaded) {
@@ -6339,6 +6340,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
   /// The download service notifies on every progress tick, so only rebuild
   /// when the resolved offline availability actually changes.
   Future<void> _checkOffline() async {
+    if (!PlatformDetection.supportsOfflineDownloads) return;
     final item = viewModel.item;
     if (item == null || !_isDownloadable(item.type)) return;
     final repo = GetIt.instance<OfflineRepository>();
@@ -11170,6 +11172,7 @@ Future<_DolbyVisionPlayDecision?> _showDolbyVisionFallbackDecisionDialog(
 Future<bool> _anyItemHasCompletedDownload(
   Iterable<AggregatedItem> items,
 ) async {
+  if (!PlatformDetection.supportsOfflineDownloads) return false;
   final repo = GetIt.instance<OfflineRepository>();
   for (final item in items) {
     final row = await repo.getItem(item.id);

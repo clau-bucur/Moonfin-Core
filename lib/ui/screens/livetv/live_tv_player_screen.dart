@@ -64,12 +64,6 @@ class LiveTvPlayerScreen extends StatefulWidget {
 class _LiveTvPlayerScreenState extends State<LiveTvPlayerScreen>
     with WidgetsBindingObserver, ImmersiveSystemUi {
   final _manager = GetIt.instance<PlaybackManager>();
-  // media_kit isn't registered on platforms that run a different backend, so
-  // ask the container rather than listing them.
-  final MediaKitPlayerBackend? _backend =
-      GetIt.instance.isRegistered<MediaKitPlayerBackend>()
-      ? GetIt.instance<MediaKitPlayerBackend>()
-      : null;
   final _client = GetIt.instance<MediaServerClient>();
   final _prefs = GetIt.instance<UserPreferences>();
   final _screensaverController = GetIt.instance<ScreensaverController>();
@@ -2072,7 +2066,7 @@ class _LiveTvPlayerScreenState extends State<LiveTvPlayerScreen>
       return htmlBackend.buildView(fit: BoxFit.contain);
     }
 
-    final mediaKitBackend = _activeMediaKitBackend ?? _backend;
+    final mediaKitBackend = _activeMediaKitBackend;
     if (mediaKitBackend == null) {
       return const ColoredBox(color: Colors.black);
     }

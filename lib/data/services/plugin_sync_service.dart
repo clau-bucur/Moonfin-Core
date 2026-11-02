@@ -1945,22 +1945,25 @@ class PluginSyncService extends ChangeNotifier {
 
   /// Serializes one table-driven field for the outgoing profile.
   dynamic _encodeSyncedField(SyncedField field) {
+    // Export stored values, not the experiment's local runtime restrictions.
+    // Other clients using the same server profile retain their preferences.
+    final value = _prefs.getStored(field.pref);
     switch (field.codec) {
       case SyncCodec.boolean:
       case SyncCodec.integer:
       case SyncCodec.text:
       case SyncCodec.decimal:
-        return _prefs.get(field.pref);
+        return value;
       case SyncCodec.enumName:
-        return (_prefs.get(field.pref) as Enum).name;
+        return (value as Enum).name;
       case SyncCodec.intAsText:
-        return _prefs.get(field.pref).toString();
+        return value.toString();
       case SyncCodec.textAsInt:
-        return int.tryParse(_prefs.get(field.pref) as String) ??
+        return int.tryParse(value as String) ??
             field.fallbackInt ??
             0;
       case SyncCodec.colorAsText:
-        return _formatArgb(_prefs.get(field.pref) as int);
+        return _formatArgb(value as int);
       case SyncCodec.csvList:
         return _csvToList(field.pref as Preference<String>);
     }

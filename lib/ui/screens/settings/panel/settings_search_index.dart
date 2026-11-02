@@ -125,15 +125,16 @@ List<_SettingsSearchEntry> _buildSettingsSearchIndex({
   final tmdbAvailable = GetIt.instance<PluginSyncService>().tmdbAvailable;
   final pluginAvailable = GetIt.instance<PluginSyncService>().pluginAvailable;
   final liveTvOnAnyServer = liveTvOnAnySignedInServer();
-  final musicOnAnyServer = musicOnAnySignedInServer();
+  final musicOnAnyServer = !VideoAppProfile.enabled && musicOnAnySignedInServer();
   final playlistsOnAnyServer = playlistsOnAnySignedInServer();
   final moonfinPluginOnAnyServer = moonfinPluginOnAnySignedInServer();
-  final seerrOnAnyServer = seerrOnAnySignedInServer();
+  final seerrOnAnyServer = !VideoAppProfile.enabled && seerrOnAnySignedInServer();
   // Retro games come from the Moonfin plugin's game libraries.
-  final gamesOnAnyServer = anySignedInServerSupports(
+  final gamesOnAnyServer = !VideoAppProfile.enabled && anySignedInServerSupports(
     (f) => f.supportsFullMoonfinPlugin,
   );
   final friendsAvailable =
+      !VideoAppProfile.enabled &&
       GetIt.instance<AchievementsService>().socialAvailable;
 
   final account = _SearchSection(

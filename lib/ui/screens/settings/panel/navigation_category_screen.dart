@@ -277,7 +277,8 @@ class _NavigationCategoryScreenState extends State<_NavigationCategoryScreen> {
                     ),
                   // Only where the plugin has friends on, so nobody is offered
                   // a button that would never show.
-                  if (GetIt.instance<AchievementsService>().socialAvailable)
+                  if (!VideoAppProfile.enabled &&
+                      GetIt.instance<AchievementsService>().socialAvailable)
                     SwitchPreferenceTile(
                       preference: UserPreferences.showFriendsButton,
                       title: l10n.friendsShowButton,

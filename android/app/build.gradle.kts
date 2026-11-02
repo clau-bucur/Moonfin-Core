@@ -117,7 +117,9 @@ android {
             versionName = androidTvVersionName
             ndk { abiFilters += tvAbis }
             manifestPlaceholders["appName"] =
-                if (testIdSuffix.isEmpty()) baseAppName else "$baseAppName Test"
+                if (testIdSuffix.isEmpty()) baseAppName else
+                    System.getenv("MOONFIN_TEST_APP_NAME")?.takeIf { it.isNotBlank() }
+                        ?: "$baseAppName Test"
             // Impeller off by default on TV: the GLES fallback stutters on
             // TV-box GPUs. MoonfinApplication turns it on for boxes where it
             // runs on Vulkan.
@@ -132,6 +134,12 @@ android {
             manifestPlaceholders["appName"] = "$baseAppName Beta"
             manifestPlaceholders["enableImpeller"] = "false"
         }
+    }
+
+    // Product flavors do not inherit each other's source sets. Keep beta's
+    // Leanback requirement and Cast metadata removal identical to TV release.
+    sourceSets.getByName("androidTv-beta") {
+        manifest.srcFile("src/androidTv/AndroidManifest.xml")
     }
 
     signingConfigs {

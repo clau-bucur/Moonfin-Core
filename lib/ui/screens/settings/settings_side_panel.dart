@@ -39,6 +39,7 @@ import '../../util/home_row_title_localizer.dart';
 import '../../../util/overlay_color_palette.dart';
 import '../../../util/game_cores.dart';
 import '../../../util/platform_detection.dart';
+import '../../../util/video_app_profile.dart';
 import '../../../util/app_beta.dart';
 import '../../../util/app_distribution.dart';
 import '../../../util/pin_code_util.dart';
@@ -165,9 +166,10 @@ bool get _showThemeEditorEntry =>
 /// with the Moonfin plugin could offer, or achievements, which the active
 /// server's plugin answered for.
 bool get _integrationsOffered =>
-    seerrOnAnySignedInServer() ||
-    (GetIt.instance.isRegistered<AchievementsService>() &&
-        GetIt.instance<AchievementsService>().available);
+    !VideoAppProfile.enabled &&
+    (seerrOnAnySignedInServer() ||
+        (GetIt.instance.isRegistered<AchievementsService>() &&
+            GetIt.instance<AchievementsService>().available));
 
 Uri _resolveThemeEditorUri() {
   final base = Uri.base;

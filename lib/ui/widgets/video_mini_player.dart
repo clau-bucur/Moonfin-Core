@@ -84,18 +84,15 @@ class VideoMiniPlayerController {
   final ValueNotifier<bool> visible = ValueNotifier<bool>(false);
 
   /// mpv's backend, on Windows and Linux. macOS plays through AetherEngine.
-  MediaKitPlayerBackend? get mediaKitBackend =>
-      GetIt.instance.isRegistered<MediaKitPlayerBackend>()
-      ? GetIt.instance<MediaKitPlayerBackend>()
-      : null;
+  MediaKitPlayerBackend? get mediaKitBackend {
+    final backend = GetIt.instance<PlaybackManager>().backend;
+    return backend is MediaKitPlayerBackend ? backend : null;
+  }
 
   /// The backend whose native HDR window this controller may present, on
   /// Windows only.
   MediaKitPlayerBackend? get hdrBackend =>
-      PlatformDetection.supportsNativeHdrWindow &&
-          GetIt.instance.isRegistered<MediaKitPlayerBackend>()
-      ? GetIt.instance<MediaKitPlayerBackend>()
-      : null;
+      PlatformDetection.supportsNativeHdrWindow ? mediaKitBackend : null;
 
   /// Called by the player screen as it goes. [screen] is its HDR presenter
   /// identity: when the video sits behind a transparent Flutter window the

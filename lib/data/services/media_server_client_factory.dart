@@ -7,6 +7,7 @@ import 'package:server_plex/server_plex.dart';
 import 'package:server_silo/server_silo.dart';
 
 import '../../util/platform_detection.dart';
+import '../../util/video_app_profile.dart';
 import '../../util/server_url.dart';
 import '../offline/connectivity_aware_media_server_client.dart';
 import '../offline/offline_catalog.dart';
@@ -97,7 +98,8 @@ class MediaServerClientFactory {
     final getIt = GetIt.instance;
     // Background isolates skip the offline stack, so there's nothing to route
     // to and the raw client is all they need.
-    if (!getIt.isRegistered<OfflineCatalog>() ||
+    if (VideoAppProfile.enabled ||
+        !getIt.isRegistered<OfflineCatalog>() ||
         !getIt.isRegistered<StoragePathService>() ||
         !getIt.isRegistered<PendingRatingStore>()) {
       return raw;

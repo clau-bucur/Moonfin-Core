@@ -22,6 +22,9 @@ class MpvPlayerRegistry {
     if (_shuttingDown) {
       throw StateError('MpvPlayerRegistry is shutting down');
     }
+    // The video build starts on Media3. Load mpv only when a fallback or an
+    // explicitly opened trailer actually needs a player.
+    MediaKit.ensureInitialized();
     return track(Player(configuration: configuration));
   }
 

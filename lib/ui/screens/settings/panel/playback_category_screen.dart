@@ -84,8 +84,9 @@ class _PlaybackCategoryScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              if ((canToggleGameBackend && _gamesOnAnyServer) ||
-                  usesNativeGameBackend) ...[
+              if (!VideoAppProfile.enabled &&
+                  ((canToggleGameBackend && _gamesOnAnyServer) ||
+                      usesNativeGameBackend)) ...[
                 _SectionHeader(l10n.games),
                 adaptiveListSection(
                   children: [

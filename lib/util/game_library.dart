@@ -4,6 +4,7 @@ import 'package:server_core/server_core.dart';
 
 import '../data/models/aggregated_library.dart';
 import '../ui/navigation/destinations.dart';
+import 'video_app_profile.dart';
 
 /// Shared helpers for recognizing and navigating to retro-game (ROM) libraries so every
 /// entry point (home tiles, sidebar, top navbar, bottom nav) treats them consistently.
@@ -30,6 +31,7 @@ class GameLibraryRegistry {
   /// nav chrome can ask without a request each. Concurrent callers share a
   /// single request.
   Future<void> refresh() {
+    if (VideoAppProfile.enabled) return Future.value();
     if (_loaded && !_stale) return Future.value();
     return _inFlightRefresh ??= _refreshNow().whenComplete(
       () => _inFlightRefresh = null,

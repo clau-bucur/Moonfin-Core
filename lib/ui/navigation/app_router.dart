@@ -17,6 +17,7 @@ import '../../preference/user_preferences.dart';
 import '../../preference/preference_constants.dart';
 import '../../util/game_cores.dart';
 import '../../util/platform_detection.dart';
+import '../../util/video_app_profile.dart';
 import '../screens/admin/admin_nav.dart';
 import '../screens/admin/admin_routes.dart';
 import '../../util/signed_in_server_features.dart';
@@ -176,6 +177,8 @@ final appRouter = GoRouter(
     if (session.activeUserId == null) {
       return Destinations.startup;
     }
+
+    if (!VideoAppProfile.allowsRoute(path)) return Destinations.home;
 
     // Has to sit above every other rule and below the signed-out one: the
     // wizard needs a user to set up, and nothing else is worth showing until

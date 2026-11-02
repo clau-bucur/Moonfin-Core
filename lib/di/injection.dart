@@ -27,6 +27,7 @@ import '../util/app_beta.dart';
 import '../util/http_overrides_stub.dart'
     if (dart.library.io) '../util/http_overrides_io.dart';
 import '../util/platform_detection.dart';
+import '../util/video_app_profile.dart';
 import 'modules/app_module.dart';
 import 'modules/auth_module.dart';
 import 'modules/server_module.dart';
@@ -481,8 +482,10 @@ Future<void> configureDependencies() async {
   );
 
   registerOfflineStorage();
-  await _migrateIosPaths(getIt<OfflineRepository>());
-  await getIt<OfflineCatalog>().warm();
+  if (!VideoAppProfile.enabled) {
+    await _migrateIosPaths(getIt<OfflineRepository>());
+    await getIt<OfflineCatalog>().warm();
+  }
 
   final connectivityService = ConnectivityService();
   connectivityService.initialize();

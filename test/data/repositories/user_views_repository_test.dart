@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:moonfin/data/repositories/user_views_repository.dart';
+import 'package:moonfin/util/video_app_profile.dart';
 import 'package:server_core/server_core.dart';
 
 class _MockClient extends Mock implements MediaServerClient {}
@@ -52,9 +53,8 @@ void main() {
   });
 
   test('the raw and parsed views share one request', () async {
-    when(
-      () => users.getUserConfiguration(),
-    ).thenAnswer((_) => later(const UserConfiguration()));
+    when(() => users.getUserConfiguration())
+        .thenAnswer((_) => later(const UserConfiguration()));
     when(() => views.getUserViews(includeHidden: true)).thenAnswer(
       (_) => later({
         'Items': [
@@ -70,13 +70,36 @@ void main() {
     verify(() => views.getUserViews(includeHidden: true)).called(1);
   });
 
+  test('raw and parsed browsing exclude non-video libraries', () async {
+    when(() => users.getUserConfiguration())
+        .thenAnswer((_) async => const UserConfiguration());
+    when(() => views.getUserViews(includeHidden: true)).thenAnswer(
+      (_) async => {
+        'Items': [
+          {'Id': 'movies', 'CollectionType': 'movies'},
+          {'Id': 'music', 'CollectionType': 'music'},
+          {'Id': 'videos', 'CollectionType': 'musicvideos'},
+          {'Id': 'books', 'CollectionType': 'books'},
+        ],
+        'TotalRecordCount': 4,
+      },
+    );
+
+    final expected = VideoAppProfile.enabled
+        ? ['movies', 'videos']
+        : ['movies', 'music', 'videos', 'books'];
+    expect((await repo.getUserViews()).map((view) => view.id), expected);
+    final raw = await repo.getVisibleViewsResponse();
+    expect((raw['Items'] as List).map((item) => (item as Map)['Id']), expected);
+    expect(raw['TotalRecordCount'], expected.length);
+  });
+
   group('the views are kept for the session', () {
     setUpAll(() => registerFallbackValue(const UserConfiguration()));
 
     setUp(() {
-      when(
-        () => users.getUserConfiguration(),
-      ).thenAnswer((_) => later(const UserConfiguration()));
+      when(() => users.getUserConfiguration())
+          .thenAnswer((_) => later(const UserConfiguration()));
       when(() => views.getUserViews(includeHidden: true)).thenAnswer(
         (_) => later({
           'Items': [
@@ -121,9 +144,8 @@ void main() {
   test(
     'a forced configuration read still collapses while one is in flight',
     () async {
-      when(
-        () => users.getUserConfiguration(),
-      ).thenAnswer((_) => later(const UserConfiguration()));
+      when(() => users.getUserConfiguration())
+          .thenAnswer((_) => later(const UserConfiguration()));
 
       await Future.wait([
         repo.getUserConfiguration(),

@@ -52,6 +52,7 @@ import '../../preference/user_preferences.dart';
 import '../../syncplay/syncplay_manager.dart';
 import '../../watch_party/silo_watch_party_manager.dart';
 import '../../util/platform_detection.dart';
+import '../../util/video_app_profile.dart';
 import '../../util/episode_playability.dart';
 import '../../util/season_queue_context.dart';
 import '../../util/audio_track_logic.dart';
@@ -365,6 +366,10 @@ void registerPlaybackModule() {
   _getIt.registerSingleton<PipService>(pipService);
 
   final prefs = _getIt<UserPreferences>();
+  final useMedia3ByDefault =
+      PlatformDetection.isAndroid &&
+      prefs.get(UserPreferences.playbackEnginePreference) ==
+          PlaybackEnginePreference.media3;
 
   MediaKitPlayerBackend? backend;
   Media3PlayerBackend? media3Backend;
@@ -373,7 +378,9 @@ void registerPlaybackModule() {
 
   if (PlatformDetection.isAppleTV) {
     nativeApplePlayerBackend = NativeApplePlayerBackend(prefs);
-    _getIt.registerSingleton<NativeApplePlayerBackend>(nativeApplePlayerBackend);
+    _getIt.registerSingleton<NativeApplePlayerBackend>(
+      nativeApplePlayerBackend,
+    );
     // Backs the Flutter player option. It sits idle until a video picks it.
     iosBackend = AetherBackend(prefs);
     _getIt.registerSingleton<AetherBackend>(iosBackend);
@@ -387,11 +394,15 @@ void registerPlaybackModule() {
       // Backs the native player option, which plays video through the player
       // the Apple TV app uses. It sits idle until a video picks it.
       nativeApplePlayerBackend = NativeApplePlayerBackend(prefs);
-      _getIt.registerSingleton<NativeApplePlayerBackend>(nativeApplePlayerBackend);
+      _getIt.registerSingleton<NativeApplePlayerBackend>(
+        nativeApplePlayerBackend,
+      );
     }
   } else {
-    backend = MediaKitPlayerBackend(prefs);
-    _getIt.registerSingleton<MediaKitPlayerBackend>(backend);
+    _getIt.registerLazySingleton<MediaKitPlayerBackend>(
+      () => MediaKitPlayerBackend(prefs),
+    );
+    if (!useMedia3ByDefault) backend = _getIt<MediaKitPlayerBackend>();
     // The constructor subscribes to moonfin/media3_video_events, which only
     // Android implements, so building this anywhere else raises on its own.
     if (PlatformDetection.isAndroid) {
@@ -406,10 +417,6 @@ void registerPlaybackModule() {
     _getIt.registerSingleton<HtmlVideoBackend>(htmlBackend);
   }
 
-  final useMedia3ByDefault =
-      PlatformDetection.isAndroid &&
-      prefs.get(UserPreferences.playbackEnginePreference) ==
-          PlaybackEnginePreference.media3;
   final PlayerBackend initialBackend = PlatformDetection.isAppleTV
       ? nativeApplePlayerBackend!
       : (PlatformDetection.isIOS || PlatformDetection.isMacOS)
@@ -475,7 +482,8 @@ void registerPlaybackModule() {
   };
 
   manager.onSecondarySubtitleTrackSelected = (itemId, index, stream) async {
-    final streams = manager.currentResolution?.mediaStreams
+    final streams =
+        manager.currentResolution?.mediaStreams
             .where((s) => s['Type'] == 'Subtitle')
             .toList() ??
         const <Map<String, dynamic>>[];
@@ -515,7 +523,10 @@ void registerPlaybackModule() {
     // A track the item doesn't list, an external one added mid playback say,
     // leaves nothing to recognise it by later, so the last choice stays.
     if (pref.isEmpty) return;
-    _getIt<UserPreferences>().setSeriesSubtitlePreference(series.seriesId, pref);
+    _getIt<UserPreferences>().setSeriesSubtitlePreference(
+      series.seriesId,
+      pref,
+    );
     _rememberSeriesTrackOnServer(
       manager.queueService.currentItem,
       series.seriesId,
@@ -644,11 +655,13 @@ void registerPlaybackModule() {
   manager.setContentRefusal(
     queueFilter: (item) {
       if (item is! AggregatedItem) return false;
+      if (!VideoAppProfile.allowsItemType(item.type ?? '')) return true;
       if (!_getIt.isRegistered<BlockedContentGate>()) return false;
       return _getIt<BlockedContentGate>().isBlockedNow(item);
     },
     playRefusal: (item) async {
       if (item is! AggregatedItem) return false;
+      if (!VideoAppProfile.allowsItemType(item.type ?? '')) return true;
       if (!_getIt.isRegistered<BlockedContentGate>()) return false;
       return _getIt<BlockedContentGate>().isBlocked(item);
     },
@@ -879,24 +892,28 @@ void setActiveStreamResolver(MediaServerClient client) {
   // Local-first: completed downloads play from disk instead of streaming,
   // with progress mirrored to the downloads DB (and to the server when
   // reachable).
-  final resolver = LocalFirstMediaStreamResolver(
-    inner: serverResolver,
-    offline: _getIt<OfflineStreamResolver>(),
-    streamFromServer: () => _getIt<PlaybackManager>().streamsFromServer,
-    restoreSubtitles: (itemId) async {
-      if (_getIt.isRegistered<DownloadService>()) {
-        await _getIt<DownloadService>().restoreMissingSubtitles(itemId);
-      }
-    },
-  );
-  final service = LocalAwarePlayerService(
-    serverService,
-    _getIt<OfflineRepository>(),
-    canReachServer: () =>
-        !_getIt.isRegistered<ConnectivityService>() ||
-        _getIt<ConnectivityService>().canReachServer,
-    onStopped: _onItemStopped,
-  );
+  final resolver = VideoAppProfile.enabled
+      ? serverResolver
+      : LocalFirstMediaStreamResolver(
+          inner: serverResolver,
+          offline: _getIt<OfflineStreamResolver>(),
+          streamFromServer: () => _getIt<PlaybackManager>().streamsFromServer,
+          restoreSubtitles: (itemId) async {
+            if (_getIt.isRegistered<DownloadService>()) {
+              await _getIt<DownloadService>().restoreMissingSubtitles(itemId);
+            }
+          },
+        );
+  final service = VideoAppProfile.enabled
+      ? serverService
+      : LocalAwarePlayerService(
+          serverService,
+          _getIt<OfflineRepository>(),
+          canReachServer: () =>
+              !_getIt.isRegistered<ConnectivityService>() ||
+              _getIt<ConnectivityService>().canReachServer,
+          onStopped: _onItemStopped,
+        );
 
   _getIt.registerSingleton<MediaStreamResolver>(resolver);
   _getIt.registerSingleton<PlayerService>(service);

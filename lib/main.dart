@@ -61,6 +61,7 @@ import 'ui/navigation/app_router.dart';
 import 'ui/screensaver/screensaver_controller.dart';
 import 'ui/widgets/reader/epub_js_view.dart';
 import 'util/platform_detection.dart';
+import 'util/video_app_profile.dart';
 import 'util/process_exit_reporter.dart';
 import 'util/system_ui.dart';
 import 'util/tv_image_cache_stub.dart'
@@ -716,7 +717,9 @@ Future<void> _retryAudioCapsOffLaunchPath() =>
 void _sweepImageCache(UserPreferences prefs, {bool throttle = false}) {
   final mb = prefs.get(UserPreferences.imageCacheLimitMb);
   unawaited(enforceImageCacheBudget(mb * 1024 * 1024, throttle: throttle));
-  unawaited(enforceGameArtworkCacheBudget(throttle: throttle));
+  if (!VideoAppProfile.enabled) {
+    unawaited(enforceGameArtworkCacheBudget(throttle: throttle));
+  }
 }
 
 /// Runs an auto-download check when the app comes back to the foreground;
@@ -857,8 +860,10 @@ void main() async {
   // past the first frame internally.
   await LiquidGlassWidgets.initialize();
 
-  registerGameCoreLicenses();
-  registerEpubJsLicenses();
+  if (!VideoAppProfile.enabled) {
+    registerGameCoreLicenses();
+    registerEpubJsLicenses();
+  }
 
   if (!PlatformDetection.isWeb && PlatformDetection.isWindows) {
     try {
@@ -906,7 +911,8 @@ void main() async {
 
   // Apple runs entirely on AetherEngine, so media_kit isn't initialized there
   // and its native libs are out of those builds.
-  if (!PlatformDetection.isAppleTV &&
+  if (!VideoAppProfile.enabled &&
+      !PlatformDetection.isAppleTV &&
       !PlatformDetection.isIOS &&
       !PlatformDetection.isMacOS) {
     MediaKit.ensureInitialized();
@@ -982,7 +988,9 @@ void main() async {
   WidgetsBinding.instance.addObserver(_PreferenceWriteFlushObserver(prefs));
   WidgetsBinding.instance.addObserver(_ImageCacheSweepObserver(prefs));
   WidgetsBinding.instance.addObserver(_CapabilityRefreshObserver());
-  WidgetsBinding.instance.addObserver(_AutoDownloadResumeObserver());
+  if (!VideoAppProfile.enabled) {
+    WidgetsBinding.instance.addObserver(_AutoDownloadResumeObserver());
+  }
   WidgetsBinding.instance.addPostFrameCallback((_) => _sweepImageCache(prefs));
 
   GetIt.instance<PlaybackManager>().queueService.queueChangedStream.listen((_) {
@@ -1032,9 +1040,11 @@ void main() async {
     );
   }
 
-  try {
-    GetIt.instance<AirPlayCommandBridge>().start();
-  } catch (_) {}
+  if (!VideoAppProfile.enabled) {
+    try {
+      GetIt.instance<AirPlayCommandBridge>().start();
+    } catch (_) {}
+  }
 
   runApp(const MoonfinApp());
 }
@@ -1068,20 +1078,20 @@ Future<void> _initDeferredStartupServices(UserPreferences prefs) async {
 
   await _detectAndApplyAudioCapabilities(prefs);
 
-  try {
-    await GetIt.instance<DownloadNotificationService>().initialize();
-  } catch (_) {}
+  if (!VideoAppProfile.enabled) {
+    try {
+      await GetIt.instance<DownloadNotificationService>().initialize();
+    } catch (_) {}
 
-  // Starts the native download engine and re-attaches to any downloads that
-  // ran while the app was suspended or dead. No-op where unsupported.
-  try {
-    await GetIt.instance<BackgroundDownloadCoordinator>().ensureInitialized();
-  } catch (_) {}
+    try {
+      await GetIt.instance<BackgroundDownloadCoordinator>().ensureInitialized();
+    } catch (_) {}
 
-  try {
-    await GetIt.instance<SeerrNotificationService>().initialize();
-    await GetIt.instance<SeerrNotificationService>().handleColdStart();
-  } catch (_) {}
+    try {
+      await GetIt.instance<SeerrNotificationService>().initialize();
+      await GetIt.instance<SeerrNotificationService>().handleColdStart();
+    } catch (_) {}
+  }
 
   if (PlatformDetection.isMobile) {
     try {

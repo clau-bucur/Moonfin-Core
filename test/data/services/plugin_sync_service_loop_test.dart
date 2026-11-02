@@ -10,6 +10,7 @@ import 'package:moonfin/auth/repositories/session_repository.dart';
 import 'package:moonfin/data/services/plugin_sync_service.dart';
 import 'package:moonfin/preference/seerr_preferences.dart';
 import 'package:moonfin/preference/user_preferences.dart';
+import 'package:moonfin/util/video_app_profile.dart';
 import 'package:server_core/server_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,6 +22,7 @@ class _MockSessionRepository extends Mock implements SessionRepository {}
 /// assert exactly which sync calls went over the wire.
 class _RecordingAdapter implements HttpClientAdapter {
   final List<String> requests = [];
+  Map<String, dynamic>? postedProfile;
 
   /// Body returned for the Resolved endpoint, replaceable per test.
   Map<String, dynamic> resolvedProfile = {};
@@ -40,6 +42,11 @@ class _RecordingAdapter implements HttpClientAdapter {
     } else if (path.contains('/Moonfin/Settings/Resolved/')) {
       body = resolvedProfile;
     } else if (path.contains('/Moonfin/Settings/Profile/')) {
+      if (options.method == 'POST') {
+        postedProfile = Map<String, dynamic>.from(
+          (options.data as Map)['profile'] as Map,
+        );
+      }
       body = {};
     }
 
@@ -125,6 +132,13 @@ void main() {
 
     expect(resolvedCount(), 1);
     expect(postCount(), 0, reason: 'the apply echoed back to the server');
+  });
+
+  test('video-only runtime values do not overwrite shared profile settings', () async {
+    await prefs.set(UserPreferences.themeMusicEnabled, true);
+    expect(prefs.get(UserPreferences.themeMusicEnabled), !VideoAppProfile.enabled);
+    await service.pushSettingsForProfile(client, profile: 'tv');
+    expect(adapter.postedProfile?['themeMusicEnabled'], isTrue);
   });
 
   test('an unchanged payload is pushed once, a changed one again', () async {

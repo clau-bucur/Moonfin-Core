@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:server_core/server_core.dart';
 
 import '../models/aggregated_library.dart';
+import '../../util/video_app_profile.dart';
 
 /// The user's own views. Anything hidden from My Media is left out unless
 /// [includeHidden] is set, which callers that apply their own exclude
@@ -14,7 +15,7 @@ Future<List<AggregatedLibrary>> loadUserViews(
 );
 
 List<AggregatedLibrary> _parseUserViews(Map<String, dynamic> response) {
-  final items = response['Items'] as List? ?? [];
+  final items = _videoViews(response)['Items'] as List? ?? [];
 
   return items.whereType<Map>().map((item) {
     final data = item.cast<String, dynamic>();
@@ -55,8 +56,29 @@ Future<Map<String, dynamic>> loadVisibleUserViews(
   final excludes = await _excludesFrom(client.usersApi.getUserConfiguration());
   final response = await viewsFuture;
 
-  if (excludes == null) return client.userViewsApi.getUserViews();
-  return _filterExcludedViews(response, excludes);
+  if (excludes == null) {
+    return _videoViews(await client.userViewsApi.getUserViews());
+  }
+  return _videoViews(_filterExcludedViews(response, excludes));
+}
+
+Map<String, dynamic> _videoViews(Map<String, dynamic> response) {
+  if (!VideoAppProfile.enabled) return response;
+  final items = (response['Items'] as List? ?? [])
+      .whereType<Map>()
+      .where(
+        (item) => VideoAppProfile.allowsLibrary(
+          item['CollectionType']?.toString() ?? '',
+          name: item['Name']?.toString() ?? '',
+        ),
+      )
+      .toList();
+  return {
+    ...response,
+    'Items': items,
+    if (response.containsKey('TotalRecordCount'))
+      'TotalRecordCount': items.length,
+  };
 }
 
 Map<String, dynamic> _filterExcludedViews(
@@ -88,9 +110,8 @@ class UserViewsRepository extends ChangeNotifier {
   UserViewsRepository(this._client);
 
   Future<List<AggregatedLibrary>> getAllViews() =>
-      _inFlightViews ??= loadUserViews(
-        _client,
-      ).whenComplete(() => _inFlightViews = null);
+      _inFlightViews ??= loadUserViews(_client)
+          .whenComplete(() => _inFlightViews = null);
 
   // Kept for the session, since every screen's nav chrome asks for the views
   // when it mounts. [invalidateViews] and a configuration change drop it.
@@ -121,8 +142,10 @@ class UserViewsRepository extends ChangeNotifier {
     final responseFuture = _hiddenResponse();
     final excludes = await _excludesFrom(cachedUserConfiguration());
     final response = await responseFuture;
-    if (excludes == null) return _client.userViewsApi.getUserViews();
-    return _filterExcludedViews(response, excludes);
+    if (excludes == null) {
+      return _videoViews(await _client.userViewsApi.getUserViews());
+    }
+    return _videoViews(_filterExcludedViews(response, excludes));
   }
 
   Future<List<AggregatedLibrary>> getUserViews() async {

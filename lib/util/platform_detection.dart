@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'os_version_stub.dart' if (dart.library.io) 'os_version_io.dart';
+import 'video_app_profile.dart';
 
 class PlatformDetection {
   const PlatformDetection._();
@@ -80,7 +81,7 @@ class PlatformDetection {
   /// Games play via EmulatorJS in a WebView everywhere except tvOS, which has
   /// no WebKit and uses the native libretro bridge instead. Per-system support
   /// on tvOS is gated by the bundled-core map in util/game_cores.dart.
-  static bool get gamesPlaybackSupported => true;
+  static bool get gamesPlaybackSupported => !VideoAppProfile.enabled;
 
   static final Set<String> _displayHdrTypes = <String>{};
   static final Map<String, dynamic> _mediaCodecCapabilities =
@@ -395,7 +396,8 @@ class PlatformDetection {
 
   /// Offline media is available on phones, tablets, desktops, and Android TV.
   /// Other TV platforms do not currently provide the download backend.
-  static bool get supportsOfflineDownloads => !isTV || isAndroid || isForcedTv;
+  static bool get supportsOfflineDownloads =>
+      !VideoAppProfile.enabled && (!isTV || isAndroid || isForcedTv);
 
   static bool get useNativeVideoSurface => isAndroid && isTV;
 

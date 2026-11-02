@@ -7,6 +7,7 @@ import 'package:server_core/server_core.dart';
 
 import '../../preference/user_preferences.dart';
 import '../../util/platform_detection.dart';
+import '../../util/video_app_profile.dart';
 import '../models/aggregated_item.dart';
 import 'theme_audio_player.dart';
 
@@ -39,6 +40,7 @@ class ThemeMusicService implements AudioOwnable {
     this._playbackManager,
     this._audioArbiter,
   ) {
+    if (VideoAppProfile.enabled) return;
     _audioArbiter.register(this);
     _mainPlaybackSub = _playbackManager.state.playingStream.listen((isPlaying) {
       if (isPlaying) {

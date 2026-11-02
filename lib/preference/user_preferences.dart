@@ -15,6 +15,7 @@ import '../util/device_performance.dart';
 import '../util/idiom/app_ui_idiom.dart';
 import '../util/language_matching.dart';
 import '../util/platform_detection.dart';
+import '../util/video_app_profile.dart';
 import 'home_section_config.dart';
 import 'preference_constants.dart';
 import 'seerr_row_config.dart';
@@ -796,6 +797,14 @@ class UserPreferences extends ChangeNotifier {
   }
 
   T get<T>(Preference<T> pref) {
+    final restricted = VideoAppProfile.preferenceOverride(pref.key);
+    if (restricted != null) return restricted as T;
+    return getStored(pref);
+  }
+
+  /// Values for settings sync, including the existing scoped-to-legacy
+  /// fallback, without this build's local feature restrictions.
+  T getStored<T>(Preference<T> pref) {
     if (_isScopedPreference(pref)) {
       final scoped = _scopedPreference(pref);
       if (scoped != null && _store.containsKey(scoped.key)) {
