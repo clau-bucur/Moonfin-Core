@@ -14,6 +14,8 @@ import 'package:moonfin/auth/repositories/user_repository.dart';
 import 'package:moonfin/l10n/app_localizations.dart';
 import 'package:moonfin/preference/seerr_preferences.dart';
 import 'package:moonfin/preference/user_preferences.dart';
+import 'package:moonfin/preference/preference_constants.dart'
+    show DesktopUiScale;
 import 'package:moonfin/auth/repositories/session_repository.dart';
 import 'package:moonfin/ui/screens/detail/stage/stage_detail_content.dart';
 import 'package:moonfin/ui/screens/detail/stage/stage_track_chips.dart';
@@ -293,7 +295,12 @@ void main() {
   testWidgets('Up from first actor returns to visible More, not Directors', (
     tester,
   ) async {
+    await prefs.set(UserPreferences.desktopUiScale, DesktopUiScale.extraLarge);
     final raw = movieWithTracks();
+    // A resumable movie adds Restart, wrapping More below the other circles
+    // as it does on Hellboy II. A shorter action row hides the scroll reset.
+    raw['RunTimeTicks'] = 72000000000;
+    raw['UserData'] = {'PlaybackPositionTicks': 30600000000, 'Played': true};
     raw['People'] = [
       {'Id': 'actor-1', 'Name': 'First actor', 'Type': 'Actor'},
       {'Id': 'director-1', 'Name': 'Director', 'Type': 'Director'},

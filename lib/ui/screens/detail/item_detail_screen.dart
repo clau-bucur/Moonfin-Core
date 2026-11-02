@@ -7705,7 +7705,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
       onFocusChange: (focused) {
         if (focused == _rowHasFocus) return;
         _rowHasFocus = focused;
-        if (!focused) return;
+        if (!focused || widget.suppressAutoScrollToTop) return;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
           final scrollable = Scrollable.maybeOf(context);
@@ -11334,15 +11334,18 @@ class _DetailActionButtonState extends State<_DetailActionButton>
               size: 24,
             ),
             const SizedBox(width: 8),
-            Text(
-              widget.label,
-              maxLines: 1,
-              softWrap: false,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: fg,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                height: 1.1,
+            Flexible(
+              child: Text(
+                widget.label,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: fg,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  height: 1.1,
+                ),
               ),
             ),
           ],
