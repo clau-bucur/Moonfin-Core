@@ -19,6 +19,8 @@ import 'package:moonfin/ui/screens/detail/stage/stage_detail_content.dart';
 import 'package:moonfin/ui/screens/detail/stage/stage_track_chips.dart';
 import 'package:moonfin/ui/screens/detail/item_detail_screen.dart';
 import 'package:moonfin/ui/widgets/focus/focusable_button.dart';
+import 'package:moonfin/ui/navigation/focus_route_observer.dart';
+import 'package:moonfin/util/platform_detection.dart';
 import 'package:moonfin/ui/screens/detail/modern/modern_detail_content.dart';
 import 'package:moonfin/ui/theme/app_theme.dart';
 import 'package:moonfin_design/moonfin_design.dart';
@@ -57,6 +59,7 @@ void main() {
   late UserPreferences prefs;
 
   setUp(() async {
+    PlatformDetection.setTvMode(true);
     await GetIt.instance.reset();
     client = _Client();
     itemsApi = _ItemsApi();
@@ -112,7 +115,10 @@ void main() {
     GetIt.instance.registerSingleton<MediaServerClient>(client);
   });
 
-  tearDown(() => GetIt.instance.reset());
+  tearDown(() async {
+    PlatformDetection.setTvMode(false);
+    await GetIt.instance.reset();
+  });
 
   Map<String, dynamic> itemData(String type) => {
     'Id': 'item-1',
@@ -153,6 +159,12 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     tester.view.physicalSize = size;
     addTearDown(tester.view.reset);
+    final playFocus = FocusNode();
+    addTearDown(playFocus.dispose);
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(seconds: 1));
+    });
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -161,6 +173,7 @@ void main() {
       MediaQuery(
         data: MediaQueryData(size: size),
         child: MaterialApp(
+          navigatorObservers: [FocusRouteObserver()],
           theme: AppTheme.buildTheme(ThemeRegistry.active),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
@@ -173,6 +186,7 @@ void main() {
                 prefs: prefs,
                 backdropUrl: ValueNotifier<String?>(null),
                 selectedMediaSourceId: null,
+                initialFocusNode: playFocus,
                 onSelectedMediaSourceChanged: (_) {},
                 actionsExpanded: false,
                 onActionsExpandedChanged: (_) {},
@@ -182,7 +196,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump(const Duration(milliseconds: 500));
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
   }
 
   Map<String, dynamic> movieWithTracks() {
@@ -264,6 +280,14 @@ void main() {
       await tester.pumpAndSettle();
       expect(chips[i].focusNode!.hasPrimaryFocus, isTrue);
     }
+    chips.last.focusNode!.requestFocus();
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(find.text('Select Version'), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(chips.last.focusNode!.hasPrimaryFocus, isTrue);
   });
 
   testWidgets('Up from first actor returns to visible More, not Directors', (
@@ -280,15 +304,30 @@ void main() {
       size: const Size(1280, 720),
     );
     await tester.pumpAndSettle();
-    final cast = tester.widget<DetailCastRow>(find.byType(DetailCastRow));
-    cast.firstItemFocusNode!.requestFocus();
-    await tester.pumpAndSettle();
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-    await tester.pumpAndSettle();
     final actions = tester.widget<DetailActionButtons>(
       find.byType(DetailActionButtons),
     );
     final more = actions.actionRowRightFocusNode!;
+    more.requestFocus();
+    await tester.pumpAndSettle();
+    expect(more.hasPrimaryFocus, isTrue);
+    final moreBox = more.context!.findRenderObject() as RenderBox;
+    expect(
+      moreBox.localToGlobal(Offset.zero).dy + moreBox.size.height,
+      lessThanOrEqualTo(720),
+    );
+    final cast = tester.widget<DetailCastRow>(find.byType(DetailCastRow));
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(cast.firstItemFocusNode!.hasPrimaryFocus, isTrue);
+    final actorBox =
+        cast.firstItemFocusNode!.context!.findRenderObject() as RenderBox;
+    expect(
+      actorBox.localToGlobal(Offset.zero).dy + actorBox.size.height,
+      lessThanOrEqualTo(720),
+    );
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pumpAndSettle();
     expect(more.hasPrimaryFocus, isTrue);
     final box = more.context!.findRenderObject() as RenderBox;
     final top = box.localToGlobal(Offset.zero).dy;

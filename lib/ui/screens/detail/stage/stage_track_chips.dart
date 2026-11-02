@@ -11,7 +11,7 @@ import '../item_detail_screen.dart';
 class StageTrackChips extends StatefulWidget {
   final List<DetailTrackChoice> choices;
   final FocusNode firstFocusNode;
-  final ValueChanged<DetailButton> onOpen;
+  final Future<void> Function(DetailButton) onOpen;
   final VoidCallback onNavigateUp;
   final VoidCallback onNavigateDown;
 
@@ -62,8 +62,15 @@ class _StageTrackChipsState extends State<StageTrackChips> {
         for (final (index, choice) in widget.choices.indexed)
           FocusableButton(
             focusNode: node(index),
-            autoScroll: true,
-            onPressed: () => widget.onOpen(choice.kind),
+            onPressed: () async {
+              await widget.onOpen(choice.kind);
+              if (mounted &&
+                  index < widget.choices.length &&
+                  widget.choices[index].kind == choice.kind &&
+                  ModalRoute.of(context)?.isCurrent != false) {
+                node(index).requestFocus();
+              }
+            },
             onNavigateUp: widget.onNavigateUp,
             onNavigateDown: widget.onNavigateDown,
             onNavigateLeft: () {

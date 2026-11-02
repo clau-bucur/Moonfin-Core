@@ -4536,6 +4536,10 @@ class DetailActionButtons extends StatefulWidget {
   /// instead of growing to fit it, for a row too narrow for a circle to grow.
   final bool labelsUnderCircles;
 
+  /// The hosting layout reveals its own focused controls instead of resetting
+  /// its scroll position whenever an action gains focus.
+  final bool suppressAutoScrollToTop;
+
   const DetailActionButtons({
     super.key,
     required this.viewModel,
@@ -4564,6 +4568,7 @@ class DetailActionButtons extends StatefulWidget {
     this.onCollectionsPressed,
     this.omitTrackButtons = false,
     this.labelsUnderCircles = false,
+    this.suppressAutoScrollToTop = false,
   });
 
   @override
@@ -5842,7 +5847,8 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
       autofocus: autofocus ?? button.autofocus,
       neonAccentColor: button.neonAccentColor,
       suppressAutoScrollToTop:
-          suppressAutoScrollToTop ?? button.suppressAutoScrollToTop,
+          widget.suppressAutoScrollToTop ||
+          (suppressAutoScrollToTop ?? button.suppressAutoScrollToTop),
       isPrimary: button.isPrimary,
     );
   }
@@ -6376,7 +6382,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
     return mediaStreamsForItem(item, selectedSource);
   }
 
-  void _openSubtitleSelector(BuildContext context, AggregatedItem item) {
+  Future<void> _openSubtitleSelector(BuildContext context, AggregatedItem item) {
     final selectedSource = selectedMediaSourceForItem(
       item,
       widget.selectedMediaSourceId,
@@ -6388,7 +6394,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
     final audioStreams = selectorStreams
         .where((s) => s['Type'] == 'Audio')
         .toList();
-    _showSubtitleSelector(context, item, subtitleStreams, audioStreams);
+    return _showSubtitleSelector(context, item, subtitleStreams, audioStreams);
   }
 
   bool _isManagementButton(_DetailActionButton button) {
@@ -7509,6 +7515,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
       }).toList();
 
       final moreButton = _DetailActionButton(
+        suppressAutoScrollToTop: widget.suppressAutoScrollToTop,
         label: widget.overflowAsMenu
             ? l10n.spotlightMoreActions
             : (_expanded ? l10n.less : l10n.more),
@@ -10108,7 +10115,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
     await context.push(Destinations.trailer(url: trailerUrl));
   }
 
-  void _showAudioSelector(
+  Future<void> _showAudioSelector(
     BuildContext context,
     List<Map<String, dynamic>> streams,
   ) async {
@@ -10339,7 +10346,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
     }
   }
 
-  void _showSubtitleSelector(
+  Future<void> _showSubtitleSelector(
     BuildContext context,
     AggregatedItem item,
     List<Map<String, dynamic>> streams,
@@ -10421,7 +10428,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
     }
   }
 
-  void _showVersionSelector(
+  Future<void> _showVersionSelector(
     BuildContext context,
     List<Map<String, dynamic>> sources,
   ) async {
@@ -10529,7 +10536,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
   }
 
   /// Opens the picker a [trackChoices] entry stands for.
-  void openTrackPicker(DetailButton kind) {
+  Future<void> openTrackPicker(DetailButton kind) async {
     final item = viewModel.item;
     if (item == null) return;
     switch (kind) {
@@ -10538,7 +10545,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
           item,
           widget.selectedMediaSourceId,
         );
-        _showAudioSelector(
+        await _showAudioSelector(
           context,
           _streamsForTrackSelectors(
             item,
@@ -10546,9 +10553,9 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
           ).where((s) => s['Type'] == 'Audio').toList(),
         );
       case DetailButton.subtitles:
-        _openSubtitleSelector(context, item);
+        await _openSubtitleSelector(context, item);
       case DetailButton.version:
-        _showVersionSelector(context, item.mediaSources);
+        await _showVersionSelector(context, item.mediaSources);
       default:
         break;
     }

@@ -4,7 +4,6 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:moonfin_design/moonfin_design.dart';
@@ -417,9 +416,11 @@ class _StageDetailContentState extends State<StageDetailContent> {
     if (!_scroll.hasClients) return 0;
     final box = target.findRenderObject();
     if (box is! RenderBox) return 0;
-    final viewport = RenderAbstractViewport.of(box);
-    if (viewport is! RenderBox) return 0;
-    final page = viewport as RenderBox;
+    // Use this page's vertical viewport, even when the target lives inside
+    // a nested horizontal Cast/Extras row.
+    final page = _scroll.position.context.notificationContext
+        ?.findRenderObject();
+    if (page is! RenderBox) return 0;
     if (!page.attached || !box.attached) return 0;
     // In the page's own units. The app draws at its own scale inside the
     // window, so screen positions don't compare with the page's height.
@@ -750,6 +751,7 @@ class _StageDetailContentState extends State<StageDetailContent> {
       onActionsExpandedChanged: widget.onActionsExpandedChanged,
       omitTrackButtons: true,
       labelsUnderCircles: landscape,
+      suppressAutoScrollToTop: true,
     );
 
     return Column(
@@ -940,7 +942,9 @@ class _StageDetailContentState extends State<StageDetailContent> {
           child: StageTrackChips(
             choices: choices,
             firstFocusNode: node,
-            onOpen: (kind) => _actionsKey.currentState?.openTrackPicker(kind),
+            onOpen: (kind) async {
+              await _actionsKey.currentState?.openTrackPicker(kind);
+            },
             onNavigateUp: () => _moveUp(node),
             onNavigateDown: () => _moveDown(node),
             onLeftEdge: _landscape ? _toActions : null,
