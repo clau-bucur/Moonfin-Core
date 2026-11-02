@@ -1,0 +1,32 @@
+{
+  "dateLocal": "2026-11-03",
+  "branch": "experiment/android-tv-video",
+  "sourceRevision": "2d1f48168c88ff30d0c54e9e0a5533afd4feff79",
+  "package": "org.moonfin.androidtv.videoexperiment",
+  "artifactBytes": 66367196,
+  "artifactSha256": "961d812db57dbdc0585031acadd09c09c1da56b1f201c232dab5481ffd0cc029",
+  "installedHashMatches": true,
+  "mainUnchangedRevision": "f95909b13187c0d7168c96ac0e3e09982b2ac96b",
+  "localTestsPassed": 53,
+  "analysis": {"errors": 0, "warnings": 0, "styleInfos": 31},
+  "shield": {
+    "homeRowsDownAndUp": 6,
+    "allDownwardLandingsReviewed": true,
+    "independentCardMemory": "passed",
+    "detailsReturnSelection": "passed",
+    "hellboyMoreVisibleOnDown": "passed",
+    "hellboyCastUpToVisibleMore": "passed",
+    "hellboyVersionDpadAndDialog": "passed",
+    "versionDialogFocusReturn": "passed",
+    "freshVerityDetails": "passed; populated layout reviewed at 5 fps",
+    "matchedRuntimeOrLayoutErrorsFinalProcess": 0,
+    "finalState": "Home; Hellboy II selected; playback not started"
+  },
+  "earlierInterruption": "HDMI-CEC sleep followed by no-focused-window input ANR; final checks rerun after waking",
+  "limitations": ["Functional and sampled visual checks; no frame-time or FPS benchmark"],
+  "preservedUncommittedFiles": [
+    "lib/l10n/app_localizations_fi.dart",
+    "lib/l10n/app_localizations_it.dart",
+    "lib/l10n/app_localizations_zh.dart"
+  ]
+}
