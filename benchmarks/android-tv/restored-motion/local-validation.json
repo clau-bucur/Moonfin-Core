@@ -1,0 +1,104 @@
+{
+  "sourceRevision": "8c4efde2af4015d319238e379b547316ec055347",
+  "recoveredFrom": "769a9b64a1c142bcb429f94e1608cbc8bf874711",
+  "branch": "experiment/android-tv-video",
+  "date": "2026-11-02",
+  "mainRevision": "f95909b13187c0d7168c96ac0e3e09982b2ac96b",
+  "flutter": {
+    "passed": 173,
+    "files": [
+      {
+        "file": "test/ui/widgets/modern_card_frame_test.dart",
+        "passed": 1
+      },
+      {
+        "file": "test/ui/widgets/modern_row_visibility_test.dart",
+        "passed": 3
+      },
+      {
+        "file": "test/ui/widgets/focus/locked_focus_row_motion_test.dart",
+        "passed": 9
+      },
+      {
+        "file": "test/ui/widgets/focus/modern_row_navigation_test.dart",
+        "passed": 12
+      },
+      {
+        "file": "test/ui/widgets/focus/tv_scroll_controller_test.dart",
+        "passed": 7
+      },
+      {
+        "file": "test/ui/widgets/focus/home_row_focus_memory_test.dart",
+        "passed": 2
+      },
+      {
+        "file": "test/ui/widgets/focus/locked_focus_row_key_stability_test.dart",
+        "passed": 5
+      },
+      {
+        "file": "test/ui/widgets/focus/locked_focus_row_grow_drift_test.dart",
+        "passed": 1
+      },
+      {
+        "file": "test/ui/screens/home/home_row_shift_test.dart",
+        "passed": 9
+      },
+      {
+        "file": "test/ui/screens/home/home_row_image_type_test.dart",
+        "passed": 81
+      },
+      {
+        "file": "test/playback/osd_buttons_test.dart",
+        "passed": 4
+      },
+      {
+        "file": "test/playback/restart_video_test.dart",
+        "passed": 1
+      },
+      {
+        "file": "test/ui/widgets/modern_card_transition_test.dart",
+        "passed": 15
+      },
+      {
+        "file": "test/ui/widgets/modern_row_test.dart",
+        "passed": 12
+      },
+      {
+        "file": "test/ui/screens/home/modern_my_media_row_test.dart",
+        "passed": 3
+      },
+      {
+        "file": "test/playback/video_player_osd_hide_test.dart",
+        "passed": 8,
+        "filter": "TV Restart|on TV, Up|Back hides|controls hide|controls stay|short Cinema"
+      }
+    ],
+    "scope": "Focused checks; not the full inherited suite",
+    "runnerNote": "Some combined runs lost workers without a Dart assertion; the listed files passed in separate final runs."
+  },
+  "analyzer": {
+    "errors": 0,
+    "warnings": 0,
+    "inheritedInfos": 2
+  },
+  "diffCheck": "passed",
+  "releaseBuild": {
+    "status": "passed",
+    "signatureVerification": "passed",
+    "flavor": "androidTv",
+    "target": "android-arm64",
+    "package": "org.moonfin.androidtv.videoexperiment",
+    "apkBytes": 66377556,
+    "apkSha256": "e44567b6afd48b1481b2330e56d584660b08f9223951b37dd8178e50d4972a44"
+  },
+  "shield": {
+    "installedThisRevision": false,
+    "testedThisRevision": false,
+    "gate": "Await user OK"
+  },
+  "preservedUncommittedFiles": [
+    "lib/l10n/app_localizations_fi.dart",
+    "lib/l10n/app_localizations_it.dart",
+    "lib/l10n/app_localizations_zh.dart"
+  ]
+}

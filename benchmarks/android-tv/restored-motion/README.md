@@ -47,6 +47,22 @@ runs also encountered worker termination.
 The pre-existing generated Finnish, Italian, and Chinese localization changes
 are preserved in the working tree and excluded from these commits.
 
+## Release artifact
+
+The Android TV ARM64 release build passed for source commit
+`8c4efde2af4015d319238e379b547316ec055347`. Local APK signature verification passed;
+the package is `org.moonfin.androidtv.videoexperiment`, labeled
+**Moonfin Video Experiment**.
+
+The APK is at
+`artifacts/android-tv-video/release-android-arm64/moonfin-video-experiment.apk`:
+66,377,556 bytes (63.30 MiB), 15,076 bytes above the previous release. SHA-256:
+`e44567b6afd48b1481b2330e56d584660b08f9223951b37dd8178e50d4972a44`.
+Flutter AOT targets ARM64; retained JNI support libraries also contain ARMv7/x64,
+as in the previous experiment build.
+
+See [local validation](local-validation.json) and [APK inventory](experiment-apk.json).
+
 ## Shield status
 
 This revision has not been installed or tested on the Shield. Device testing
