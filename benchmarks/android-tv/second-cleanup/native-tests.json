@@ -1,0 +1,59 @@
+{
+  "SourceRevision": "de19c5803cd91ff822673b7b1dfbdc36a2d9af7a",
+  "Variant": "androidTvDebug",
+  "Tests": 47.0,
+  "Failures": 0.0,
+  "Errors": 0.0,
+  "Skipped": 0.0,
+  "Suites": [
+    {
+      "Suite": "org.moonfin.androidtv.AutoDownloadRefreshPolicyTest",
+      "Tests": 4,
+      "Failures": 0,
+      "Errors": 0,
+      "Skipped": 0
+    },
+    {
+      "Suite": "org.moonfin.androidtv.BurstCoalescerTest",
+      "Tests": 6,
+      "Failures": 0,
+      "Errors": 0,
+      "Skipped": 0
+    },
+    {
+      "Suite": "org.moonfin.androidtv.DisplayCapabilitiesTest",
+      "Tests": 6,
+      "Failures": 0,
+      "Errors": 0,
+      "Skipped": 0
+    },
+    {
+      "Suite": "org.moonfin.androidtv.ImpellerPolicyTest",
+      "Tests": 7,
+      "Failures": 0,
+      "Errors": 0,
+      "Skipped": 0
+    },
+    {
+      "Suite": "org.moonfin.androidtv.NativeInputDeviceClassifierTest",
+      "Tests": 13,
+      "Failures": 0,
+      "Errors": 0,
+      "Skipped": 0
+    },
+    {
+      "Suite": "org.moonfin.androidtv.ProcessExitPolicyTest",
+      "Tests": 6,
+      "Failures": 0,
+      "Errors": 0,
+      "Skipped": 0
+    },
+    {
+      "Suite": "org.moonfin.androidtv.TombstoneTest",
+      "Tests": 5,
+      "Failures": 0,
+      "Errors": 0,
+      "Skipped": 0
+    }
+  ]
+}

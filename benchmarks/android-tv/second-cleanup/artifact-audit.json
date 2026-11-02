@@ -1,0 +1,27 @@
+{
+  "SourceRevision": "de19c5803cd91ff822673b7b1dfbdc36a2d9af7a",
+  "BeforeRevision": "87dd6fa67c318e216a58113695aedb817f26824b",
+  "FirstCleanupBytes": 80459967,
+  "SecondCleanupBytes": 69424326,
+  "RemovedBytes": 11035641,
+  "NativeLibrariesRemoved": [
+    "lib/arm64-v8a/libmoonfin_libretro.so",
+    "lib/arm64-v8a/libpdfium.so",
+    "lib/arm64-v8a/librar_native.so",
+    "lib/armeabi-v7a/libmoonfin_libretro.so",
+    "lib/armeabi-v7a/librar_native.so",
+    "lib/x86_64/libmoonfin_libretro.so",
+    "lib/x86_64/librar_native.so"
+  ],
+  "AndroidPluginRegistrationsRemoved": [
+    "archive_extract",
+    "firebase_core",
+    "firebase_messaging",
+    "flutter_inappwebview_android",
+    "fullscreen_window",
+    "gamepads_android",
+    "rar"
+  ],
+  "AbiPolicy": "Unchanged: ARM64 Flutter AOT; support JNI libraries for ARM64, ARMv7, x86_64",
+  "VideoLibraryCheck": "ARM64 mpv, libass and libasskt present"
+}

@@ -1,5 +1,9 @@
 # Android TV video: first-round results
 
+The [second cleanup results](second-cleanup/README.md) cover runner removal,
+dependency/native pruning and the updated Shield checks. This page retains
+the original first-round measurements for comparison.
+
 Measured on 2026-11-02. This is a staged runtime cleanup, with isolated test
 applications. It is not yet a fully pruned Android-only source tree.
 

@@ -108,8 +108,9 @@ test plugin, although Gradle correctly excludes that plugin from release.
 
 ## Measurements
 
-See [the first-round results](../benchmarks/android-tv/README.md) for the
-measured APK sizes, device smoke checks and unresolved validation work.
+See [the first-round results](../benchmarks/android-tv/README.md) and
+[second cleanup results](../benchmarks/android-tv/second-cleanup/README.md)
+for measured APK sizes, device checks and unresolved validation work.
 
 ```powershell
 .\scripts\measure-apk.ps1 -ApkPath <apk> -SourceRevision <commit> `

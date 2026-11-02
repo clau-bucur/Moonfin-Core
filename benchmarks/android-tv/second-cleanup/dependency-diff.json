@@ -1,0 +1,290 @@
+{
+  "BeforeRevision": "0edb080c921bfdfb0aaf90a3d9251f27bb2c0e8c",
+  "AfterRevision": "fc60ac14d797507cb4610b1d11d508ee686a2fba",
+  "BeforePackageCount": 293,
+  "AfterPackageCount": 241,
+  "RemovedPackages": [
+    {
+      "Name": "_flutterfire_internals",
+      "Version": "1.3.77",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "archive_extract",
+      "Version": "0.1.0",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "console",
+      "Version": "4.1.0",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "csslib",
+      "Version": "1.0.2",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "cupertino_ui",
+      "Version": "1.0.2",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "firebase_core",
+      "Version": "4.15.0",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "firebase_core_platform_interface",
+      "Version": "8.1.1",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "firebase_core_web",
+      "Version": "3.12.0",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "firebase_messaging",
+      "Version": "16.7.0",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "firebase_messaging_platform_interface",
+      "Version": "4.10.0",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "firebase_messaging_web",
+      "Version": "4.2.5",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "flutter_inappwebview",
+      "Version": "6.1.5",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "flutter_inappwebview_android",
+      "Version": "1.1.3",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "flutter_inappwebview_internal_annotations",
+      "Version": "1.3.0",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "flutter_inappwebview_ios",
+      "Version": "1.1.2",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "flutter_inappwebview_macos",
+      "Version": "1.1.2",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "flutter_inappwebview_platform_interface",
+      "Version": "1.3.0+1",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "flutter_inappwebview_web",
+      "Version": "1.1.2",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "flutter_inappwebview_windows",
+      "Version": "0.6.0",
+      "Dependency": "direct overridden"
+    },
+    {
+      "Name": "flutter_secure_storage_tvos",
+      "Version": "0.0.2",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "flutter_tvos",
+      "Version": "1.1.3",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "flutter_widget_from_html_core",
+      "Version": "0.16.1",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "fullscreen_window",
+      "Version": "1.2.1",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "gamepads",
+      "Version": "0.1.12",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "gamepads_android",
+      "Version": "0.1.10",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "gamepads_darwin",
+      "Version": "0.1.4",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "gamepads_linux",
+      "Version": "0.1.2",
+      "Dependency": "direct overridden"
+    },
+    {
+      "Name": "gamepads_platform_interface",
+      "Version": "0.1.4",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "gamepads_web",
+      "Version": "0.1.3",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "gamepads_windows",
+      "Version": "0.3.2",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "html",
+      "Version": "0.15.6",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "kindle_unpack",
+      "Version": "0.1.1",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "material_ui",
+      "Version": "1.1.1",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "media_kit_libs_linux",
+      "Version": "1.2.1",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "media_kit_libs_windows_video",
+      "Version": "1.0.12",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "msix",
+      "Version": "3.16.13",
+      "Dependency": "direct dev"
+    },
+    {
+      "Name": "path_provider_tvos",
+      "Version": "0.0.2",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "pdfium_dart",
+      "Version": "0.3.1",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "pdfium_flutter",
+      "Version": "0.3.1",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "pdfrx",
+      "Version": "2.6.5",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "pdfrx_engine",
+      "Version": "0.6.1",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "rar",
+      "Version": "0.3.0",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "screen_brightness_ios",
+      "Version": "2.1.2",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "screen_retriever",
+      "Version": "0.2.2",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "screen_retriever_linux",
+      "Version": "0.2.2",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "screen_retriever_macos",
+      "Version": "0.2.2",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "screen_retriever_platform_interface",
+      "Version": "0.2.2",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "screen_retriever_windows",
+      "Version": "0.2.2",
+      "Dependency": "transitive"
+    },
+    {
+      "Name": "shared_preferences_tvos",
+      "Version": "0.0.2",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "sqflite_tvos",
+      "Version": "0.0.2",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "webview_win_floating",
+      "Version": "3.0.3",
+      "Dependency": "direct main"
+    },
+    {
+      "Name": "window_manager",
+      "Version": "0.5.2",
+      "Dependency": "direct main"
+    }
+  ],
+  "AddedPackages": [],
+  "VersionChanges": [],
+  "DependencyRoleChanges": [
+    {
+      "Name": "archive",
+      "Before": "direct main",
+      "After": "transitive",
+      "Version": "4.3.0"
+    },
+    {
+      "Name": "dbus",
+      "Before": "direct main",
+      "After": "transitive",
+      "Version": "0.7.15"
+    },
+    {
+      "Name": "webview_flutter_wkwebview",
+      "Before": "direct main",
+      "After": "transitive",
+      "Version": "3.27.0"
+    }
+  ]
+}
