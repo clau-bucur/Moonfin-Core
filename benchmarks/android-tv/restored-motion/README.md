@@ -2,6 +2,9 @@
 
 Date: 2026-11-02. Branch: `experiment/android-tv-video`.
 
+Follow-up: [details loading and PR verification](../details-loading/README.md)
+records the subsequent PR #1541 port and confirmation against PR #1542.
+
 Recovered the original card-motion implementation from local commit
 `769a9b64a1c142bcb429f94e1608cbc8bf874711` (`improve/modern-home-card-motion`).
 The old remote-tracking ref still existed locally after branch deletion. This

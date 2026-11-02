@@ -37,6 +37,7 @@ import 'package:moonfin/ui/widgets/rating_display.dart';
 import 'package:moonfin/ui/widgets/seerr/seerr_item_chips.dart';
 import 'package:moonfin/ui/widgets/seerr/seerr_stats_card.dart';
 import 'package:moonfin/ui/widgets/skeleton/skeleton_detail_screen.dart';
+import 'package:moonfin/ui/widgets/playback/loading_animation_widget.dart';
 import 'package:moonfin/ui/widgets/skeleton/skeleton_shimmer.dart';
 import 'package:moonfin/util/platform_detection.dart';
 import 'package:moonfin_design/moonfin_design.dart';
@@ -483,40 +484,34 @@ void main() {
     expect(actions.bottom, lessThanOrEqualTo(tvSize.height));
   });
 
-  // Both read the same hero inset helper, and this is what holds them to it.
-  // A copy of the formula on either side shows up here as a jump on load.
-  testWidgets('the TV skeleton and content start their hero at the same place', (
-    tester,
-  ) async {
-    PlatformDetection.setTvMode(true);
-    addTearDown(() => PlatformDetection.setTvMode(false));
-
-    const tvSize = Size(960, 540);
-    tester.view.physicalSize = tvSize;
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-
-    final vm = viewModel('Movie');
-    await pumpContent(tester, vm, size: tvSize);
-    final contentHeroTop = tester.getRect(find.byType(NouveauHero)).top;
-
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpWidget(
-      MediaQuery(
-        data: const MediaQueryData(size: tvSize),
-        child: MaterialApp(
-          theme: AppTheme.buildTheme(ThemeRegistry.active),
-          home: const Scaffold(
+  testWidgets(
+    'TV loading avoids a placeholder hero and reveals ready content immediately',
+    (tester) async {
+      PlatformDetection.setTvMode(true);
+      addTearDown(() => PlatformDetection.setTvMode(false));
+      const tvSize = Size(960, 540);
+      tester.view.physicalSize = tvSize;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
             body: DetailScreenSkeleton(style: DetailScreenStyle.nouveau),
           ),
         ),
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 100));
-    final skeletonHeroTop = tester.getRect(find.byType(SkeletonBox).first).top;
+      );
+      await tester.pump(const Duration(milliseconds: 599));
+      expect(find.byType(SkeletonBox), findsNothing);
+      expect(find.byType(LoadingAnimationWidget), findsNothing);
+      await tester.pump(const Duration(milliseconds: 1));
+      expect(find.byType(LoadingAnimationWidget), findsOneWidget);
 
-    expect(skeletonHeroTop, closeTo(contentHeroTop, 2.0));
-  });
+      await pumpContent(tester, viewModel('Movie'), size: tvSize);
+      expect(find.byType(NouveauHero), findsOneWidget);
+      expect(find.byType(LoadingAnimationWidget), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('null metadata and empty rails render safely', (tester) async {
     final vm = viewModel(
