@@ -1,0 +1,50 @@
+{
+  "SourceRevision": "eefa0a9f73d07fbe178b850a37afabc766be661d",
+  "DeviceAccess": false,
+  "Analyzer": {
+    "Command": "dart analyze lib packages/playback_core/lib test",
+    "Errors": 0,
+    "Warnings": 11,
+    "Infos": 127
+  },
+  "Runs": [
+    {
+      "Name": "Video/Home/auth/subtitle/profile focus",
+      "Passed": 313,
+      "Failed": 1,
+      "Note": "The remote-message banner test exposed the root overlay lookup; corrected and covered by the passing 72-test retry."
+    },
+    {
+      "Name": "Remote commands and root Back retry",
+      "Passed": 72,
+      "Failed": 0
+    },
+    {
+      "Name": "Streaming manager, detail viewmodels/layouts, chapter and artwork regression",
+      "Passed": 207,
+      "Failed": 0
+    },
+    {
+      "Name": "Final artwork/motion/root Back",
+      "Passed": 15,
+      "Failed": 0
+    },
+    {
+      "Name": "Live stream completion and recovery, isolated",
+      "Passed": 61,
+      "Failed": 0
+    }
+  ],
+  "FullInheritedSuite": "Not rerun; earlier full-suite runner/completion limitation is documented in the parent report.",
+  "PreExistingTranslationEditsPreserved": {
+    "fi": true,
+    "it": true,
+    "zh": true
+  },
+  "Shield": {
+    "Status": "Awaiting explicit user OK",
+    "Installed": false,
+    "Launched": false,
+    "Tested": false
+  }
+}

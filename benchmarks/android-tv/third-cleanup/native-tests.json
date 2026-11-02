@@ -1,0 +1,310 @@
+{
+  "SourceRevision": "eefa0a9f73d07fbe178b850a37afabc766be661d",
+  "DeviceAccess": false,
+  "Commands": [
+    ":app:testAndroidTvDebugUnitTest",
+    ":moonfin_native_video:testDebugUnitTest"
+  ],
+  "Tests": 315,
+  "Failures": 0,
+  "Errors": 0,
+  "Skipped": 0,
+  "Suites": [
+    {
+      "suite": "org.moonfin.androidtv.BurstCoalescerTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.012"
+    },
+    {
+      "suite": "org.moonfin.androidtv.DisplayCapabilitiesTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.02"
+    },
+    {
+      "suite": "org.moonfin.androidtv.ImpellerPolicyTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.013"
+    },
+    {
+      "suite": "org.moonfin.androidtv.NativeInputDeviceClassifierTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.003"
+    },
+    {
+      "suite": "org.moonfin.androidtv.ProcessExitPolicyTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.542"
+    },
+    {
+      "suite": "org.moonfin.androidtv.TombstoneTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.024"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.DecoderReclaimPolicyTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.021"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.DisplayModeChooserTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.012"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.DisplayModeSettleTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.003"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.DisplayModeSwitchPolicyTest",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.007"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.DoviInterceptModeTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.01"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.DtsCoreFallbackTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.063"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.iec.Iec61937CarrierProbeTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.002"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.iec.Iec61937PackerTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.095"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.LetterboxBarScannerTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.004"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.LetterboxCropLayoutTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.001"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.Media3SlotPolicyTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.014"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.MoonfinAssOverlaySeekTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "37.988"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.MoonfinAssOverlayVisibilityTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "2.835"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.MoonfinAssParserFactoryTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.019"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.PaddingRowMaskTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.001"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.PassthroughSilenceRecoveryTest",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.003"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.PlatformViewCensusTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.003"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.ResumeWedgePolicyTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.002"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.RouteFlapHoldTest",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.003"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.subtitle.DeclaredSubtitlesTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.002"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.subtitle.SecondarySubtitleRenderingTest",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "29.266"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.subtitle.StackedCuesTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.021"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.subtitle.SubtitleLayoutPlannerTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.004"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.subtitle.SubtitleOffsetPolicyTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.098"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.subtitle.SupSubtitleParserTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.006"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.subtitle.TimeOffsetMediaPeriodTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.017"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.SubtitleSeekPolicyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.35"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.ts.HdmvTsTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.014"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.UnsupportedVideoPolicyTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.001"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.Vc1AliasMediaCodecSelectorTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.002"
+    },
+    {
+      "suite": "org.moonfin.nativevideo.VsyncPacerTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "time": "0.017"
+    }
+  ]
+}

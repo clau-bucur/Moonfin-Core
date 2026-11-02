@@ -135,7 +135,8 @@ test plugin, although Gradle correctly excludes that plugin from release.
 ## Measurements
 
 See [the first-round results](../benchmarks/android-tv/README.md) and
-[second cleanup results](../benchmarks/android-tv/second-cleanup/README.md)
+[second cleanup results](../benchmarks/android-tv/second-cleanup/README.md), and
+[third cleanup results](../benchmarks/android-tv/third-cleanup/README.md)
 for measured APK sizes, device checks and unresolved validation work.
 
 ```powershell

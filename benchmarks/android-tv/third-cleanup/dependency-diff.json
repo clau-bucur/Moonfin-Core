@@ -1,0 +1,94 @@
+{
+  "BeforeRevision": "72912a405eb35f9dd9965a4c9d5e6355e7c4ecff",
+  "AfterRevision": "eefa0a9f73d07fbe178b850a37afabc766be661d",
+  "BeforePackageCount": 241,
+  "AfterPackageCount": 227,
+  "RemovedPackages": [
+    {
+      "Name": "background_downloader",
+      "Version": "9.6.0",
+      "Dependency": "direct main",
+      "Source": "git"
+    },
+    {
+      "Name": "charcode",
+      "Version": "1.4.0",
+      "Dependency": "transitive",
+      "Source": "hosted"
+    },
+    {
+      "Name": "cli_util",
+      "Version": "0.4.2",
+      "Dependency": "transitive",
+      "Source": "hosted"
+    },
+    {
+      "Name": "drift",
+      "Version": "2.28.2",
+      "Dependency": "direct main",
+      "Source": "hosted"
+    },
+    {
+      "Name": "drift_dev",
+      "Version": "2.28.0",
+      "Dependency": "direct dev",
+      "Source": "hosted"
+    },
+    {
+      "Name": "flutter_local_notifications",
+      "Version": "21.0.0",
+      "Dependency": "direct main",
+      "Source": "hosted"
+    },
+    {
+      "Name": "flutter_local_notifications_linux",
+      "Version": "8.0.0",
+      "Dependency": "transitive",
+      "Source": "hosted"
+    },
+    {
+      "Name": "flutter_local_notifications_platform_interface",
+      "Version": "11.0.0",
+      "Dependency": "transitive",
+      "Source": "hosted"
+    },
+    {
+      "Name": "flutter_local_notifications_windows",
+      "Version": "3.0.0",
+      "Dependency": "transitive",
+      "Source": "hosted"
+    },
+    {
+      "Name": "recase",
+      "Version": "4.1.0",
+      "Dependency": "transitive",
+      "Source": "hosted"
+    },
+    {
+      "Name": "sqlite3",
+      "Version": "2.9.4",
+      "Dependency": "direct main",
+      "Source": "hosted"
+    },
+    {
+      "Name": "sqlite3_flutter_libs",
+      "Version": "0.5.42",
+      "Dependency": "direct main",
+      "Source": "hosted"
+    },
+    {
+      "Name": "sqlparser",
+      "Version": "0.41.2",
+      "Dependency": "transitive",
+      "Source": "hosted"
+    },
+    {
+      "Name": "timezone",
+      "Version": "0.11.0",
+      "Dependency": "transitive",
+      "Source": "hosted"
+    }
+  ],
+  "AddedPackages": [],
+  "RetainedVersionChanges": []
+}
