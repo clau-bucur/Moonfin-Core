@@ -7,6 +7,7 @@ import '../../preference/preference_constants.dart';
 import '../../util/platform_detection.dart';
 import '../../util/tv_ui_scale.dart';
 import '../../util/focus/dpad_keys.dart';
+import '../../util/focus/input_mode_tracker.dart';
 import '../../util/focus/key_event_utils.dart';
 import '../../util/item_watch_state.dart';
 import '../../util/focus/scroll_utils.dart';
@@ -296,6 +297,33 @@ class MediaCard extends StatefulWidget {
 
 class _MediaCardState extends State<MediaCard> with FocusStateMixin {
   final _selectKeyHandler = LongPressSelectKeyHandler();
+  bool _reportedHover = false;
+
+  void _startHover() {
+    if (_reportedHover) return;
+    _reportedHover = true;
+    widget.onHoverStart?.call();
+  }
+
+  void _endHover() {
+    if (!_reportedHover) return;
+    _reportedHover = false;
+    widget.onHoverEnd?.call();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (PlatformDetection.isTV &&
+        !InputModeTracker.pointerIsLive(context) &&
+        _reportedHover) {
+      // A remote key takes over without moving the parked mouse. Notify the
+      // row after build so it can restore expansion to its focused card.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !InputModeTracker.pointerIsLive(context)) _endHover();
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -410,13 +438,15 @@ class _MediaCardState extends State<MediaCard> with FocusStateMixin {
     final labelGap = classic ? tvPx(16) : MediaCard._labelGap;
     final externallyDriven = widget.externalIsFocused != null;
     final hasNodeFocus = widget.focusNode?.hasFocus ?? false;
+    final activeHover = hovered &&
+        (!PlatformDetection.isTV || InputModeTracker.pointerIsLive(context));
     final effectiveFocused = externallyDriven
-        ? (widget.externalIsFocused! || hovered)
+        ? (widget.externalIsFocused! || activeHover)
         : (focused || hasNodeFocus);
-    final showMarquee = hovered || effectiveFocused;
+    final showMarquee = activeHover || effectiveFocused;
     final cardActive =
         widget.cardFocusExpansion &&
-        (externallyDriven ? effectiveFocused : showFocusBorder);
+        (externallyDriven ? effectiveFocused : (focused || activeHover));
     final inner = GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTapDown: (_) => widget.onPressStart?.call(),
@@ -461,7 +491,7 @@ class _MediaCardState extends State<MediaCard> with FocusStateMixin {
                       playedPercentage: widget.playedPercentage,
                       watchedBehavior: widget.watchedBehavior,
                       focused: effectiveFocused,
-                      hovered: hovered,
+                      hovered: activeHover,
                       focusColor: widget.focusColor,
                       suppressFocusBorder: widget.suppressImageFocusBorder,
                       suppressFocusGlow: widget.suppressFocusGlow,
@@ -544,11 +574,16 @@ class _MediaCardState extends State<MediaCard> with FocusStateMixin {
       cursor: SystemMouseCursors.click,
       onEnter: (_) {
         setHovered(true);
-        widget.onHoverStart?.call();
+        if (!PlatformDetection.isTV) _startHover();
+      },
+      // Enter/exit are also synthesized when a row moves beneath a parked
+      // pointer. Only a real hover movement can expand a card on TV.
+      onHover: (_) {
+        if (PlatformDetection.isTV) _startHover();
       },
       onExit: (_) {
         setHovered(false);
-        widget.onHoverEnd?.call();
+        _endHover();
       },
       child: externallyDriven
           ? inner
