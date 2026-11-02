@@ -1546,15 +1546,11 @@ class _ContentRowsState extends State<_ContentRows>
     if (includeMediaBar) {
       currentTop += _mediaBarExtent();
     }
-    final focusedRowSpacing =
-        PlatformDetection.isTV && !fullScreenRows && !showInfoOverlay
-        ? _focusedRowExtraSpacing * 2
-        : 0.0;
-
+    // Each sliver is fixed to rowExtents[i], including its internal padding.
+    // Counting that padding again makes lower rows overshoot their headings.
     for (var i = 0; i < rowExtents.length; i++) {
       rowTopOffsets.add(currentTop);
       currentTop += rowExtents[i];
-      currentTop += focusedRowSpacing;
     }
 
     _invalidateRowTargetOffsetCache();
