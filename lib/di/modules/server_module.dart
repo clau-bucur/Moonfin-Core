@@ -14,7 +14,6 @@ import '../../data/services/connectivity_service.dart';
 import '../../data/services/download_notification_service.dart';
 import '../../data/services/download_service.dart';
 import '../../data/services/media_server_client_factory.dart';
-import '../../data/services/push_messaging_service.dart';
 import '../../data/services/saved_media_presence.dart';
 import '../../data/services/seerr_notification_service.dart';
 import '../../data/services/socket_handler.dart';
@@ -62,13 +61,6 @@ void registerServerModule() {
       !_getIt.isRegistered<SeerrNotificationService>()) {
     _getIt.registerLazySingleton<SeerrNotificationService>(
       () => SeerrNotificationService(),
-    );
-  }
-
-  if (!VideoAppProfile.enabled &&
-      !_getIt.isRegistered<PushMessagingService>()) {
-    _getIt.registerLazySingleton<PushMessagingService>(
-      () => PushMessagingService(),
     );
   }
 

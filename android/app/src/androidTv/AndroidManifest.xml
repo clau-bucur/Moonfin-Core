@@ -13,9 +13,6 @@
         tools:replace="android:required" />
 
     <application>
-        <meta-data
-            android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            tools:node="remove" />
 
         <activity android:name=".MainActivity">
             <intent-filter>

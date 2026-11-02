@@ -1,3 +1,5 @@
+import '../../../util/video_app_profile.dart';
+
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -21,7 +23,6 @@ import 'package:playback_silo/playback_silo.dart'
 import 'package:server_core/server_core.dart';
 import 'package:screen_brightness_platform_interface/screen_brightness_platform_interface.dart';
 import 'package:volume_controller/volume_controller.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../../../data/utils/chapter_markers.dart';
 import '../../../data/utils/server_trickplay.dart';
@@ -159,7 +160,7 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen>
-    with WidgetsBindingObserver, WindowListener, ImmersiveSystemUi {
+    with WidgetsBindingObserver, ImmersiveSystemUi {
   static const _streamLoadingLabel = 'Loading Stream...';
 
   /// How long away counts as having moved on rather than stepped out.
@@ -260,9 +261,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   /// The backend whose HDR output this screen presents, or null on platforms
   /// without the native window.
   MediaKitPlayerBackend? get _hdrBackend =>
-      PlatformDetection.supportsNativeHdrWindow
-      ? _activeMediaKitBackend
-      : null;
+      PlatformDetection.supportsNativeHdrWindow ? _activeMediaKitBackend : null;
 
   /// Whether mpv currently renders into its own native window.
   bool get _nativeHdrEngaged => _hdrBackend?.hdrOutput.isEngaged ?? false;
@@ -518,8 +517,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   bool get _isCurrentPreroll => _isPrerollQueueItem(_queue.currentItem);
 
-  bool get _isCinemaSkipVisible =>
-      _isCurrentPreroll && _cinemaSkip.visible;
+  bool get _isCinemaSkipVisible => _isCurrentPreroll && _cinemaSkip.visible;
 
   void _configureCinemaSkip() => _cinemaSkip.configure(
     enabled: _prefs.get(UserPreferences.cinemaModeSkipEnabled),
@@ -829,9 +827,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       ]);
     }
     WidgetsBinding.instance.addObserver(this);
-    if (PlatformDetection.isDesktop) {
-      windowManager.addListener(this);
-    }
+
     _loadSegmentsForCurrentItem();
     unawaited(_syncAutoHdrSwitching());
     _positionSub = _state.positionStream.listen(_onPositionUpdate);
@@ -869,7 +865,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       unawaited(_pushMedia3UiMetadata());
       unawaited(_syncAutoHdrSwitching());
     });
-    if (PlatformDetection.isAndroid || PlatformDetection.isIOS) {
+    if (!VideoAppProfile.enabled &&
+        (PlatformDetection.isAndroid || PlatformDetection.isIOS)) {
       _castEventsSub = _nativeCast.googleCastEventStream().listen(
         (e) => _onRemoteEvent(
           e,
@@ -1022,9 +1019,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     // mini player resets it when it ends.
     if (!_isMinimizing) _manager.autoAdvanceEnabled = true;
     WidgetsBinding.instance.removeObserver(this);
-    if (PlatformDetection.isDesktop) {
-      windowManager.removeListener(this);
-    }
+
     _cancelTemporarySpeed();
     _hideTimer?.cancel();
     _skipSegmentAutoHideTimer?.cancel();
@@ -1041,9 +1036,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _skipBackwardTimer?.cancel();
     _surfaceTaps.cancel();
     _persistVolumeTimer?.cancel();
-    if (PlatformDetection.isDesktop) {
-      unawaited(_prefs.set(UserPreferences.playerVolume, _playerVolume));
-    }
+
     _volumeListenerSub?.cancel();
     if (_useSystemVolume) {
       VolumeController.instance.removeListener();
@@ -1189,9 +1182,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     }
     _lastCastErrorAt = now;
     _lastCastErrorMessage = message;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _showThrottledPlaybackError(String message) {
@@ -1211,9 +1203,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
     _lastPlaybackErrorAt = now;
     _lastPlaybackErrorMessage = normalized;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(normalized)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(normalized)));
   }
 
   void _showBringupFailureIfAny(PlaybackBringupState state) {
@@ -1382,26 +1373,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     return true;
   }
 
-  @override
-  void onWindowFocus() {
-    _ensureDesktopOverlayFocus();
-  }
-
   // Fullscreen can be entered without the player ever being asked: F11 and
   // Alt+Enter are handled by the global shortcut in app.dart, which calls
   // FullscreenHelper directly, and the title bar, Win+Up and the window menu
   // bypass the app entirely. Listening to the window itself catches all of
   // them, so _isDesktopFullscreen and the auto-HDR switch stay in step
   // whichever route was taken.
-  @override
-  void onWindowEnterFullScreen() {
-    unawaited(_syncDesktopFullscreenState());
-  }
-
-  @override
-  void onWindowLeaveFullScreen() {
-    unawaited(_syncDesktopFullscreenState());
-  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
@@ -3911,7 +3888,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
             onVerticalDragEnd: swipeGestures ? _onVerticalDragEnd : null,
             onVerticalDragCancel: swipeGestures ? _onVerticalDragCancel : null,
             onLongPressStart: holdForSpeed ? _onSurfaceLongPressStart : null,
-            onLongPressEnd: holdForSpeed ? (_) => _onSurfaceLongPressEnd() : null,
+            onLongPressEnd: holdForSpeed
+                ? (_) => _onSurfaceLongPressEnd()
+                : null,
             onLongPressCancel: holdForSpeed ? _onSurfaceLongPressEnd : null,
             behavior: HitTestBehavior.opaque,
             child: Listener(
@@ -3928,7 +3907,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                   ? _handleScrollSignal
                   : null,
               child: MouseRegion(
-                cursor: PlatformDetection.useDesktopUi &&
+                cursor:
+                    PlatformDetection.useDesktopUi &&
                         !_controlsVisible &&
                         !_isCinemaSkipVisible
                     ? SystemMouseCursors.none
@@ -4057,26 +4037,34 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                         ),
                       if (_isCinemaSkipVisible)
                         SkipSegmentOverlay(
-                          key: ValueKey('cinema-preroll-${_cinemaSkip.generation}'),
+                          key: ValueKey(
+                            'cinema-preroll-${_cinemaSkip.generation}',
+                          ),
                           segment: MediaSegment(
                             id: '__cinema_preroll__${_cinemaSkip.generation}',
-                            itemId: _itemIdForQueueItem(_queue.currentItem) ?? '',
+                            itemId:
+                                _itemIdForQueueItem(_queue.currentItem) ?? '',
                             type: MediaSegmentType.preview,
                             start: Duration.zero,
                             end: _cinemaSkip.duration,
                           ),
-                          actionLabel: AppLocalizations.of(context).settingsSkip,
+                          actionLabel: AppLocalizations.of(context)
+                              .settingsSkip,
                           focusNode: _tvSkipSegmentFocus,
                           onSkip: _cinemaSkip.skip,
                           onDismiss: _dismissCinemaSkip,
                           positionStream: _state.positionStream,
                           initialPosition: _state.position,
-                          rightInset: 24.0 +
-                              (PlatformDetection.isMobile && !PlatformDetection.isTV
+                          rightInset:
+                              24.0 +
+                              (PlatformDetection.isMobile &&
+                                      !PlatformDetection.isTV
                                   ? MediaQuery.viewPaddingOf(context).right
                                   : 0),
-                          bottomInset: MediaQuery.viewPaddingOf(context).bottom +
-                              (PlatformDetection.isMobile && !PlatformDetection.isTV
+                          bottomInset:
+                              MediaQuery.viewPaddingOf(context).bottom +
+                              (PlatformDetection.isMobile &&
+                                      !PlatformDetection.isTV
                                   ? 16
                                   : 24),
                         ),
@@ -4090,13 +4078,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                               _nextUpItem!.primaryImageTag != null &&
                                   _prefs.get(UserPreferences.nextUpBehavior) !=
                                       NextUpBehavior.minimal
-                              ? _clientForItem(
-                                  _nextUpItem!,
-                                ).imageApi.getPrimaryImageUrl(
-                                  _nextUpItem!.id,
-                                  maxWidth: 400,
-                                  tag: _nextUpItem!.primaryImageTag,
-                                )
+                              ? _clientForItem(_nextUpItem!).imageApi
+                                    .getPrimaryImageUrl(
+                                      _nextUpItem!.id,
+                                      maxWidth: 400,
+                                      tag: _nextUpItem!.primaryImageTag,
+                                    )
                               : null,
                           timeoutMs: _prefs.get(UserPreferences.nextUpTimeout),
                           onPlayNext: _handleNextUpPlay,
@@ -4387,9 +4374,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                   alignment: pos.alignment,
                   child: Padding(
                     padding: pos.safePadding,
-                    child: PlayerLoadingOverlay(
-                      label: _streamLoadingLabel,
-                    ),
+                    child: PlayerLoadingOverlay(label: _streamLoadingLabel),
                   ),
                 ),
         );
@@ -4854,11 +4839,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       return null;
     }
 
-    return _clientForQueueItem(item).imageApi.getLogoImageUrl(
-      normalizedItemId,
-      maxWidth: 420,
-      tag: normalizedTag,
-    );
+    return _clientForQueueItem(item).imageApi
+        .getLogoImageUrl(normalizedItemId, maxWidth: 420, tag: normalizedTag);
   }
 
   String? _artworkUrlForQueueItem(dynamic item) {
@@ -5211,7 +5193,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     );
   }
 
-
   /// The seek bar slider itself, lifted out so the marker layer can stack
   /// over it without pushing the whole tree past the line limit.
   Widget _buildSeekSlider({
@@ -5223,16 +5204,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       data: osdSeekBarTheme(thumbFocused: _seekbarFocused),
       child: Slider(
         value: positionMs.clamp(0.0, durationMs),
-        secondaryTrackValue: bufferMs.clamp(
-          0.0,
-          durationMs,
-        ),
+        secondaryTrackValue: bufferMs.clamp(0.0, durationMs),
         max: durationMs,
         onChangeStart: (v) {
-          _suppressSeekPrompts(
-            duration:
-                _seekDragPromptSuppressionDuration,
-          );
+          _suppressSeekPrompts(duration: _seekDragPromptSuppressionDuration);
           _pendingScrubSeekTarget = null;
           _beginScrub();
           setState(() {
@@ -5243,14 +5218,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         },
         onChanged: (v) {
           _suppressSeekPrompts(
-            duration:
-                _seekDragPromptSuppressionDuration,
+            duration: _seekDragPromptSuppressionDuration,
             dismissVisiblePrompts: false,
           );
           setState(() => _seekValue = v);
-          _prefetchVisibleTrickplayPreview(
-            Duration(milliseconds: v.round()),
-          );
+          _prefetchVisibleTrickplayPreview(Duration(milliseconds: v.round()));
         },
         onChangeEnd: (v) {
           _suppressSeekPrompts();
@@ -5528,10 +5500,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         MediaQuery.of(context).orientation == Orientation.portrait) {
       return Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildDockedTransportRow(),
-          _buildSecondaryControlsRow(),
-        ],
+        children: [_buildDockedTransportRow(), _buildSecondaryControlsRow()],
       );
     }
     return Row(
@@ -5701,7 +5670,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           (s) => s['Type'] == 'Subtitle',
         );
         final canDownloadRemoteSubtitles =
-            item is AggregatedItem && TrackPicker.canDownloadRemoteSubtitles(item);
+            item is AggregatedItem &&
+            TrackPicker.canDownloadRemoteSubtitles(item);
         final showSubtitleButton =
             hasSubtitleStreams || canDownloadRemoteSubtitles;
         final subtitleButtonIcon =
@@ -6024,7 +5994,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   Future<void> _syncAlwaysOnTopState() async {
     if (!PlatformDetection.useDesktopUi) return;
     try {
-      final onTop = await windowManager.isAlwaysOnTop();
+      final onTop = false;
       _wasAlwaysOnTopOnEntry ??= onTop;
       if (!mounted) return;
       setState(() => _isAlwaysOnTop = onTop);
@@ -6034,7 +6004,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   Future<void> _setAlwaysOnTop(bool value) async {
     if (!PlatformDetection.useDesktopUi) return;
     try {
-      await windowManager.setAlwaysOnTop(value);
       if (!mounted) return;
       setState(() => _isAlwaysOnTop = value);
     } catch (_) {}
@@ -7209,10 +7178,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     );
   }
 
-  void _showTrackSelector({
-    required bool audio,
-    bool secondary = false,
-  }) {
+  void _showTrackSelector({required bool audio, bool secondary = false}) {
     unawaited(
       TrackPicker.show(
         context,
@@ -7260,8 +7226,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   /// its crop.
   ZoomMode get _effectiveZoomMode {
     if (!_letterboxCropApplied) return _zoomMode;
-    final fullscreen =
-        !PlatformDetection.useDesktopUi || _isDesktopFullscreen;
+    final fullscreen = !PlatformDetection.useDesktopUi || _isDesktopFullscreen;
     final cropper = _activeMediaKitBackend?.letterboxCropper;
     if (cropper is MpvLetterboxCropper) {
       final screen = MediaQuery.sizeOf(context);
@@ -7392,12 +7357,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _zoomModeToastOverlay = null;
   }
 
-  String _zoomModeLabel(AppLocalizations l10n, ZoomMode mode) =>
-      switch (mode) {
-        ZoomMode.fit => l10n.fit,
-        ZoomMode.autoCrop => l10n.autoCrop,
-        ZoomMode.stretch => l10n.stretch,
-      };
+  String _zoomModeLabel(AppLocalizations l10n, ZoomMode mode) => switch (mode) {
+    ZoomMode.fit => l10n.fit,
+    ZoomMode.autoCrop => l10n.autoCrop,
+    ZoomMode.stretch => l10n.stretch,
+  };
 
   String _tooltipMessage(String label, {String? shortcut}) {
     if (shortcut == null || shortcut.isEmpty || PlatformDetection.isTV) {
@@ -7926,7 +7890,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         CastTargetKind.dlna => 'DLNA',
         _ => l10n.cast,
       };
-      _showThrottledCastError(l10n.castActionFailed(label, describeError(e, l10n)));
+      _showThrottledCastError(
+        l10n.castActionFailed(label, describeError(e, l10n)),
+      );
     }
   }
 

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_tvos/flutter_tvos.dart'
-    show TvRemoteController, TvRemoteTouchEvent, TvRemoteTouchPhase;
 import 'package:moonfin_design/moonfin_design.dart';
 
 import 'seerr/seerr_media_type_badge.dart';
@@ -391,9 +389,7 @@ class _MediaCardState extends State<MediaCard> with FocusStateMixin {
           widget.titleColor ??
           (isNeon ? AppColorScheme.accent : AppColorScheme.onSurface),
       fontWeight: classic ? FontWeight.w600 : FontWeight.bold,
-      fontSize: classic
-          ? tvPx(22)
-          : MediaCard._titleFontSize(baseTextStyle),
+      fontSize: classic ? tvPx(22) : MediaCard._titleFontSize(baseTextStyle),
       height: classic ? 30 / 22 : null,
       shadows: const [Shadow(blurRadius: 4, color: Colors.black54)],
     );
@@ -507,10 +503,7 @@ class _MediaCardState extends State<MediaCard> with FocusStateMixin {
                       height: titleLineHeight,
                       width: cardWidth,
                       child: showMarquee
-                          ? MarqueeText(
-                              text: widget.title!,
-                              style: titleStyle,
-                            )
+                          ? MarqueeText(text: widget.title!, style: titleStyle)
                           : Text(
                               widget.title!,
                               maxLines: 1,
@@ -595,121 +588,8 @@ class _MediaCardState extends State<MediaCard> with FocusStateMixin {
     return SizedBox(width: widget.width, child: mouseRegion);
   }
 
-  Widget _withTvParallax({required bool active, required Widget child}) {
-    if (!PlatformDetection.isAppleTV) return child;
-    return _TvFocusParallax(active: active, child: child);
-  }
-}
-
-class _TvFocusParallax extends StatefulWidget {
-  final bool active;
-  final Widget child;
-
-  const _TvFocusParallax({required this.active, required this.child});
-
-  @override
-  State<_TvFocusParallax> createState() => _TvFocusParallaxState();
-}
-
-class _TvFocusParallaxState extends State<_TvFocusParallax>
-    with SingleTickerProviderStateMixin {
-  static const double _maxAngle = 0.10;
-  static const double _ease = 0.18;
-
-  late final _ticker = createTicker(_onTick);
-  final ValueNotifier<Offset> _tilt = ValueNotifier<Offset>(Offset.zero);
-  Offset _target = Offset.zero;
-  bool _listening = false;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.active) _attach();
-  }
-
-  @override
-  void didUpdateWidget(_TvFocusParallax oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.active && !oldWidget.active) {
-      _attach();
-    } else if (!widget.active && oldWidget.active) {
-      _detach();
-    }
-  }
-
-  @override
-  void dispose() {
-    _detach();
-    _ticker.dispose();
-    _tilt.dispose();
-    super.dispose();
-  }
-
-  void _attach() {
-    if (_listening) return;
-    _listening = true;
-    TvRemoteController.instance.addRawListener(_onTouch);
-  }
-
-  void _detach() {
-    if (_listening) {
-      TvRemoteController.instance.removeRawListener(_onTouch);
-      _listening = false;
-    }
-    _target = Offset.zero;
-    _startTicker();
-  }
-
-  void _onTouch(TvRemoteTouchEvent event) {
-    if (!widget.active) return;
-    switch (event.phase) {
-      case TvRemoteTouchPhase.started:
-      case TvRemoteTouchPhase.move:
-      case TvRemoteTouchPhase.loc:
-        _target = Offset(event.x.clamp(-1.0, 1.0), event.y.clamp(-1.0, 1.0));
-        _startTicker();
-      case TvRemoteTouchPhase.ended:
-      case TvRemoteTouchPhase.cancelled:
-        _target = Offset.zero;
-        _startTicker();
-      case TvRemoteTouchPhase.clickStart:
-      case TvRemoteTouchPhase.clickEnd:
-        break;
-    }
-  }
-
-  void _startTicker() {
-    if (!_ticker.isActive) _ticker.start();
-  }
-
-  void _onTick(Duration _) {
-    final next = Offset.lerp(_tilt.value, _target, _ease)!;
-    if (_target == Offset.zero && next.distance < 0.002) {
-      _tilt.value = Offset.zero;
-      _ticker.stop();
-      return;
-    }
-    _tilt.value = next;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<Offset>(
-      valueListenable: _tilt,
-      child: widget.child,
-      builder: (context, tilt, child) {
-        if (tilt == Offset.zero) return child!;
-        return Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.0012)
-            ..rotateY(tilt.dx * _maxAngle)
-            ..rotateX(-tilt.dy * _maxAngle),
-          child: child,
-        );
-      },
-    );
-  }
+  Widget _withTvParallax({required bool active, required Widget child}) =>
+      child;
 }
 
 class _CardImage extends StatelessWidget {
@@ -926,8 +806,7 @@ class _CardImage extends StatelessWidget {
                                 ? const EdgeInsets.only(bottom: 4)
                                 : EdgeInsets.zero,
                           ),
-                        if (isFavorite)
-                          const MediaFavoriteBadge(size: 22),
+                        if (isFavorite) const MediaFavoriteBadge(size: 22),
                       ],
                     ),
                   ),
@@ -1050,9 +929,8 @@ class _PlaceholderIcon extends StatelessWidget {
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.5,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: Theme.of(context).colorScheme.onSurface
+                            .withValues(alpha: 0.5),
                       ),
                     ),
                   ),

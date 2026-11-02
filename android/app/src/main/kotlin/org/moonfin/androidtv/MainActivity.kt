@@ -33,22 +33,6 @@ import android.util.Rational
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.WindowManager
-import androidx.mediarouter.media.MediaRouteSelector
-import androidx.mediarouter.media.MediaRouter
-import com.google.android.gms.cast.CastMediaControlIntent
-import com.google.android.gms.cast.MediaInfo
-import com.google.android.gms.cast.MediaLoadRequestData
-import com.google.android.gms.cast.MediaQueueData
-import com.google.android.gms.cast.MediaQueueItem
-import com.google.android.gms.cast.MediaMetadata
-import com.google.android.gms.cast.MediaSeekOptions
-import com.google.android.gms.cast.MediaStatus
-import com.google.android.gms.cast.framework.media.RemoteMediaClient
-import com.google.android.gms.cast.framework.CastContext
-import com.google.android.gms.cast.framework.CastSession
-import com.google.android.gms.cast.framework.SessionManagerListener
-import com.google.android.gms.common.api.PendingResult
-import com.google.android.gms.common.images.WebImage
 import com.ryanheise.audioservice.AudioServiceActivity
 import com.ryanheise.audioservice.AudioServicePlugin
 import com.ryanheise.audioservice.AudioServiceState
@@ -60,60 +44,20 @@ import java.io.ByteArrayOutputStream
 import kotlin.concurrent.thread
 
 import android.hardware.input.InputManager
-import org.flame_engine.gamepads_android.GamepadsCompatibleActivity
 
-class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
-
-    // Never invoked: kept only so the gamepads_android plugin's
-    // GamepadsCompatibleActivity.registerKeyEventHandler call below has
-    // somewhere to store its callback. See dispatchKeyEvent's comment for why
-    // calling it per key event was removed.
-    private var keyHandler: ((KeyEvent) -> Boolean)? = null
-    private var motionHandler: ((MotionEvent) -> Boolean)? = null
-
-    override fun registerInputDeviceListener(listener: InputManager.InputDeviceListener, handler: Handler?) {
-        val inputManager = getSystemService(Context.INPUT_SERVICE) as InputManager
-        inputManager.registerInputDeviceListener(listener, handler)
-    }
-
-    override fun registerKeyEventHandler(handler: (KeyEvent) -> Boolean) {
-        keyHandler = handler
-    }
-
-    override fun registerMotionEventHandler(handler: (MotionEvent) -> Boolean) {
-        motionHandler = handler
-    }
+class MainActivity : AudioServiceActivity() {
 
     private var methodChannel: MethodChannel? = null
     private var discoveryMulticastLock: android.net.wifi.WifiManager.MulticastLock? = null
-    private var castChannel: MethodChannel? = null
-    private var castEventsChannel: EventChannel? = null
-    private var castEventsSink: EventChannel.EventSink? = null
     private var audioCapsEventsChannel: EventChannel? = null
     private var audioCapsSink: EventChannel.EventSink? = null
     private var audioDeviceCallback: AudioDeviceCallback? = null
     private var displayCapsEventsChannel: EventChannel? = null
     private var displayCapsSink: EventChannel.EventSink? = null
     private var displayListener: DisplayManager.DisplayListener? = null
-    private var castStatusListener: SessionManagerListener<CastSession>? = null
-    private var castDiscoveryCallback: MediaRouter.Callback? = null
-
-    // A receiver is published by both the MediaRouter and the MediaRouter2
-    // provider service, so it arrives once per provider under ids that differ
-    // only in their provider prefix. Keyed on the receiver itself, the picker
-    // lists each device once.
-    private val emittedCastReceivers = mutableSetOf<String>()
-    private var dlnaChannel: MethodChannel? = null
-    private var dlnaEventsChannel: EventChannel? = null
-    private var dlnaController: DlnaController? = null
     private var externalPlayerChannel: MethodChannel? = null
     private var externalPlayerPendingResult: MethodChannel.Result? = null
     private var gamepadChannel: MethodChannel? = null
-    private var libretroBridge: LibretroBridge? = null
-    // Native path: constructed alongside libretroBridge in configureFlutterEngine
-    // (it needs that instance to reach nativeSetMask). Nullable rather than
-    // lateinit since dispatchKeyEvent can run before the engine is configured.
-    private var nativePad: NativePadInput? = null
     // GameInputRouter is deliberately Android-free, so the Activity owns the
     // registration and forwards.
     private val gameInputManager by lazy {
@@ -132,10 +76,10 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
 
     private val gameInputRouter = GameInputRouter(object : GameInputRouter.Callbacks {
         override fun onEmulatorButton(label: String, pressed: Boolean, device: Map<String, String>?) {
-            sendGamepadButton(label, pressed, device)
+            // Game playback is not part of this TV video application.
         }
 
-        override fun onEmulatorKeyboard(keyCode: Int) = sendEmulatorKeyboardKey(keyCode)
+        override fun onEmulatorKeyboard(keyCode: Int) {}
 
         override fun onNavigate(axis: String, direction: String) = sendGamepadNavigate(axis, direction)
     })
@@ -146,11 +90,6 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
     private var pipEnabled = false
     private val handler = Handler(Looper.getMainLooper())
     private var dismissRunnable: Runnable? = null
-    private var pendingCastTimeout: Runnable? = null
-    private var pendingCastListener: SessionManagerListener<CastSession>? = null
-    private var castMediaListener: RemoteMediaClient.Listener? = null
-    private var castProgressListener: RemoteMediaClient.ProgressListener? = null
-    private var castErrorReported = false
 
     // The Handler half of a BurstCoalescer: one pending runnable, replaced on
     // every event, so the trigger that reaches the emit is the burst's last.
@@ -205,10 +144,6 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
     companion object {
         private var engineHandedToActivity: FlutterEngine? = null
         private const val CHANNEL = "org.moonfin.androidtv/pip"
-        private const val CAST_CHANNEL = "com.moonfin/native_cast"
-        private const val CAST_EVENTS_CHANNEL = "com.moonfin/native_cast_events"
-        private const val DLNA_CHANNEL = "com.moonfin/native_dlna"
-        private const val DLNA_EVENTS_CHANNEL = "com.moonfin/native_dlna_events"
         private const val EXTERNAL_PLAYER_CHANNEL = "moonfin/external_player"
         private const val ACTION_PLAY_PAUSE = "org.moonfin.androidtv.ACTION_PIP_PLAY_PAUSE"
         private const val DISMISS_DELAY_MS = 300L
@@ -361,29 +296,6 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
         super.configureFlutterEngine(flutterEngine)
         engineHandedToActivity = flutterEngine
 
-        val bridge = LibretroBridge(
-            flutterEngine,
-            onActiveChanged = { active -> nativePad?.setActive(active) },
-            onBeforeResume = { nativePad?.releaseHeldInput() },
-            onControllerTypeChanged = { nativePad?.onControllerTypeChanged() },
-        )
-        libretroBridge = bridge
-        nativePad = NativePadInput(
-            bridge,
-            handler,
-            this,
-            object : NativePadInput.Callbacks {
-                override fun onControllerMappingKey(keyCode: Int, device: Map<String, Any?>) =
-                    sendControllerMappingKey(keyCode, device)
-
-                override fun onControllerDiagnosticsAxes(payload: Map<String, Any?>) =
-                    sendControllerDiagnosticsAxes(payload)
-
-                override fun onControllerDiagnosticsButton(payload: Map<String, Any?>) =
-                    sendControllerDiagnosticsButton(payload)
-            },
-        )
-
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             MediaStoreHelper.CHANNEL,
@@ -475,53 +387,11 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
             GAMEPAD_CHANNEL,
         )
         gamepadChannel?.setMethodCallHandler { call, result ->
-            when (call.method) {
-                "setActive" -> {
-                    gameInputRouter.setGameActive(call.argument<Boolean>("active") ?: false)
-                    result.success(true)
-                }
-                "setEmulatorControlsActive" -> {
-                    gameInputRouter.setEmulatorControlsActive(call.argument<Boolean>("active") ?: false)
-                    result.success(true)
-                }
-                "setNavigationEnabled" -> {
-                    gameInputRouter.setNavigationEnabled(call.argument<Boolean>("enabled") ?: false)
-                    result.success(true)
-                }
-                "setControllerMapping" -> {
-                    nativePad?.setControllerMappings(call.argument<String>("mapping") ?: "{}")
-                    result.success(true)
-                }
-                "setControllerAssignments" -> {
-                    nativePad?.setControllerAssignments(call.argument<String>("assignments") ?: "{}")
-                    result.success(true)
-                }
-                "setStickSnap" -> {
-                    val modes = call.argument<Map<String, String>>("modes") ?: emptyMap()
-                    nativePad?.setStickSnap(modes)
-                    result.success(true)
-                }
-                "setControllerMappingCapture" -> {
-                    nativePad?.setCapture(
-                        call.argument<Boolean>("active") ?: false,
-                        call.argument<String>("connectionId") ?: call.argument<String>("deviceId"),
-                    )
-                    result.success(true)
-                }
-                "setControllerDiagnostics" -> {
-                    nativePad?.setDiagnostics(
-                        call.argument<Boolean>("active") ?: false,
-                        call.argument<String>("connectionId"),
-                    )
-                    result.success(true)
-                }
-                "setOverlayOpen" -> {
-                    libretroBridge?.overlayOpen = call.argument<Boolean>("open") ?: false
-                    result.success(true)
-                }
-                "getGamepadDevices" -> result.success(gameInputRouter.gamepadDevices())
-                "getNativeGamepadDevices" -> result.success(nativePad?.nativeGamepadDevices() ?: emptyList<Any>())
-                else -> result.notImplemented()
+            if (call.method == "setNavigationEnabled") {
+                gameInputRouter.setNavigationEnabled(call.argument<Boolean>("enabled") ?: false)
+                result.success(true)
+            } else {
+                result.notImplemented()
             }
         }
 
@@ -572,173 +442,6 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
                 else -> result.notImplemented()
             }
         }
-
-        castChannel = MethodChannel(
-            flutterEngine.dartExecutor.binaryMessenger,
-            CAST_CHANNEL,
-        )
-        castChannel?.setMethodCallHandler { call, result ->
-            when (call.method) {
-                "discoverGoogleCastTargets" -> {
-                    result.success(discoverGoogleCastTargets())
-                }
-                "startGoogleCastDiscovery" -> {
-                    startGoogleCastDiscovery()
-                    result.success(null)
-                }
-                "stopGoogleCastDiscovery" -> {
-                    stopGoogleCastDiscovery()
-                    result.success(null)
-                }
-                "startGoogleCastSession" -> {
-                    val args = call.arguments as? Map<*, *> ?: emptyMap<String, Any>()
-                    startGoogleCastSession(args, result)
-                }
-                "showAirPlayRoutePicker" -> {
-                    result.error(
-                        "UNSUPPORTED",
-                        "AirPlay is only available on iOS.",
-                        null,
-                    )
-                }
-                "pauseGoogleCast" -> {
-                    withRemoteMediaClient(result) { remoteClient ->
-                        remoteClient.pause()
-                        result.success(null)
-                    }
-                }
-                "playGoogleCast" -> {
-                    withRemoteMediaClient(result) { remoteClient ->
-                        remoteClient.play()
-                        result.success(null)
-                    }
-                }
-                "seekGoogleCast" -> {
-                    val args = call.arguments as? Map<*, *> ?: emptyMap<String, Any>()
-                    val positionTicks = (args["positionTicks"] as? Number)?.toLong()
-                    if (positionTicks == null || positionTicks < 0L) {
-                        result.error("BAD_ARGS", "Missing or invalid positionTicks", null)
-                        return@setMethodCallHandler
-                    }
-
-                    withRemoteMediaClient(result) { remoteClient ->
-                        val positionMs = positionTicks / 10000L
-                        val seekOptions = MediaSeekOptions.Builder()
-                            .setPosition(positionMs)
-                            .build()
-                        remoteClient.seek(seekOptions)
-                        result.success(null)
-                    }
-                }
-                "stopGoogleCastSession" -> {
-                    // Stopping only the media leaves the session up, and with it the
-                    // receiver, the cast icon and the notification.
-                    runCatching { CastContext.getSharedInstance(this).sessionManager.endCurrentSession(true) }
-                    result.success(null)
-                }
-                "getGoogleCastVolume" -> {
-                    val session = getCurrentCastSession()
-                    if (session == null) {
-                        result.error("NO_CAST_SESSION", "No active Google Cast session", null)
-                        return@setMethodCallHandler
-                    }
-                    result.success(session.volume.toDouble())
-                }
-                "setGoogleCastVolume" -> {
-                    val args = call.arguments as? Map<*, *> ?: emptyMap<String, Any>()
-                    val volume = (args["volume"] as? Number)?.toDouble()
-                    if (volume == null || volume.isNaN()) {
-                        result.error("BAD_ARGS", "Missing or invalid volume", null)
-                        return@setMethodCallHandler
-                    }
-                    val session = getCurrentCastSession()
-                    if (session == null) {
-                        result.error("NO_CAST_SESSION", "No active Google Cast session", null)
-                        return@setMethodCallHandler
-                    }
-                    val clamped = volume.coerceIn(0.0, 1.0)
-                    session.setVolume(clamped)
-                    result.success(null)
-                }
-                else -> result.notImplemented()
-            }
-        }
-
-        castEventsChannel = EventChannel(
-            flutterEngine.dartExecutor.binaryMessenger,
-            CAST_EVENTS_CHANNEL,
-        )
-        castEventsChannel?.setStreamHandler(object : EventChannel.StreamHandler {
-            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-                castEventsSink = events
-                emitGoogleCastEvent(
-                    state = if (getCurrentCastSession() != null) "connected" else "disconnected",
-                )
-                emitCurrentGoogleCastStatus()
-            }
-
-            override fun onCancel(arguments: Any?) {
-                castEventsSink = null
-            }
-        })
-
-        registerCastStatusListener()
-
-        dlnaController = DlnaController(this)
-
-        dlnaChannel = MethodChannel(
-            flutterEngine.dartExecutor.binaryMessenger,
-            DLNA_CHANNEL,
-        )
-        dlnaChannel?.setMethodCallHandler { call, result ->
-            val ctrl = dlnaController
-            if (ctrl == null) {
-                result.error("DLNA_UNAVAILABLE", "DLNA controller not initialized", null)
-                return@setMethodCallHandler
-            }
-            when (call.method) {
-                "discoverDlnaTargets" -> ctrl.discoverTargets(result)
-                "startDlnaDiscovery" -> {
-                    ctrl.startContinuousDiscovery()
-                    result.success(null)
-                }
-                "stopDlnaDiscovery" -> {
-                    ctrl.stopContinuousDiscovery()
-                    result.success(null)
-                }
-                "playToDlnaDevice" -> {
-                    val args = call.arguments as? Map<*, *> ?: emptyMap<String, Any>()
-                    ctrl.playToDevice(args, result)
-                }
-                "pauseDlna" -> ctrl.pause(result)
-                "playDlna" -> ctrl.play(result)
-                "seekDlna" -> {
-                    val args = call.arguments as? Map<*, *> ?: emptyMap<String, Any>()
-                    ctrl.seek(args, result)
-                }
-                "stopDlna" -> ctrl.stop(result)
-                "getDlnaVolume" -> ctrl.getVolume(result)
-                "setDlnaVolume" -> {
-                    val args = call.arguments as? Map<*, *> ?: emptyMap<String, Any>()
-                    ctrl.setVolume(args, result)
-                }
-                else -> result.notImplemented()
-            }
-        }
-
-        dlnaEventsChannel = EventChannel(
-            flutterEngine.dartExecutor.binaryMessenger,
-            DLNA_EVENTS_CHANNEL,
-        )
-        dlnaEventsChannel?.setStreamHandler(object : EventChannel.StreamHandler {
-            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-                dlnaController?.setEventSink(events)
-            }
-
-            override fun onCancel(arguments: Any?) {
-                dlnaController?.setEventSink(null)
-            }
-        })
 
         // Re-probe audio capabilities whenever the audio route changes (e.g. an
         // AVR is powered on after launch) and push the fresh result to Dart so
@@ -918,59 +621,16 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
         }
     }
 
-    // Native libretro sessions are checked first and own the pad end-to-end:
-    // no binder IPC, no boxing, no Dart channel crossing per event (see
-    // NativePadInput). Everything else -- home screen navigation and
-    // EmulatorJS's WebView, which owns key focus but can't reliably read the
-    // Gamepad API -- goes through GameInputRouter, captured here at the top
-    // of the dispatch chain before any view sees it.
+    // D-pad events remain native; only analog stick navigation crosses to Dart.
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        val pad = nativePad
-        if (pad != null && pad.active && pad.onKey(event)) return true
         if (gameInputRouter.onKeyEvent(event)) return true
-        // A native session decides for itself what a pad button does, so the
-        // gate waits for it to finish.
-        if (pad?.active != true && gameInputRouter.blocksNavigation(event)) return true
-        // keyHandler is the gamepads_android plugin's registration
-        // (GamepadsCompatibleActivity.registerKeyEventHandler), which forwards
-        // to the xyz.luan/gamepads channel's Gamepads.normalizedEvents stream.
-        // Verified before deleting the call: nothing in this app subscribes to
-        // that stream on Android -- GamepadNavigationScope.isSupported and
-        // native_game_player_screen's _readsGamepadsInDart both exclude
-        // Android (that path is Windows/Linux only; Android reads pad buttons
-        // as real key events here and the stick via registerMotionEventHandler
-        // below, whose return value IS consulted). Its own return value was
-        // already discarded unconditionally, so invoking it per key event was
-        // pure dead work. The registration method itself stays: the plugin
-        // casts this Activity to GamepadsCompatibleActivity and calls it
-        // unconditionally, so the interface member must remain implemented.
+        if (gameInputRouter.blocksNavigation(event)) return true
         return super.dispatchKeyEvent(event)
     }
 
     override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
-        val pad = nativePad
-        if (pad != null && pad.active && pad.onMotion(event)) return true
         if (gameInputRouter.onMotionEvent(event)) return true
-        if (motionHandler?.invoke(event) == true) {
-            return true
-        }
         return super.dispatchGenericMotionEvent(event)
-    }
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (!hasFocus) nativePad?.releaseHeldInput()
-    }
-
-    override fun onPause() {
-        // Both before super, and both required. releaseHeldInput drops buttons
-        // physically held as the app goes away, so they cannot fire on resume.
-        // onHostPause pauses the core and drops the surface while the consumer
-        // is still alive, rather than after it has gone away - see
-        // LibretroBridge.onHostPause.
-        nativePad?.releaseHeldInput()
-        libretroBridge?.onHostPause()
-        super.onPause()
     }
 
     // The axis is "h" or "v" so Dart can tell which one a "none" recentre came
@@ -981,49 +641,6 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
                 "onNavigate",
                 mapOf("axis" to axis, "direction" to direction),
             )
-        }
-    }
-
-    private fun sendGamepadButton(label: String, pressed: Boolean, device: Map<String, String>?) {
-        runOnUiThread {
-            gamepadChannel?.invokeMethod(
-                "onButton",
-                mapOf(
-                    "label" to label,
-                    "pressed" to pressed,
-                    "device" to device,
-                ),
-            )
-        }
-    }
-
-    private fun sendControllerMappingKey(keyCode: Int, device: Map<String, Any?>) {
-        runOnUiThread {
-            gamepadChannel?.invokeMethod(
-                "onControllerMappingKey",
-                mapOf(
-                    "keyCode" to keyCode,
-                    "device" to device,
-                ),
-            )
-        }
-    }
-
-    private fun sendControllerDiagnosticsAxes(payload: Map<String, Any?>) {
-        runOnUiThread {
-            gamepadChannel?.invokeMethod("onControllerDiagnosticsAxes", payload)
-        }
-    }
-
-    private fun sendControllerDiagnosticsButton(payload: Map<String, Any?>) {
-        runOnUiThread {
-            gamepadChannel?.invokeMethod("onControllerDiagnosticsButton", payload)
-        }
-    }
-
-    private fun sendEmulatorKeyboardKey(keyCode: Int) {
-        runOnUiThread {
-            gamepadChannel?.invokeMethod("onKeyboard", mapOf("keyCode" to keyCode))
         }
     }
 
@@ -1080,10 +697,6 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
 
     override fun onResume() {
         super.onResume()
-        // Re-attach the emulator's output surface on devices where Flutter's
-        // SurfaceProducer callbacks never fire (API 24-28). A no-op everywhere
-        // else - the bridge stands down as soon as it sees a real callback.
-        libretroBridge?.onHostResume()
         if (isInPictureInPictureMode) return
         dismissRunnable?.let {
             handler.removeCallbacks(it)
@@ -1139,43 +752,15 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
         // Process-wide InputManager registration: without this the listener
         // keeps this Activity alive across every recreation.
         gameInputManager?.unregisterInputDeviceListener(gameInputDeviceListener)
-        // A native game may still be running. When the process also dies below
-        // this is redundant but harmless; when it doesn't - e.g. the system
-        // destroys this stopped activity to reclaim memory while a foreground
-        // service (AudioService) keeps the process alive.
-        // Without it they leak into the next activity instance.
-        // stop() is idempotent, so calling it here even when nothing is loaded,
-        // or when killProcess() runs moments later, is safe.
-        libretroBridge?.stop()
-        // After stop(), so its onActiveChanged(false) can still reach
-        // setActive(false) on a live pad.
-        nativePad?.dispose()
-        nativePad = null
         dismissRunnable?.let { handler.removeCallbacks(it) }
-        pendingCastTimeout?.let { handler.removeCallbacks(it) }
-        val castContext = runCatching { CastContext.getSharedInstance(this) }.getOrNull()
-        val sessionManager = castContext?.sessionManager
-        pendingCastListener?.let { listener ->
-            sessionManager?.removeSessionManagerListener(listener, CastSession::class.java)
-        }
-        castStatusListener?.let { listener ->
-            sessionManager?.removeSessionManagerListener(listener, CastSession::class.java)
-        }
-        unregisterCastMediaCallback()
-        stopGoogleCastDiscovery()
         try { unregisterReceiver(pipReceiver) } catch (_: Exception) {}
         try { unregisterReceiver(screenReceiver) } catch (_: Exception) {}
-        castChannel?.setMethodCallHandler(null)
-        castEventsChannel?.setStreamHandler(null)
         unregisterAudioDeviceCallback()
         audioCapsEventsChannel?.setStreamHandler(null)
         // DisplayManagerGlobal holds registrations process wide, so without
         // this the listener keeps this Activity alive across every recreation.
         unregisterDisplayListener()
         displayCapsEventsChannel?.setStreamHandler(null)
-        dlnaController?.onDestroy()
-        dlnaChannel?.setMethodCallHandler(null)
-        dlnaEventsChannel?.setStreamHandler(null)
         externalPlayerChannel?.setMethodCallHandler(null)
         gamepadChannel?.setMethodCallHandler(null)
         watchNextChannel?.setMethodCallHandler(null)
@@ -1193,525 +778,6 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
             // a new engine from attaching to stale native callback state.
             Process.killProcess(Process.myPid())
         }
-    }
-
-    private fun discoverGoogleCastTargets(): List<Map<String, Any>> {
-        val selector = castRouteSelector()
-        val mediaRouter = MediaRouter.getInstance(this)
-        val routes = dedupedCastRoutes(mediaRouter.routes, selector)
-
-        return routes.map { route ->
-            mapOf(
-                "id" to route.id,
-                "title" to route.name,
-                "subtitle" to (route.description?.toString() ?: "Google Cast"),
-            )
-        }
-    }
-
-    private fun castRouteSelector(): MediaRouteSelector =
-        MediaRouteSelector.Builder()
-            .addControlCategory(
-                CastMediaControlIntent.categoryForCast(
-                    CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID,
-                ),
-            )
-            .build()
-
-    // MediaRouter only actively scans for Cast devices while a callback with an
-    // active-scan flag is registered; reading routes without one returns a stale
-    // (often empty) list. Register an active-scan callback while the picker is
-    // open and emit each matching route as a `deviceFound` event.
-    private fun startGoogleCastDiscovery() {
-        runOnUiThread {
-            val mediaRouter = MediaRouter.getInstance(this)
-            val selector = castRouteSelector()
-            emittedCastReceivers.clear()
-            if (castDiscoveryCallback == null) {
-                val callback = object : MediaRouter.Callback() {
-                    override fun onRouteAdded(router: MediaRouter, route: MediaRouter.RouteInfo) {
-                        emitCastRouteFound(route, selector)
-                    }
-
-                    override fun onRouteChanged(router: MediaRouter, route: MediaRouter.RouteInfo) {
-                        emitCastRouteFound(route, selector)
-                    }
-                }
-                castDiscoveryCallback = callback
-                mediaRouter.addCallback(
-                    selector,
-                    callback,
-                    MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN,
-                )
-            }
-            dedupedCastRoutes(mediaRouter.routes, selector).forEach {
-                emitCastRouteFound(it, selector)
-            }
-        }
-    }
-
-    private fun stopGoogleCastDiscovery() {
-        runOnUiThread {
-            val callback = castDiscoveryCallback ?: return@runOnUiThread
-            MediaRouter.getInstance(this).removeCallback(callback)
-            castDiscoveryCallback = null
-            emittedCastReceivers.clear()
-        }
-    }
-
-    // Route ids carry the publishing provider ahead of a colon and the receiver
-    // after it, so the receiver alone is what tells two devices apart.
-    private fun castReceiverKey(routeId: String): String =
-        routeId.substringAfterLast(':', routeId)
-
-    // Filtering before the dedupe matters: distinctBy keeps whichever route it
-    // meets first, so a route that fails the selector would otherwise take the
-    // slot for a receiver and leave the matching one unlisted.
-    private fun dedupedCastRoutes(
-        routes: List<MediaRouter.RouteInfo>,
-        selector: MediaRouteSelector,
-    ): List<MediaRouter.RouteInfo> = routes
-        .filter { it.isEnabled && it.matchesSelector(selector) }
-        .distinctBy { castReceiverKey(it.id) }
-
-    private fun emitCastRouteFound(route: MediaRouter.RouteInfo, selector: MediaRouteSelector) {
-        if (!route.isEnabled || !route.matchesSelector(selector)) return
-        if (!emittedCastReceivers.add(castReceiverKey(route.id))) return
-        castEventsSink?.success(
-            mapOf(
-                "kind" to "googleCast",
-                "state" to "deviceFound",
-                "id" to route.id,
-                "title" to route.name,
-                "subtitle" to (route.description?.toString() ?: "Google Cast"),
-            ),
-        )
-    }
-
-    private fun startGoogleCastSession(args: Map<*, *>, result: MethodChannel.Result) {
-        val targetId = args["targetId"] as? String
-        val streamUrl = args["streamUrl"] as? String
-        val contentType = args["contentType"] as? String
-        val title = args["title"] as? String ?: "Moonfin"
-        val subtitle = args["subtitle"] as? String
-        val posterUrl = args["posterUrl"] as? String
-        val queueItems = parseQueueItems(args["queueItems"])
-        val startTicks = (args["startPositionTicks"] as? Number)?.toLong()
-
-        if (targetId.isNullOrEmpty() || streamUrl.isNullOrEmpty()) {
-            result.error("BAD_ARGS", "Missing targetId or streamUrl", null)
-            return
-        }
-
-        emitGoogleCastEvent("connecting")
-
-        val mediaRouter = MediaRouter.getInstance(this)
-        val route = mediaRouter.routes.firstOrNull { it.id == targetId }
-        if (route == null) {
-            result.error("NOT_FOUND", "Google Cast route not found", null)
-            return
-        }
-
-        val castContext = try {
-            CastContext.getSharedInstance(this)
-        } catch (t: Throwable) {
-            result.error("CAST_INIT_FAILED", t.message, null)
-            return
-        }
-
-        val sessionManager = castContext.sessionManager
-        val currentSession = sessionManager.currentCastSession
-        if (currentSession != null) {
-            loadOnCastSession(
-                session = currentSession,
-                streamUrl = streamUrl,
-                contentType = contentType,
-                title = title,
-                subtitle = subtitle,
-                posterUrl = posterUrl,
-                queueItems = queueItems,
-                startTicks = startTicks,
-                result = result,
-            )
-            return
-        }
-
-        pendingCastTimeout?.let { handler.removeCallbacks(it) }
-        pendingCastListener?.let { listener ->
-            sessionManager.removeSessionManagerListener(listener, CastSession::class.java)
-        }
-
-        val listener = object : SessionManagerListener<CastSession> {
-            override fun onSessionStarted(session: CastSession, sessionId: String) {
-                cleanupPendingCast(sessionManager, this)
-                loadOnCastSession(session, streamUrl, contentType, title, subtitle, posterUrl, queueItems, startTicks, result)
-            }
-
-            override fun onSessionResumed(session: CastSession, wasSuspended: Boolean) {
-                cleanupPendingCast(sessionManager, this)
-                loadOnCastSession(session, streamUrl, contentType, title, subtitle, posterUrl, queueItems, startTicks, result)
-            }
-
-            override fun onSessionStartFailed(session: CastSession, error: Int) {
-                cleanupPendingCast(sessionManager, this)
-                result.error("CAST_START_FAILED", "Failed to start cast session: $error", null)
-            }
-
-            override fun onSessionEnded(session: CastSession, error: Int) {}
-            override fun onSessionEnding(session: CastSession) {}
-            override fun onSessionResumeFailed(session: CastSession, error: Int) {}
-            override fun onSessionResuming(session: CastSession, sessionId: String) {}
-            override fun onSessionStarting(session: CastSession) {}
-            override fun onSessionSuspended(session: CastSession, reason: Int) {}
-        }
-
-        pendingCastListener = listener
-        sessionManager.addSessionManagerListener(listener, CastSession::class.java)
-
-        pendingCastTimeout = Runnable {
-            cleanupPendingCast(sessionManager, listener)
-            emitGoogleCastEvent("error", "Timed out waiting for cast session")
-            result.error("CAST_TIMEOUT", "Timed out waiting for cast session", null)
-        }.also { handler.postDelayed(it, 15000L) }
-
-        mediaRouter.selectRoute(route)
-    }
-
-    private fun cleanupPendingCast(
-        sessionManager: com.google.android.gms.cast.framework.SessionManager,
-        listener: SessionManagerListener<CastSession>,
-    ) {
-        pendingCastTimeout?.let { handler.removeCallbacks(it) }
-        pendingCastTimeout = null
-        sessionManager.removeSessionManagerListener(listener, CastSession::class.java)
-        pendingCastListener = null
-    }
-
-    private fun loadOnCastSession(
-        session: CastSession,
-        streamUrl: String,
-        contentType: String?,
-        title: String,
-        subtitle: String?,
-        posterUrl: String?,
-        queueItems: List<Map<String, Any>>,
-        startTicks: Long?,
-        result: MethodChannel.Result,
-    ) {
-        val remoteClient = session.remoteMediaClient
-        if (remoteClient == null) {
-            result.error("NO_REMOTE_CLIENT", "No cast remote media client", null)
-            return
-        }
-
-        castErrorReported = false
-        val startMs = startTicks?.div(10000L) ?: 0L
-        val effectiveQueueItems = if (queueItems.isEmpty()) {
-            listOf(
-                mapOf(
-                    "streamUrl" to streamUrl,
-                    "contentType" to (contentType ?: ""),
-                    "title" to title,
-                    "subtitle" to (subtitle ?: ""),
-                    "posterUrl" to (posterUrl ?: ""),
-                ),
-            )
-        } else {
-            queueItems
-        }
-
-        if (effectiveQueueItems.size > 1) {
-            val castQueueItems = effectiveQueueItems.mapNotNull { entry ->
-                buildQueueItem(
-                    streamUrl = entry["streamUrl"] as? String,
-                    contentType = entry["contentType"] as? String,
-                    title = entry["title"] as? String,
-                    subtitle = entry["subtitle"] as? String,
-                    posterUrl = entry["posterUrl"] as? String,
-                )
-            }
-            if (castQueueItems.isEmpty()) {
-                result.error("BAD_ARGS", "Queue items are invalid", null)
-                return
-            }
-
-            val queueData = MediaQueueData.Builder()
-                .setItems(castQueueItems)
-                .setStartIndex(0)
-                .build()
-
-            val loadRequest = MediaLoadRequestData.Builder()
-                .setQueueData(queueData)
-                .setAutoplay(true)
-                .setCurrentTime(startMs)
-                .build()
-
-            watchCastLoadResult(remoteClient.load(loadRequest))
-        } else {
-            val single = effectiveQueueItems.first()
-            val mediaInfo = buildMediaInfo(
-                streamUrl = single["streamUrl"] as? String ?: streamUrl,
-                contentType = single["contentType"] as? String ?: contentType,
-                title = single["title"] as? String ?: title,
-                subtitle = single["subtitle"] as? String ?: subtitle,
-                posterUrl = single["posterUrl"] as? String ?: posterUrl,
-            )
-            val loadRequest = MediaLoadRequestData.Builder()
-                .setMediaInfo(mediaInfo)
-                .setAutoplay(true)
-                .setCurrentTime(startMs)
-                .build()
-            watchCastLoadResult(remoteClient.load(loadRequest))
-        }
-
-        registerCastMediaListeners(remoteClient)
-        emitCurrentGoogleCastStatus(remoteClient)
-        result.success(null)
-    }
-
-    // The Flutter result already reported success when the load was issued,
-    // so a rejected load can only reach the user through an error event.
-    private fun watchCastLoadResult(
-        pending: PendingResult<RemoteMediaClient.MediaChannelResult>,
-    ) {
-        pending.setResultCallback { mediaResult ->
-            if (!mediaResult.status.isSuccess) {
-                emitCastPlaybackError(
-                    "Receiver rejected the media (status ${mediaResult.status.statusCode})",
-                )
-            }
-        }
-    }
-
-    // A failed receiver keeps repeating the same status, so only the first
-    // report is worth showing until the next load.
-    private fun emitCastPlaybackError(message: String) {
-        if (castErrorReported) return
-        castErrorReported = true
-        emitGoogleCastEvent("error", message)
-    }
-
-    private fun parseQueueItems(raw: Any?): List<Map<String, Any>> {
-        val entries = raw as? List<*> ?: return emptyList()
-        return entries.mapNotNull { entry ->
-            val map = entry as? Map<*, *> ?: return@mapNotNull null
-            val streamUrl = map["streamUrl"] as? String ?: return@mapNotNull null
-            val title = map["title"] as? String ?: "Moonfin"
-            buildMap<String, Any> {
-                put("streamUrl", streamUrl)
-                put("title", title)
-                (map["contentType"] as? String)?.let { put("contentType", it) }
-                (map["subtitle"] as? String)?.let { put("subtitle", it) }
-                (map["posterUrl"] as? String)?.let { put("posterUrl", it) }
-            }
-        }
-    }
-
-    private fun buildMediaInfo(
-        streamUrl: String,
-        contentType: String?,
-        title: String,
-        subtitle: String?,
-        posterUrl: String?,
-    ): MediaInfo {
-        val metadata = MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE).apply {
-            putString(MediaMetadata.KEY_TITLE, title)
-            if (!subtitle.isNullOrBlank()) {
-                putString(MediaMetadata.KEY_SUBTITLE, subtitle)
-            }
-            if (!posterUrl.isNullOrBlank()) {
-                runCatching {
-                    addImage(WebImage(Uri.parse(posterUrl)))
-                }
-            }
-        }
-
-        return MediaInfo.Builder(streamUrl)
-            .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
-            .setContentType(contentType?.takeIf { it.isNotBlank() } ?: "video/mp4")
-            .setMetadata(metadata)
-            .build()
-    }
-
-    private fun buildQueueItem(
-        streamUrl: String?,
-        contentType: String?,
-        title: String?,
-        subtitle: String?,
-        posterUrl: String?,
-    ): MediaQueueItem? {
-        val url = streamUrl ?: return null
-        val mediaInfo = buildMediaInfo(
-            streamUrl = url,
-            contentType = contentType,
-            title = title ?: "Moonfin",
-            subtitle = subtitle,
-            posterUrl = posterUrl,
-        )
-        return MediaQueueItem.Builder(mediaInfo).build()
-    }
-
-    private fun withRemoteMediaClient(
-        result: MethodChannel.Result,
-        action: (com.google.android.gms.cast.framework.media.RemoteMediaClient) -> Unit,
-    ) {
-        val castContext = try {
-            CastContext.getSharedInstance(this)
-        } catch (t: Throwable) {
-            result.error("CAST_INIT_FAILED", t.message, null)
-            return
-        }
-
-        val session = castContext.sessionManager.currentCastSession
-        if (session == null) {
-            result.error("NO_CAST_SESSION", "No active Google Cast session", null)
-            return
-        }
-
-        val remoteClient = session.remoteMediaClient
-        if (remoteClient == null) {
-            result.error("NO_REMOTE_CLIENT", "No cast remote media client", null)
-            return
-        }
-
-        action(remoteClient)
-    }
-
-    private fun registerCastStatusListener() {
-        val sessionManager = runCatching { CastContext.getSharedInstance(this).sessionManager }.getOrNull()
-            ?: return
-
-        castStatusListener?.let { listener ->
-            sessionManager.removeSessionManagerListener(listener, CastSession::class.java)
-        }
-
-        val listener = object : SessionManagerListener<CastSession> {
-            override fun onSessionStarted(session: CastSession, sessionId: String) {
-                registerCastMediaListeners(session.remoteMediaClient)
-                emitCurrentGoogleCastStatus(session.remoteMediaClient)
-                emitGoogleCastEvent("connected")
-            }
-
-            override fun onSessionResumed(session: CastSession, wasSuspended: Boolean) {
-                registerCastMediaListeners(session.remoteMediaClient)
-                emitCurrentGoogleCastStatus(session.remoteMediaClient)
-                emitGoogleCastEvent("connected")
-            }
-
-            override fun onSessionEnded(session: CastSession, error: Int) {
-                unregisterCastMediaCallback()
-                emitGoogleCastEvent("disconnected")
-            }
-
-            override fun onSessionSuspended(session: CastSession, reason: Int) {
-                unregisterCastMediaCallback()
-                emitGoogleCastEvent("disconnected")
-            }
-
-            override fun onSessionStartFailed(session: CastSession, error: Int) {
-                emitGoogleCastEvent("error", "Failed to start cast session: $error")
-            }
-
-            // The SDK tries to resume the last session on launch, and failing that
-            // just means there's nothing left to rejoin.
-            override fun onSessionResumeFailed(session: CastSession, error: Int) {
-                emitGoogleCastEvent("disconnected")
-            }
-
-            override fun onSessionEnding(session: CastSession) {}
-            override fun onSessionResuming(session: CastSession, sessionId: String) {}
-            override fun onSessionStarting(session: CastSession) {}
-        }
-
-        castStatusListener = listener
-        sessionManager.addSessionManagerListener(listener, CastSession::class.java)
-    }
-
-    private fun emitGoogleCastEvent(state: String, message: String? = null, positionTicks: Long? = null) {
-        val payload = mutableMapOf<String, Any>(
-            "kind" to "googleCast",
-            "state" to state,
-        )
-        if (!message.isNullOrBlank()) {
-            payload["message"] = message
-        }
-        if (positionTicks != null && positionTicks > 0L) {
-            payload["positionTicks"] = positionTicks
-        }
-        runOnUiThread {
-            castEventsSink?.success(payload)
-        }
-    }
-
-    private fun registerCastMediaListeners(remoteClient: RemoteMediaClient?) {
-        if (remoteClient == null) return
-        unregisterCastMediaCallback()
-
-        val listener = object : RemoteMediaClient.Listener {
-            override fun onStatusUpdated() {
-                emitCurrentGoogleCastStatus(remoteClient)
-            }
-
-            override fun onMetadataUpdated() {}
-            override fun onQueueStatusUpdated() {
-                emitCurrentGoogleCastStatus(remoteClient)
-            }
-            override fun onPreloadStatusUpdated() {}
-            override fun onSendingRemoteMediaRequest() {}
-            override fun onAdBreakStatusUpdated() {}
-        }
-
-        val progressListener = RemoteMediaClient.ProgressListener { progressMs, _ ->
-            val status = remoteClient.mediaStatus ?: return@ProgressListener
-            val state = when (status.playerState) {
-                MediaStatus.PLAYER_STATE_PLAYING -> "playing"
-                MediaStatus.PLAYER_STATE_PAUSED -> "paused"
-                MediaStatus.PLAYER_STATE_BUFFERING -> "buffering"
-                MediaStatus.PLAYER_STATE_IDLE -> "idle"
-                else -> return@ProgressListener
-            }
-            val ticks = if (progressMs > 0) progressMs * 10000L else 0L
-            emitGoogleCastEvent(state, positionTicks = ticks)
-        }
-
-        castMediaListener = listener
-        castProgressListener = progressListener
-        remoteClient.addListener(listener)
-        remoteClient.addProgressListener(progressListener, 1000)
-    }
-
-    private fun unregisterCastMediaCallback() {
-        val remoteClient = getCurrentCastSession()?.remoteMediaClient
-        castMediaListener?.let { listener ->
-            remoteClient?.removeListener(listener)
-        }
-        castProgressListener?.let { listener ->
-            remoteClient?.removeProgressListener(listener)
-        }
-        castMediaListener = null
-        castProgressListener = null
-    }
-
-    private fun emitCurrentGoogleCastStatus(remoteClient: RemoteMediaClient? = getCurrentCastSession()?.remoteMediaClient) {
-        val client = remoteClient ?: return
-        val status = client.mediaStatus ?: return
-        // Without the reason an errored idle looks like an ordinary one and the
-        // failure never reaches the app.
-        if (status.playerState == MediaStatus.PLAYER_STATE_IDLE &&
-            status.idleReason == MediaStatus.IDLE_REASON_ERROR
-        ) {
-            emitCastPlaybackError("Receiver failed to play the media")
-        }
-        val state = when (status.playerState) {
-            MediaStatus.PLAYER_STATE_PLAYING -> "playing"
-            MediaStatus.PLAYER_STATE_PAUSED -> "paused"
-            MediaStatus.PLAYER_STATE_BUFFERING -> "buffering"
-            MediaStatus.PLAYER_STATE_IDLE -> "idle"
-            else -> return
-        }
-        val positionMs = client.approximateStreamPosition
-        val ticks = if (positionMs > 0) positionMs * 10000L else 0L
-        emitGoogleCastEvent(state, positionTicks = ticks)
     }
 
     private fun listExternalPlayerApps(): List<Map<String, Any>> {
@@ -2122,9 +1188,6 @@ class MainActivity : AudioServiceActivity(), GamepadsCompatibleActivity {
         }
     }
 
-    private fun getCurrentCastSession(): CastSession? {
-        return runCatching { CastContext.getSharedInstance(this).sessionManager.currentCastSession }
-            .getOrNull()
-    }
+
 
 }

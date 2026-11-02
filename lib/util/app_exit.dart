@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../data/database/offline_database.dart';
 import '../playback/mpv_player_registry.dart';
@@ -22,7 +21,7 @@ class AppExit {
   /// when the process exits. Most importantly it closes the drift/SQLite
   /// database so its background isolate shuts down gracefully instead of
   /// aborting (SIGABRT) during teardown. Idempotent and safe to call from
-  /// every exit path 
+  /// every exit path
   static Future<void> prepareForExit() => _teardown ??= _tearDown();
 
   static Future<void> _tearDown() async {
@@ -54,13 +53,6 @@ class AppExit {
       } catch (e, st) {
         debugPrint('[AppExit] Apple TV exit channel error: $e\n$st');
       }
-    }
-
-    if (PlatformDetection.isDesktop) {
-      try {
-        await windowManager.close();
-        return;
-      } catch (_) {}
     }
 
     await SystemNavigator.pop();

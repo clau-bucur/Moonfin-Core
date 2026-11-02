@@ -99,9 +99,7 @@ import 'theme_store_screen.dart';
 import 'home_sections_screen.dart';
 import 'home_row_toggles_screen.dart';
 import 'home_rows_image_type_screen.dart';
-import 'emulator_cores_screen.dart';
 import 'achievements_screen.dart';
-import 'downloaded_games_screen.dart';
 import 'library_order_screen.dart';
 import 'library_settings_screen.dart';
 import 'media_bar_settings_screen.dart';
@@ -199,9 +197,9 @@ Future<void> _openThemeEditor(BuildContext context) async {
 
   if (!ok && context.mounted) {
     final l10n = AppLocalizations.of(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.adminCouldNotOpenUrl('$uri'))),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.adminCouldNotOpenUrl('$uri'))));
   }
 }
 
@@ -238,7 +236,9 @@ class _SettingsEntryListScreen extends StatelessWidget {
       body: ListView(
         children: [
           adaptiveListSection(
-            children: [for (final entry in entries) _PanelEntryTile(entry: entry)],
+            children: [
+              for (final entry in entries) _PanelEntryTile(entry: entry),
+            ],
           ),
         ],
       ),
@@ -543,7 +543,10 @@ class _SettingsSidePanelState extends ConsumerState<SettingsSidePanel> {
   /// The inspector speaks for the category until a setting takes focus.
   void _describeCategory(_SettingsCategory category) {
     _preview.focus(
-      SettingsPreviewEntry(title: category.title, description: category.subtitle),
+      SettingsPreviewEntry(
+        title: category.title,
+        description: category.subtitle,
+      ),
     );
   }
 
@@ -852,9 +855,8 @@ class _SettingsSidePanelState extends ConsumerState<SettingsSidePanel> {
                           Container(
                             height:
                                 _inspectorFixedHeight +
-                                MediaQuery.textScalerOf(
-                                  context,
-                                ).scale(_inspectorTextHeight),
+                                MediaQuery.textScalerOf(context)
+                                    .scale(_inspectorTextHeight),
                             padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
                             decoration: BoxDecoration(
                               color: AppColorScheme.surface,
@@ -898,7 +900,10 @@ class _SettingsSidePanelState extends ConsumerState<SettingsSidePanel> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(padding: const EdgeInsets.fromLTRB(16, 4, 16, 8), child: search),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            child: search,
+          ),
           if (_categories.length > 1)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),

@@ -21,15 +21,35 @@ regular fork checkout and `main` are kept separate from this worktree.
 - TV beta shares the TV manifest instead of losing the Leanback requirement.
 
 `VideoAppProfile` defaults to enabled on this branch. Its temporary
-`MOONFIN_VIDEO_ONLY=false` opt-out supports inherited regression tests during
-the staged cleanup. The supplied build command explicitly enables the profile
+`MOONFIN_VIDEO_ONLY=false` opt-out supports tests of retained shared internals during
+the staged cleanup. It no longer restores deleted feature routes or packages. The supplied build command explicitly enables the profile
 and forces the TV interface.
 
-This round does **not** yet delete every unused source package, platform runner,
-native game bridge, Cast dependency or the PDF engine. The lazy offline database
-registration also remains for existing shared callers; streaming bypasses the
-offline client/resolver wrappers. Package and native pruning follow measured
-validation of this first runtime reduction. No frame-rate gain is assumed.
+## Second cleanup
+
+- Removed the iOS, tvOS, macOS, Windows, Linux and web app runners, their build
+  helpers, and platform-specific publishing jobs. CI now builds only this TV
+  experiment; Android mobile flavors are gone.
+- Removed reader/emulator route factories and the EPUB, PDF, MOBI, RAR and
+  native archive-extraction implementations and vendored packages.
+- Removed the Android libretro JNI build, emulator bridges, Google Cast sender
+  framework, DLNA sender and Firebase push integration.
+- Removed direct desktop/tvOS dependencies. Android remote keys stay native;
+  analog stick navigation uses the existing app channel without the gamepads
+  plugin. Desktop window management and Apple remote/parallax hooks are gone.
+- Retained server-session remote control; it no longer registers native Cast,
+  DLNA or AirPlay discovery/event subscriptions in the TV video profile.
+
+Media3, mpv, subtitle fonts, HDR/audio capability probes, audio focus, media
+buttons, Watch Next and video WebView trailers remain. Removing these would
+change video compatibility, not merely remove unrelated features.
+
+The shared offline database, download/settings types, background downloader and
+local-notification packages still remain behind the disabled feature paths.
+They require a separate extraction from shared item, connectivity and settings
+code. Some non-video pure Dart models/helpers also remain. Transitive plugin
+packages may still describe other platforms even though their app runners and
+direct integrations have been removed. No frame-rate gain is assumed.
 
 ## Build an isolated test app
 
@@ -125,7 +145,8 @@ behavior until that compatibility matrix passes.
 The new video-profile tests run with the default profile. The inherited suite
 can also exercise the retained shared implementation with its compatibility
 profile, because many inherited tests deliberately assert reader/game/preview
-behavior that this branch removes:
+behavior in the remaining shared code. Deleted feature tests are removed alongside
+the implementations; the opt-out cannot recover deleted readers or emulators:
 
 ```powershell
 flutter test --no-pub test/util/video_app_profile_test.dart `

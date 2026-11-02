@@ -43,7 +43,6 @@ import '../services/silo_token_storage.dart';
 import '../../data/services/achievements_service.dart';
 import '../../data/services/plex_tv_service.dart';
 import '../../data/services/plugin_sync_service.dart';
-import '../../data/services/push_messaging_service.dart';
 import '../../data/services/remote_search_session.dart';
 import '../../data/services/server_messages_service.dart';
 import '../../data/services/socket_handler.dart';
@@ -467,10 +466,6 @@ class SessionRepository {
     // bails before login, so this is where closed-app push actually enrolls.
     if (PlatformDetection.isMobile) {
       try {
-        if (GetIt.instance.isRegistered<PushMessagingService>()) {
-          await GetIt.instance<PushMessagingService>()
-              .registerWithCurrentToken();
-        }
         await _pluginSyncService.pushNotificationPrefs(client);
       } catch (_) {}
     }
@@ -757,18 +752,12 @@ class SessionRepository {
     // Drop this device's push registration while the session/token is still
     // live, otherwise the plugin keeps sending closed-app pushes after logout.
     if (PlatformDetection.isMobile && !tokenKnownInvalid) {
-      try {
-        if (GetIt.instance.isRegistered<PushMessagingService>()) {
-          await GetIt.instance<PushMessagingService>().unregister();
-        }
-      } catch (_) {}
+      try {} catch (_) {}
     }
 
     _pluginSyncService.resetState();
     if (GetIt.instance.isRegistered<SiloWatchPartyManager>()) {
-      GetIt.instance<SiloWatchPartyManager>().onSessionChanged(
-        signedOut: true,
-      );
+      GetIt.instance<SiloWatchPartyManager>().onSessionChanged(signedOut: true);
     }
     if (GetIt.instance.isRegistered<AchievementsService>()) {
       GetIt.instance<AchievementsService>().reset();
@@ -848,7 +837,9 @@ class SessionRepository {
         GetIt.instance<MoonfinAudioHandler>().notifyChildrenChanged();
       }
       if (GetIt.instance.isRegistered<CarPlayService>()) {
-        GetIt.instance<CarPlayService>().notifySignInChanged(signedIn: signedIn);
+        GetIt.instance<CarPlayService>().notifySignInChanged(
+          signedIn: signedIn,
+        );
       }
     } catch (_) {}
   }
@@ -1363,8 +1354,7 @@ class SessionRepository {
           // Another controller's text has no Search to land in yet, so it
           // opens one. Edits from a phone whose input session ended stay
           // dropped.
-          final opened = RemoteSearchSession(null)
-            ..receive(message.arguments);
+          final opened = RemoteSearchSession(null)..receive(message.arguments);
           await _openRemoteSearch(manager, opened);
         }
       default:

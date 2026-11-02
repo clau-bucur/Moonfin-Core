@@ -7,12 +7,9 @@ import 'package:flutter/cupertino.dart' show CupertinoTheme, CupertinoThemeData;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_tvos/flutter_tvos.dart'
-    show TvRemoteController, TvRemoteConfig, FlutterTvosPlatform;
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:playback_core/playback_core.dart';
-import 'package:window_manager/window_manager.dart';
 
 import 'auth/repositories/session_repository.dart';
 import 'data/models/achievement_models.dart';
@@ -28,7 +25,6 @@ import 'data/services/server_messages_service.dart';
 import 'data/services/retro_artwork/retro_artwork_data_source.dart';
 import 'data/services/theme_music_service.dart';
 import 'data/services/deep_link_service.dart';
-import 'data/services/topshelf_service.dart';
 import 'data/services/watch_next_service.dart';
 import 'di/providers.dart';
 import 'l10n/app_localizations.dart';
@@ -58,7 +54,6 @@ import 'ui/screensaver/screensaver_host.dart';
 import 'util/achievement_icons.dart';
 import 'util/app_exit.dart';
 import 'util/focus/dpad_keys.dart';
-import 'util/focus/siri_remote_glide.dart';
 import 'util/fullscreen_helper.dart';
 import 'util/global_shortcut_focus.dart';
 import 'util/focus/input_mode_tracker.dart';
@@ -68,11 +63,14 @@ import 'util/platform_detection.dart';
 import 'util/video_app_profile.dart';
 import 'util/tv_ui_scale.dart';
 import 'ui/widgets/overlay_sheet.dart';
+
 import 'package:moonfin_design/moonfin_design.dart';
+
 import 'util/focus/key_event_utils.dart';
 import 'util/focus/gamepad/gamepad_navigation_scope.dart';
 import 'util/focus/gamepad/gamepad_key_synthesizer.dart';
 import 'util/focus/open_popup.dart';
+
 import 'package:custom_tv_text_field/custom_tv_text_field.dart';
 
 class MoonfinApp extends StatefulWidget {
@@ -102,34 +100,7 @@ class _MoonfinAppState extends State<MoonfinApp> {
     _prefs.addListener(_syncLocaleFromPrefs);
     _prefs.addListener(_syncIdiomFromPrefs);
     _prefs.addListener(_syncGlassFromPrefs);
-    if (PlatformDetection.isAppleTV) {
-      TopShelfService().startDeepLinkListener(navigateWhenReady);
-      if (!FlutterTvosPlatform.isTvos) {
-        // The package gates init on Platform.operatingSystem being tvos and
-        // this build reports ios, so init returns early and leaves the remote
-        // unconfigured and never forwarding touches. Our own check is a build
-        // time define and is the one to trust here, and flipping the test hook
-        // is the only way past that guard.
-        // ignore: invalid_use_of_visible_for_testing_member
-        TvRemoteController.debugForceTvosForTesting = true;
-      }
-      TvRemoteController.instance.init();
-      // Both engine swipe detectors are pushed out of reach so SiriRemoteGlide
-      // can drive focus from the raw touch stream instead. Clicks stay native,
-      // with the dead zone widened so an off-center click reads as select
-      // rather than a direction.
-      TvRemoteController.instance.config = const TvRemoteConfig(
-        shortSwipeThreshold: 1000000,
-        fastSwipeThreshold: 1000000,
-        continuousSwipeMoveThreshold: 1000000,
-        dpadDeadZone: 0.6,
-        keyRepeatInitialDelay: Duration(milliseconds: 450),
-        keyRepeatInterval: Duration(milliseconds: 180),
-      );
-      _syncSiriRemoteFromPrefs();
-      _prefs.addListener(_syncSiriRemoteFromPrefs);
-      SiriRemoteGlide.instance.attach();
-    }
+
     if (PlatformDetection.isAndroid && PlatformDetection.isTV) {
       WatchNextService().startDeepLinkListener(navigateWhenReady);
     }
@@ -148,12 +119,6 @@ class _MoonfinAppState extends State<MoonfinApp> {
     if (AppUiIdiomResolver.current != before && mounted) {
       setState(() {});
     }
-  }
-
-  void _syncSiriRemoteFromPrefs() {
-    SiriRemoteGlide.instance.sensitivity = _prefs.get(
-      UserPreferences.siriRemoteSwipeSensitivity,
-    );
   }
 
   void _syncGlassFromPrefs() {
@@ -225,7 +190,6 @@ class _MoonfinAppState extends State<MoonfinApp> {
     _prefs.removeListener(_syncLocaleFromPrefs);
     _prefs.removeListener(_syncIdiomFromPrefs);
     _prefs.removeListener(_syncGlassFromPrefs);
-    _prefs.removeListener(_syncSiriRemoteFromPrefs);
     _deepLinks.dispose();
     _themeController.dispose();
     super.dispose();
@@ -397,9 +361,8 @@ class _MoonfinAppState extends State<MoonfinApp> {
                     final scale = _prefs
                         .get(UserPreferences.desktopUiScale)
                         .scaleFactor;
-                    final systemScale = MediaQuery.textScalerOf(
-                      context,
-                    ).scale(1.0);
+                    final systemScale = MediaQuery.textScalerOf(context)
+                        .scale(1.0);
                     // The pixel font renders far larger and wider than a normal
                     // face at a given size, so shrink all text to keep dense
                     // layouts from overflowing.
@@ -433,7 +396,7 @@ class _GlobalShortcutScope extends StatefulWidget {
 }
 
 class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
-    with WindowListener, WidgetsBindingObserver {
+    with WidgetsBindingObserver {
   static const _maxRouteHistoryEntries = 200;
   static const _mouseThumbNavDebounce = Duration(milliseconds: 180);
 
@@ -446,11 +409,9 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
   final bool _trackMouseThumbHistory = PlatformDetection.isDesktop;
   final List<String> _routeHistory = [];
   late final KeyEventCallback _hardwareKeyHandler;
-  Timer? _geometrySaveTimer;
   // Windows answers isMaximized() from an uninitialized WINDOWPLACEMENT and
   // returns whatever was on the stack, so the state is tracked from the window
   // events instead, seeded with the state the window was restored into.
-  bool _isMaximized = false;
   int _routeHistoryIndex = -1;
   DateTime? _lastMouseThumbNavAt;
   String? _pendingRouteHistoryLocation;
@@ -471,14 +432,6 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
       _onRouterStateChanged();
     }
     WidgetsBinding.instance.addObserver(this);
-    if (PlatformDetection.isDesktop) {
-      final prefs = GetIt.instance<UserPreferences>();
-      _isMaximized =
-          prefs.get(UserPreferences.windowMaximized) &&
-          !prefs.get(UserPreferences.windowFullscreen);
-      windowManager.addListener(this);
-      unawaited(windowManager.setPreventClose(true));
-    }
   }
 
   String _currentRouteLocation() {
@@ -695,8 +648,6 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
   bool _routeReadsBackKey() =>
       Destinations.routeReadsBackKey(_currentRoutePath());
 
-  bool _isHomeRoute() => _currentRoutePath() == Destinations.home;
-
   bool _shortcutsDialogOpen = false;
 
   /// The shortcut list for wherever the user is. Pressing the key again
@@ -846,11 +797,13 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
       return true;
     }
 
-    final altPressed = keys.contains(LogicalKeyboardKey.altLeft) ||
+    final altPressed =
+        keys.contains(LogicalKeyboardKey.altLeft) ||
         keys.contains(LogicalKeyboardKey.altRight);
 
     if (PlatformDetection.useDesktopUi &&
-        (key == LogicalKeyboardKey.f11 || (key == LogicalKeyboardKey.enter && altPressed))) {
+        (key == LogicalKeyboardKey.f11 ||
+            (key == LogicalKeyboardKey.enter && altPressed))) {
       unawaited(FullscreenHelper.toggle());
       return true;
     }
@@ -858,7 +811,7 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
     if (PlatformDetection.isDesktop &&
         ctrlPressed &&
         key == LogicalKeyboardKey.keyQ) {
-      unawaited(windowManager.close());
+      unawaited(AppExit.closeApp());
       return true;
     }
 
@@ -932,10 +885,6 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
 
   @override
   void dispose() {
-    _geometrySaveTimer?.cancel();
-    if (PlatformDetection.isDesktop) {
-      windowManager.removeListener(this);
-    }
     if (_trackMouseThumbHistory) {
       appRouter.routerDelegate.removeListener(_onRouterStateChanged);
     }
@@ -953,77 +902,6 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
     }
   }
 
-  Future<void> _saveWindowGeometry() async {
-    try {
-      final prefs = GetIt.instance<UserPreferences>();
-      final isFullScreen = await windowManager.isFullScreen();
-      await prefs.set(UserPreferences.windowFullscreen, isFullScreen);
-      await prefs.set(UserPreferences.windowMaximized, _isMaximized);
-      // Keep the last windowed bounds. Neither state reports the size the
-      // window would return to, so saving either would lose the real one.
-      if (isFullScreen || _isMaximized) return;
-      final size = await windowManager.getSize();
-      final pos = await windowManager.getPosition();
-      await prefs.set(UserPreferences.windowWidth, size.width);
-      await prefs.set(UserPreferences.windowHeight, size.height);
-      await prefs.set(UserPreferences.windowX, pos.dx);
-      await prefs.set(UserPreferences.windowY, pos.dy);
-    } catch (_) {}
-  }
-
-  void _scheduleSaveGeometry() {
-    _geometrySaveTimer?.cancel();
-    _geometrySaveTimer = Timer(const Duration(milliseconds: 500), () {
-      _saveWindowGeometry();
-    });
-  }
-
-  @override
-  void onWindowEvent(String eventName) {
-    _isMaximized = FullscreenHelper.maximizedAfterWindowEvent(
-      eventName,
-      _isMaximized,
-    );
-    if (eventName == 'move' ||
-        eventName == 'resize' ||
-        eventName == 'moved' ||
-        eventName == 'resized' ||
-        eventName == 'maximize' ||
-        eventName == 'unmaximize' ||
-        eventName == 'enter-full-screen' ||
-        eventName == 'leave-full-screen') {
-      _scheduleSaveGeometry();
-    }
-  }
-
-  @override
-  void onWindowClose() {
-    unawaited(_handleWindowClose());
-  }
-
-  Future<void> _handleWindowClose() async {
-    _geometrySaveTimer?.cancel();
-    // Read the window bounds before hiding so the saved geometry stays correct
-    // on platforms where a hidden window reports stale size or position.
-    await _saveWindowGeometry();
-    // Hide right away so the window disappears instantly while the slower
-    // database and preference teardown finishes.
-    try {
-      await windowManager.hide();
-    } catch (_) {}
-    await AppExit.prepareForExit();
-    await windowManager.destroy();
-  }
-
-  @override
-  void onWindowFocus() {
-    if (_isPlayerRoute()) return;
-    if (_isHomeRoute()) return;
-    if (FocusManager.instance.primaryFocus == null && !_focusNode.hasFocus) {
-      _focusNode.requestFocus();
-    }
-  }
-
   KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
@@ -1031,10 +909,12 @@ class _GlobalShortcutScopeState extends State<_GlobalShortcutScope>
 
     final key = event.logicalKey;
     final keys = HardwareKeyboard.instance.logicalKeysPressed;
-    final altPressed = keys.contains(LogicalKeyboardKey.altLeft) ||
+    final altPressed =
+        keys.contains(LogicalKeyboardKey.altLeft) ||
         keys.contains(LogicalKeyboardKey.altRight);
 
-    if ((key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.select) && !altPressed) {
+    if ((key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.select) &&
+        !altPressed) {
       return activateFocusedTarget(context);
     }
 

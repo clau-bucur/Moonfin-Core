@@ -4,12 +4,8 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-enum _EmbeddedPlayerMode {
-  manualIframe,
-  unsupported,
-}
+enum _EmbeddedPlayerMode { manualIframe, unsupported }
 
 class WebYouTubeTrailer extends StatefulWidget {
   final String videoId;
@@ -205,17 +201,9 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
 
   Future<void> _initializeController() async {
     try {
-      // iOS/macOS need inline playback with no user-gesture gate for muted
-      // autoplay; otherwise the WebView blocks it and the caller falls back.
-      final PlatformWebViewControllerCreationParams params =
-          WebViewPlatform.instance is WebKitWebViewPlatform
-              ? WebKitWebViewControllerCreationParams(
-                  allowsInlineMediaPlayback: true,
-                  mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
-                )
-              : const PlatformWebViewControllerCreationParams();
-
-      final controller = WebViewController.fromPlatformCreationParams(params);
+      final controller = WebViewController.fromPlatformCreationParams(
+        const PlatformWebViewControllerCreationParams(),
+      );
 
       controller
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -293,7 +281,8 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
     // Events posted by the previous video can arrive after a swap; drop
     // state and error messages that carry a different video id.
     final eventVideoId = payload['videoId']?.toString();
-    final isStaleEvent = eventVideoId != null &&
+    final isStaleEvent =
+        eventVideoId != null &&
         eventVideoId.isNotEmpty &&
         eventVideoId != widget.videoId;
 
@@ -406,7 +395,8 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
   }
 
   void _showStartupChromeMask() {
-    if (_playerMode != _EmbeddedPlayerMode.manualIframe || widget.ignorePointer) {
+    if (_playerMode != _EmbeddedPlayerMode.manualIframe ||
+        widget.ignorePointer) {
       return;
     }
 
@@ -729,8 +719,9 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
         final view = WebViewWidget(controller: controller);
         return IgnorePointer(
           ignoring: widget.ignorePointer,
-          child:
-              widget.ignorePointer ? view : _buildWithStartupChromeMask(view),
+          child: widget.ignorePointer
+              ? view
+              : _buildWithStartupChromeMask(view),
         );
 
       case _EmbeddedPlayerMode.unsupported:

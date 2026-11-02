@@ -27,16 +27,6 @@ fun loadAndroidTvVersionName(rootDir: File, fallback: String): String {
 
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
-    // Applied only for a normal build. google-services.json lists clients for
-    // the real application ids, so a test build under MOONFIN_TEST_ID_SUFFIX
-    // (see productFlavors) would fail with "No matching client found". Skipping
-    // it there is safe because push messaging bails immediately on TV anyway -
-    // push_messaging_service.dart:38 returns unless PlatformDetection.isMobile,
-    // and the initializeApp call is try/caught regardless.
-    id("com.google.gms.google-services")
-        .apply(System.getenv("MOONFIN_TEST_ID_SUFFIX").isNullOrEmpty())
-    // END: FlutterFire Configuration
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
@@ -92,24 +82,9 @@ android {
         // the server, so an uninstall can lose real game progress. A distinct id
         // installs alongside instead and touches nothing.
         val testIdSuffix = System.getenv("MOONFIN_TEST_ID_SUFFIX").orEmpty()
-        val mobileAbis = listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         val tvAbis = listOf("arm64-v8a", "armeabi-v7a", "x86_64")
-        create("mobile") {
-            dimension = "device"
-            applicationId = baseAppId
-            versionCode = flutter.versionCode
-            versionName = flutter.versionName
-            ndk { abiFilters += mobileAbis }
-            manifestPlaceholders["appName"] = baseAppName
-        }
-        create("mobile-beta") {
-            dimension = "device"
-            applicationId = "$baseAppId.beta"
-            versionCode = flutter.versionCode
-            versionName = flutter.versionName
-            ndk { abiFilters += mobileAbis }
-            manifestPlaceholders["appName"] = "$baseAppName Beta"
-        }
+
+
         create("androidTv") {
             dimension = "device"
             applicationId = baseAppId + testIdSuffix
@@ -177,12 +152,7 @@ android {
         }
     }
 
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.22.1"
-        }
-    }
+
 
 }
 
@@ -200,7 +170,6 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20240303")
-    implementation("com.google.android.gms:play-services-cast-framework:22.3.1")
     implementation("eu.simonbinder:sqlite3-native-library:3.52.0")
     implementation("androidx.tvprovider:tvprovider:1.1.0")
     implementation("androidx.work:work-runtime-ktx:2.12.0")

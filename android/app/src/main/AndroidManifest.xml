@@ -17,7 +17,7 @@
     <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA"/>
     <uses-feature android:name="android.hardware.microphone" android:required="false"/>
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
-    <uses-feature android:name="android.software.leanback" android:required="false"/>
+    <uses-feature android:name="android.software.leanback" android:required="true"/>
     <application
         android:label="${appName}"
         android:name=".MoonfinApplication"
@@ -81,11 +81,6 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <!-- Where pushes land when the payload names no channel. Must match
-             the channel the app creates at startup. -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="seerr_notifications" />
 
         <!-- Impeller renderer, set per flavor in build.gradle.kts. Off by
              default on TV boxes, whose GPUs (often PowerVR) stutter on the
@@ -94,9 +89,6 @@
         <meta-data
             android:name="io.flutter.embedding.android.EnableImpeller"
             android:value="${enableImpeller}" />
-        <meta-data
-            android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="org.moonfin.androidtv.MoonfinCastOptionsProvider" />
 
         <service
             android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
@@ -132,8 +124,6 @@
             android:exported="true"
             android:grantUriPermissions="true" />
 
-        <meta-data android:name="com.google.android.gms.car.application"
-                   android:resource="@xml/automotive_app_desc"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

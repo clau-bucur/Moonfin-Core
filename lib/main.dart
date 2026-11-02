@@ -3,15 +3,11 @@ import 'dart:async';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:moonfin_design/moonfin_design.dart' show LiquidGlassWidgets;
-import 'package:path_provider/path_provider.dart';
 import 'package:playback_core/playback_core.dart';
-import 'package:screen_retriever/screen_retriever.dart';
-import 'package:window_manager/window_manager.dart';
 
 import 'app.dart';
 import 'data/models/aggregated_item.dart';
@@ -19,14 +15,11 @@ import 'background/watch_next_background.dart' as watch_next_bg;
 import 'data/services/carplay_service.dart';
 import 'data/services/cast/airplay_command_bridge.dart';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'background/auto_download_background.dart';
 import 'background/auto_download_background_main.dart' as auto_download_bg;
 import 'data/services/auto_download_service.dart';
 import 'data/services/background_download_coordinator.dart';
 import 'data/services/download_notification_service.dart';
-import 'data/services/push_messaging_service.dart';
 import 'data/services/seerr_notification_service.dart';
 import 'data/services/media_server_client_factory.dart';
 import 'data/services/crash_report_service.dart';
@@ -34,7 +27,6 @@ import 'data/services/log_service.dart';
 import 'data/services/storage_path_service.dart';
 import 'util/scroll_sensitivity_binding.dart';
 import 'util/silo_image_hooks.dart';
-import 'util/webview_environment.dart';
 import 'data/services/theme_store_service.dart';
 import 'di/injection.dart';
 import 'playback/appletv_audio_now_playing_feeder.dart';
@@ -45,25 +37,19 @@ import 'playback/codec_caps_repair.dart';
 import 'playback/device_capability_cache.dart';
 import 'playback/display_hdr_probe.dart';
 import 'playback/media_browse_service.dart';
-import 'playback/mpris_service.dart';
 import 'playback/playback_lifecycle_handler.dart';
 import 'platform/background_refresh.dart';
 import 'platform/web_runtime_config.dart';
 import 'preference/preference_constants.dart';
 import 'preference/user_preferences.dart';
-import 'util/fullscreen_helper.dart';
-import 'util/window_geometry.dart';
 import 'util/http_overrides_stub.dart'
     if (dart.library.io) 'util/http_overrides_io.dart';
-import 'util/game_core_licenses.dart';
 import 'util/device_performance.dart';
 import 'ui/navigation/app_router.dart';
 import 'ui/screensaver/screensaver_controller.dart';
-import 'ui/widgets/reader/epub_js_view.dart';
 import 'util/platform_detection.dart';
 import 'util/video_app_profile.dart';
 import 'util/process_exit_reporter.dart';
-import 'util/system_ui.dart';
 import 'util/tv_image_cache_stub.dart'
     if (dart.library.io) 'util/tv_image_cache_io.dart';
 
@@ -126,10 +112,6 @@ void _configureImageCache() {
     apply(400, 96 << 20);
     return;
   }
-  if (PlatformDetection.isMobile) {
-    apply(400, 120 << 20);
-    return;
-  }
 
   if (PlatformDetection.isTV) {
     apply(500, 96 << 20);
@@ -145,8 +127,8 @@ void _configureImageCache() {
 void _capSkiaCache() {
   if (!PlatformDetection.isAndroid) return;
   WidgetsBinding.instance.addPostFrameCallback((_) {
-    final size = WidgetsBinding.instance.platformDispatcher.implicitView
-        ?.physicalSize;
+    final size =
+        WidgetsBinding.instance.platformDispatcher.implicitView?.physicalSize;
     final cap = size == null ? null : skiaCacheCapFor(size.width * size.height);
     if (cap == null) return;
     unawaited(
@@ -219,68 +201,6 @@ void _startProcessExitReporter() {
         ? GetIt.instance<ScreensaverController>().visible
         : null,
   );
-}
-
-Future<void> _restoreWindowGeometry() async {
-  final prefs = GetIt.instance<UserPreferences>();
-  final w = prefs.get(UserPreferences.windowWidth);
-  final h = prefs.get(UserPreferences.windowHeight);
-  final x = prefs.get(UserPreferences.windowX);
-  final y = prefs.get(UserPreferences.windowY);
-  final startFullscreen = prefs.get(UserPreferences.windowFullscreen);
-  final startMaximized =
-      prefs.get(UserPreferences.windowMaximized) && !startFullscreen;
-
-  const minW = 800.0;
-  const minH = 500.0;
-  final hasSavedGeometry = w >= minW && h >= minH;
-  final bounds = hasSavedGeometry
-      ? fitBoundsToWorkAreas(Rect.fromLTWH(x, y, w, h), await _workAreas())
-      : null;
-
-  final options = WindowOptions(
-    size: bounds?.size ?? const Size(1280, 720),
-    minimumSize: const Size(minW, minH),
-    center: !hasSavedGeometry && !startMaximized,
-    skipTaskbar: false,
-  );
-
-  await windowManager.waitUntilReadyToShow(options, () async {
-    if (bounds != null) {
-      await windowManager.setPosition(bounds.topLeft);
-    }
-    // Before show, so platforms that apply it right away never draw the
-    // windowed size first.
-    if (startMaximized) {
-      await windowManager.maximize();
-    }
-    await windowManager.show();
-    await windowManager.focus();
-  });
-
-  // Fullscreen resizes the window, and doing that before the engine has drawn
-  // leaves it laid out at the old size with the rest of the window black. The
-  // timer this replaces was standing in for the first frame, which is a race
-  // on a cold start.
-  if (startFullscreen) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      unawaited(FullscreenHelper.setFullscreen(true));
-    });
-  }
-}
-
-/// Usable areas of the attached displays, or an empty list when they cannot be
-/// read, which leaves saved bounds alone rather than guessing at a screen.
-Future<List<Rect>> _workAreas() async {
-  try {
-    return [
-      for (final display in await screenRetriever.getAllDisplays())
-        (display.visiblePosition ?? Offset.zero) &
-            (display.visibleSize ?? display.size),
-    ];
-  } catch (_) {
-    return const [];
-  }
 }
 
 /// Applies the stored layout override before anything reads the platform
@@ -446,9 +366,7 @@ Future<void> _detectAndSetDisplayCapabilities() async {
 Future<Map<String, dynamic>?> _queryCodecCaps(MethodChannel channel) async {
   final raw = await channel.invokeMethod<Map<dynamic, dynamic>>(
     'mediaCodecCapabilities',
-    <String, dynamic>{
-      'includeSoftwareDecoders': !PlatformDetection.isTV,
-    },
+    <String, dynamic>{'includeSoftwareDecoders': !PlatformDetection.isTV},
   );
   return raw?.map((key, value) => MapEntry(key.toString(), value));
 }
@@ -704,15 +622,14 @@ Future<void> _detectAndApplyAudioCapabilities(UserPreferences prefs) async {
   } catch (_) {}
 }
 
-Future<void> _retryAudioCapsOffLaunchPath() =>
-    _retryOffLaunchPath(() async {
-      final profile = await AudioCapabilityProbe.query();
-      if (profile == null || AudioCapabilityProbe.looksEmpty(profile)) {
-        return false;
-      }
-      AudioCapabilityProbe.apply(profile);
-      return true;
-    });
+Future<void> _retryAudioCapsOffLaunchPath() => _retryOffLaunchPath(() async {
+  final profile = await AudioCapabilityProbe.query();
+  if (profile == null || AudioCapabilityProbe.looksEmpty(profile)) {
+    return false;
+  }
+  AudioCapabilityProbe.apply(profile);
+  return true;
+});
 
 void _sweepImageCache(UserPreferences prefs, {bool throttle = false}) {
   final mb = prefs.get(UserPreferences.imageCacheLimitMb);
@@ -843,7 +760,8 @@ class _PreferenceWriteFlushObserver with WidgetsBindingObserver {
 }
 
 @pragma('vm:entry-point')
-Future<void> watchNextBackgroundMain() => watch_next_bg.watchNextBackgroundMain();
+Future<void> watchNextBackgroundMain() =>
+    watch_next_bg.watchNextBackgroundMain();
 
 /// Entry for the Android auto-download worker's headless engine.
 @pragma('vm:entry-point')
@@ -859,28 +777,6 @@ void main() async {
   // renderer is disabled, and the Impeller pipeline warm-up is deferred
   // past the first frame internally.
   await LiquidGlassWidgets.initialize();
-
-  if (!VideoAppProfile.enabled) {
-    registerGameCoreLicenses();
-    registerEpubJsLicenses();
-  }
-
-  if (!PlatformDetection.isWeb && PlatformDetection.isWindows) {
-    try {
-      final appDataDir = await getApplicationSupportDirectory();
-      final customPath = '${appDataDir.path}\\WebView2Data';
-      gWebViewEnvironment = await WebViewEnvironment.create(
-        settings: WebViewEnvironmentSettings(
-          userDataFolder: customPath,
-          // mediaPlaybackRequiresUserGesture doesn't lift WebView2's audio
-          // block, so N64 in EmulatorJS sits on a black screen until a click,
-          // which a controller never sends.
-          additionalBrowserArguments:
-              '--autoplay-policy=no-user-gesture-required',
-        ),
-      );
-    } catch (_) {}
-  }
 
   if (PlatformDetection.isAppleTV) {
     ErrorWidget.builder = (FlutterErrorDetails details) {
@@ -903,10 +799,6 @@ void main() async {
 
   if (PlatformDetection.isWeb) {
     await loadWebRuntimeConfig();
-  }
-
-  if (PlatformDetection.isDesktop) {
-    await windowManager.ensureInitialized();
   }
 
   // Apple runs entirely on AetherEngine, so media_kit isn't initialized there
@@ -947,19 +839,8 @@ void main() async {
   // appear blank. Pumping a warm-up frame gives the font loader time to finish.
   // The issue is intermittent and goes away on re-run once the OS font cache
   // is warm, which confirms the timing root cause.
-  if (PlatformDetection.isLinux ||
-      PlatformDetection.isAppleTV) {
+  if (PlatformDetection.isLinux || PlatformDetection.isAppleTV) {
     WidgetsBinding.instance.scheduleWarmUpFrame();
-  }
-
-  if (PlatformDetection.isMobile) {
-    SystemUi.install();
-
-    // Registered before runApp so a background/terminated push can be handled.
-    // The handler itself is a no-op; the OS draws these notifications.
-    try {
-      FirebaseMessaging.onBackgroundMessage(pushBackgroundHandler);
-    } catch (_) {}
   }
 
   await configureDependencies();
@@ -973,7 +854,8 @@ void main() async {
 
   // Registered before runApp so a CarPlay-only launch (no window scene, no
   // widgets) can browse and start playback.
-  if (PlatformDetection.isIOS && !GetIt.instance.isRegistered<CarPlayService>()) {
+  if (PlatformDetection.isIOS &&
+      !GetIt.instance.isRegistered<CarPlayService>()) {
     try {
       final carPlayService = CarPlayService(
         browse: GetIt.instance<MediaBrowseService>(),
@@ -994,7 +876,8 @@ void main() async {
   WidgetsBinding.instance.addPostFrameCallback((_) => _sweepImageCache(prefs));
 
   GetIt.instance<PlaybackManager>().queueService.queueChangedStream.listen((_) {
-    final activeItem = GetIt.instance<PlaybackManager>().queueService.currentItem;
+    final activeItem =
+        GetIt.instance<PlaybackManager>().queueService.currentItem;
     if (activeItem is AggregatedItem) {
       prefs.unhideFromContinueWatching(activeItem.id);
       if (activeItem.seriesId != null && activeItem.seriesId!.isNotEmpty) {
@@ -1006,13 +889,8 @@ void main() async {
 
   // Register Theme Store themes before the active theme is resolved so a
   // store-saved theme applies on launch.
-  await ThemeStoreService(
-    GetIt.instance<StoragePathService>(),
-  ).loadAndRegister();
-
-  if (PlatformDetection.isDesktop) {
-    await _restoreWindowGeometry();
-  }
+  await ThemeStoreService(GetIt.instance<StoragePathService>())
+      .loadAndRegister();
 
   // Audio and notification services are only needed once playback or a
   // download can happen, so they initialize after the first frame.
@@ -1061,18 +939,9 @@ Future<void> _initDeferredStartupServices(UserPreferences prefs) async {
         clientFactory: GetIt.instance<MediaServerClientFactory>(),
       );
     } catch (e, st) {
-      debugPrint('initAudioService failed (lock-screen controls disabled): $e\n$st');
-    }
-  }
-
-  if (PlatformDetection.isLinux) {
-    try {
-      await initMprisService(
-        manager: GetIt.instance<PlaybackManager>(),
-        clientFactory: GetIt.instance<MediaServerClientFactory>(),
+      debugPrint(
+        'initAudioService failed (lock-screen controls disabled): $e\n$st',
       );
-    } catch (e, st) {
-      debugPrint('initMprisService failed (MPRIS controls disabled): $e\n$st');
     }
   }
 
@@ -1093,12 +962,6 @@ Future<void> _initDeferredStartupServices(UserPreferences prefs) async {
     } catch (_) {}
   }
 
-  if (PlatformDetection.isMobile) {
-    try {
-      await GetIt.instance<PushMessagingService>().initialize();
-    } catch (_) {}
-  }
-
   // Audio session ownership differs per platform:
   // - Android: MoonfinAudioHandler acquires audio focus per playback, and skips
   //   it when the backend manages focus itself like media3. We only configure
@@ -1113,12 +976,14 @@ Future<void> _initDeferredStartupServices(UserPreferences prefs) async {
   if (PlatformDetection.isAndroid) {
     try {
       final session = await AudioSession.instance;
-      await session.configure(AudioSessionConfiguration(
-        androidAudioAttributes: AndroidAudioAttributes(
-          contentType: AndroidAudioContentType.music,
-          usage: AndroidAudioUsage.media,
+      await session.configure(
+        AudioSessionConfiguration(
+          androidAudioAttributes: AndroidAudioAttributes(
+            contentType: AndroidAudioContentType.music,
+            usage: AndroidAudioUsage.media,
+          ),
         ),
-      ));
+      );
       session.becomingNoisyEventStream.listen((_) {
         GetIt.instance<PlaybackManager>().pause();
       });

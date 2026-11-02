@@ -6,7 +6,6 @@ import 'package:server_core/server_core.dart' show ServerType;
 
 import '../../auth/repositories/server_repository.dart';
 import '../../auth/repositories/session_repository.dart';
-import '../../auth/repositories/user_repository.dart';
 import '../../data/services/connectivity_service.dart';
 import '../../data/services/remote_search_session.dart';
 import '../../data/services/retro_artwork/retro_artwork_activity_gate.dart';
@@ -14,13 +13,8 @@ import '../../di/injection.dart';
 import '../../playback/apple_player_ui.dart';
 import '../../playback/external_player_policy.dart';
 import '../../preference/user_preferences.dart';
-import '../../preference/preference_constants.dart';
-import '../../util/game_cores.dart';
 import '../../util/platform_detection.dart';
 import '../../util/video_app_profile.dart';
-import '../screens/admin/admin_nav.dart';
-import '../screens/admin/admin_routes.dart';
-import '../../util/signed_in_server_features.dart';
 import '../screens/auth/emby_connect_screen.dart';
 import '../screens/auth/plex_sign_in_screen.dart';
 import '../screens/auth/login_screen.dart';
@@ -36,41 +30,19 @@ import '../screens/browse/library_browse_screen.dart';
 import '../screens/browse/library_genres_screen.dart';
 import '../screens/browse/library_letters_screen.dart';
 import '../screens/browse/library_suggestions_screen.dart';
-import '../screens/browse/book_category_screen.dart';
-import '../screens/browse/book_library_screen.dart';
-import '../screens/browse/music_category_screen.dart';
-import '../screens/browse/music_library_screen.dart';
-import '../widgets/book/book_navigation.dart';
-import '../widgets/music/music_navigation.dart';
-import '../../data/models/tmdb_item_ref.dart';
 import '../screens/detail/item_detail_screen.dart';
-import '../screens/games/game_library_screen.dart';
-import '../screens/games/game_system_screen.dart';
-import '../screens/games/game_detail_screen.dart';
-import '../screens/games/romm_account_screen.dart';
-import '../screens/playback/game_emulator_screen.dart';
-import '../screens/playback/native_game_player_screen.dart';
 import '../screens/detail/item_list_screen.dart';
 import '../screens/home/home_screen.dart';
-import '../screens/seerr/seerr_browse_screen.dart';
-import '../screens/seerr/seerr_collection_screen.dart';
-import '../screens/seerr/seerr_discover_screen.dart';
-import '../screens/seerr/seerr_person_screen.dart';
-import '../screens/seerr/seerr_requests_screen.dart';
 import '../screens/livetv/live_tv_channel_player_loader.dart';
 import '../screens/livetv/live_tv_guide_screen.dart';
 import '../screens/livetv/live_tv_player_screen.dart';
-import '../../data/viewmodels/book_browse_view_model.dart' show BookScope;
 import '../../data/viewmodels/live_tv_guide_view_model.dart';
 import '../screens/livetv/live_tv_recordings_screen.dart';
 import '../screens/livetv/live_tv_schedule_screen.dart';
 import '../screens/livetv/live_tv_screen.dart';
 import '../screens/livetv/live_tv_series_recordings_screen.dart';
-import '../screens/playback/audio_player_screen.dart';
-import '../screens/playback/book_reader_screen.dart';
 import '../screens/playback/external_player_host_screen.dart';
 import '../screens/playback/next_up_screen.dart';
-import '../screens/playback/photo_player_screen.dart';
 import '../screens/playback/still_watching_screen.dart';
 import '../screens/playback/trailer_player_screen.dart';
 import '../screens/playback/video_player_screen.dart';
@@ -111,7 +83,6 @@ bool _shouldRunSetupWizard() {
 
 /// The admin area has no TV layout. The settings tile is hidden there and on
 /// servers it doesn't cover, and this stops deep links too.
-bool _adminAvailable() => !PlatformDetection.isTV && adminServerSupported();
 
 /// Surfaces that genuinely need the server. Everything else works offline
 /// against the downloads catalog.
@@ -186,18 +157,6 @@ final appRouter = GoRouter(
     // to itself forever.
     if (path != Destinations.setup && _shouldRunSetupWizard()) {
       return Destinations.setup;
-    }
-
-    if (path.startsWith('/admin')) {
-      final user = getIt<UserRepository>().currentUser;
-      // Silo is administered from its own web app, so a deep link to
-      // Moonfin's admin screens (Jellyfin/Emby admin APIs) would only fail.
-      if (user == null ||
-          !user.isAdministrator ||
-          !_adminAvailable() ||
-          !activeServerSupports((f) => f.supportsAdmin)) {
-        return Destinations.home;
-      }
     }
 
     // The hard gate for Kids Mode. Hiding a nav entry is presentation, but a
@@ -373,48 +332,7 @@ final appRouter = GoRouter(
         return CollectionScreen(collectionId: collectionId);
       },
     ),
-    GoRoute(
-      path: Destinations.musicBrowse,
-      builder: (context, state) {
-        final libraryId = state.pathParameters['libraryId']!;
-        return MusicLibraryScreen(libraryId: libraryId);
-      },
-    ),
-    GoRoute(
-      path: Destinations.musicCategoryBrowse,
-      redirect: (context, state) =>
-          MusicCategoryKind.parse(state.pathParameters['category']) == null
-          ? Destinations.musicLibrary(state.pathParameters['libraryId']!)
-          : null,
-      builder: (context, state) => MusicCategoryScreen(
-        libraryId: state.pathParameters['libraryId']!,
-        kind: MusicCategoryKind.parse(state.pathParameters['category'])!,
-        show: state.uri.queryParameters['show'],
-      ),
-    ),
-    GoRoute(
-      path: Destinations.bookCategoryBrowse,
-      redirect: (context, state) =>
-          BookCategoryKind.parse(state.pathParameters['category']) == null
-          ? Destinations.bookLibrary(state.pathParameters['libraryId']!)
-          : null,
-      builder: (context, state) => BookCategoryScreen(
-        libraryId: state.pathParameters['libraryId']!,
-        kind: BookCategoryKind.parse(state.pathParameters['category'])!,
-        scope: BookScope.values.asNameMap()[state.uri.queryParameters['scope']],
-      ),
-    ),
-    GoRoute(
-      path: Destinations.bookBrowse,
-      builder: (context, state) {
-        final libraryId = state.pathParameters['libraryId']!;
-        final collectionType = state.uri.queryParameters['collectionType'];
-        return BookLibraryScreen(
-          libraryId: libraryId,
-          collectionType: collectionType,
-        );
-      },
-    ),
+
     GoRoute(
       path: Destinations.genreBrowse,
       builder: (context, state) {
@@ -470,83 +388,6 @@ final appRouter = GoRouter(
     ),
 
     // Games
-    GoRoute(
-      path: Destinations.gameSystem,
-      builder: (context, state) {
-        final libraryId = state.pathParameters['libraryId']!;
-        final systemId = state.pathParameters['systemId']!;
-        return GameSystemScreen(
-          key: ValueKey('game-system-$libraryId-$systemId'),
-          libraryId: libraryId,
-          systemId: systemId,
-          systemName: state.uri.queryParameters['name'],
-        );
-      },
-    ),
-    GoRoute(
-      path: Destinations.gameLibrary,
-      builder: (context, state) {
-        final libraryId = state.pathParameters['libraryId']!;
-        return GameLibraryScreen(
-          key: ValueKey('game-lib-$libraryId'),
-          libraryId: libraryId,
-          title: state.uri.queryParameters['title'],
-        );
-      },
-    ),
-    GoRoute(
-      path: Destinations.gameDetail,
-      builder: (context, state) {
-        final libraryId = state.pathParameters['libraryId']!;
-        final gameId = state.pathParameters['gameId']!;
-        return GameDetailScreen(
-          key: ValueKey('game-$gameId'),
-          libraryId: libraryId,
-          gameId: gameId,
-        );
-      },
-    ),
-    GoRoute(
-      path: Destinations.rommAccount,
-      builder: (context, state) => const RommAccountScreen(),
-    ),
-    GoRoute(
-      path: Destinations.gamePlayer,
-      pageBuilder: (context, state) {
-        final libraryId = state.pathParameters['libraryId']!;
-        final gameId = state.pathParameters['gameId']!;
-        final core = state.uri.queryParameters['core'] ?? 'nes';
-        final startFresh = state.uri.queryParameters['fresh'] == '1';
-        final forceEmulatorJs =
-            state.uri.queryParameters['backend'] == 'emulatorjs';
-        final hardwareRenderingEnabled = state.uri.queryParameters['hw'] != '0';
-        return _opaqueFullScreenPage<void>(
-          state: state,
-          // Native libretro or the EmulatorJS WebView: forced where only one
-          // backend works (tvOS and Linux native), the user's choice elsewhere,
-          // and per game where native can't play the system but the WebView can
-          // (a PSP or N64 title on the bundled Apple targets).
-          child: !forceEmulatorJs && usesNativeGameBackendFor(core)
-              ? NativeGamePlayerScreen(
-                  libraryId: libraryId,
-                  gameId: gameId,
-                  core: core,
-                  gameName: state.uri.queryParameters['name'],
-                  startFresh: startFresh,
-                  hardwareRenderingEnabled: hardwareRenderingEnabled,
-                )
-              : GameEmulatorScreen(
-                  libraryId: libraryId,
-                  gameId: gameId,
-                  core: core,
-                  romFileName: state.uri.queryParameters['romFile'],
-                  biosId: state.uri.queryParameters['bios'],
-                  gameName: state.uri.queryParameters['name'],
-                  startFresh: startFresh,
-                ),
-        );
-      },
-    ),
 
     // Live TV
     GoRoute(
@@ -630,31 +471,7 @@ final appRouter = GoRouter(
         child: const ExternalPlayerHostScreen(),
       ),
     ),
-    GoRoute(
-      path: Destinations.audioPlayer,
-      builder: (context, state) => const AudioPlayerScreen(),
-    ),
-    GoRoute(
-      path: Destinations.bookReader,
-      builder: (context, state) {
-        final itemId = state.pathParameters['itemId']!;
-        final serverId = state.uri.queryParameters['serverId'];
-        final extra = state.extra as Map<String, dynamic>?;
-        return BookReaderScreen(
-          itemId: itemId,
-          serverId: serverId,
-          initialPosition: extra?['initialPosition'] as int?,
-          initialMode: extra?['initialMode'] as String?,
-        );
-      },
-    ),
-    GoRoute(
-      path: Destinations.photoPlayer,
-      builder: (context, state) {
-        final itemId = state.pathParameters['itemId']!;
-        return PhotoPlayerScreen(itemId: itemId);
-      },
-    ),
+
     GoRoute(
       path: Destinations.trailerPlayer,
       builder: (context, state) {
@@ -679,7 +496,6 @@ final appRouter = GoRouter(
     ),
 
     // Admin
-    adminShellRoute,
 
     // Settings
     GoRoute(
@@ -688,64 +504,6 @@ final appRouter = GoRouter(
     ),
 
     // Seerr
-    GoRoute(
-      path: Destinations.seerrDiscover,
-      builder: (context, state) => const SeerrDiscoverScreen(),
-    ),
-    GoRoute(
-      path: Destinations.seerrRequests,
-      builder: (context, state) => SeerrRequestsScreen(
-        initialTab: state.uri.queryParameters['tab'] == 'issues' ? 1 : 0,
-      ),
-    ),
-    GoRoute(
-      path: Destinations.seerrBrowse,
-      builder: (context, state) {
-        final params = state.uri.queryParameters;
-        return SeerrBrowseScreen(
-          filterId: params['filterId'],
-          filterName: params['filterName'],
-          mediaType: params['mediaType'],
-          filterType: params['filterType'],
-        );
-      },
-    ),
-    GoRoute(
-      path: Destinations.seerrMediaDetail,
-      builder: (context, state) {
-        final rawId = state.pathParameters['itemId']!;
-        final kind = state.uri.queryParameters['mediaType'] == 'tv'
-            ? TmdbItemKind.tv
-            : TmdbItemKind.movie;
-        final ref = TmdbItemRef.tryParse(rawId) ?? TmdbItemRef(kind, rawId);
-        return ItemDetailScreen(
-          key: ValueKey(ref.itemId),
-          itemId: ref.itemId,
-          seerrTitle: state.uri.queryParameters['title'],
-        );
-      },
-    ),
-    GoRoute(
-      path: Destinations.seerrCollectionDetail,
-      builder: (context, state) {
-        final collectionId = state.pathParameters['collectionId']!;
-        return SeerrCollectionScreen(collectionId: collectionId);
-      },
-    ),
-    GoRoute(
-      path: Destinations.seerrPersonDetail,
-      builder: (context, state) {
-        final personId = state.pathParameters['personId']!;
-        final prefs = GetIt.instance<UserPreferences>();
-        if (prefs.get(UserPreferences.detailScreenStyle) != DetailScreenStyle.classic) {
-          return ItemDetailScreen(
-            key: ValueKey('tmdb:$personId'),
-            itemId: 'tmdb:$personId',
-          );
-        }
-        return SeerrPersonScreen(personId: personId);
-      },
-    ),
   ],
 );
 

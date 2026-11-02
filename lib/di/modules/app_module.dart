@@ -30,13 +30,10 @@ import '../../data/services/background_service.dart';
 import '../../data/services/access_schedule_service.dart';
 import '../../data/services/app_update_service.dart';
 import '../../data/services/upcoming_episode_service.dart';
-import '../../data/services/cast/airplay_provider.dart';
 import '../../data/services/cast/airplay_command_bridge.dart';
 import '../../data/services/cast/cast_service.dart';
-import '../../data/services/cast/dlna_provider.dart';
 import '../../data/services/cast/native_airplay_channel.dart';
 import '../../data/services/cast/native_dlna_channel.dart';
-import '../../data/services/cast/google_cast_provider.dart';
 import '../../data/services/cast/native_cast_channel.dart';
 import '../../data/services/cast/remote_session_cast_provider.dart';
 import '../../data/services/achievements_service.dart';
@@ -204,27 +201,9 @@ void registerAppModule() {
     dispose: (bridge) => bridge.dispose(),
   );
   _getIt.registerLazySingleton(
-    () => CastService(
-      [
-        RemoteSessionCastProvider(_getIt<MediaServerClientFactory>()),
-        GoogleCastProvider(
-          _getIt<NativeCastChannel>(),
-          _getIt<MediaServerClientFactory>(),
-        ),
-        AirPlayProvider(
-          _getIt<NativeCastChannel>(),
-          _getIt<NativeAirPlayChannel>(),
-          _getIt<MediaServerClientFactory>(),
-        ),
-        DlnaProvider(
-          _getIt<NativeDlnaChannel>(),
-          _getIt<MediaServerClientFactory>(),
-        ),
-      ],
-      nativeCast: _getIt<NativeCastChannel>(),
-      nativeDlna: _getIt<NativeDlnaChannel>(),
-      nativeAirPlay: _getIt<NativeAirPlayChannel>(),
-    ),
+    () => CastService([
+      RemoteSessionCastProvider(_getIt<MediaServerClientFactory>()),
+    ]),
     dispose: (service) => service.dispose(),
   );
   _getIt.registerLazySingleton(

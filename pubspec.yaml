@@ -1,5 +1,5 @@
 name: moonfin
-description: "Moonfin - Jellyfin & Emby media client for mobile, tablet, and desktop"
+description: "Moonfin Android TV video browsing and playback experiment"
 publish_to: 'none'
 version: 3.0.0+30000156
 
@@ -21,7 +21,7 @@ dependencies:
 
   # Navigation
   go_router: ^17.2.2
-  # moonfin:// deep links on Android, iOS, macOS, Windows and Linux
+  # moonfin:// deep links on Android TV
   app_links: ^7.2.1
   animated_reorderable_list: ^1.3.0
 
@@ -47,20 +47,12 @@ dependencies:
   sqlite3_flutter_libs: 0.5.42
   sqlite3: ^2.7.0
 
-  # Media Playback (Android, desktop and web. Apple runs on AetherEngine)
+  # Android TV video playback: Media3 plus mpv fallback
   # mpv_frame_sampler_native.dart imports media_kit's NativeLibrary and libmpv
   # bindings from src/, so check that file when moving this pin.
   media_kit: 1.2.6
   media_kit_video: 2.0.1
-  # media_kit_libs_video would pull in the Apple libs packages, and
-  # media_kit_video's podspecs link -framework Mpv whenever they find one in
-  # pubspec.lock. Two FFmpeg builds in one binary let the engine bind a call
-  # to the wrong one, which aborts playback, so Apple keeps libmpv out
-  # entirely. The platforms that need it are listed individually instead.
   media_kit_libs_android_video: 1.3.8
-  media_kit_libs_windows_video: 1.0.12
-  media_kit_libs_linux: 1.2.1
-
   # Image Loading
   # Vendored fork of cached_network_image 3.4.1 that skips decoding an image
   # again once it's been shown, since that second decode painted blank on
@@ -85,25 +77,10 @@ dependencies:
   # Connectivity
   connectivity_plus: ^7.1.1
 
-  # Gamepad UI navigation on desktop and iOS. Android is left out on purpose,
-  # because this plugin's setup wants to override the same Activity methods
-  # MainActivity already uses for the emulator, and pads there already arrive
-  # as key events anyway.
-  #
-  # Raw input stream only. The companion flutter_gamepads widget layer isn't
-  # used, since it drops input when nothing has focus and can't repeat a held
-  # direction. See GamepadNavigationScope.
-  gamepads: ^0.1.10
-
-  # Notifications
   flutter_local_notifications: ^21.0.0
   audio_service: ^0.18.18
   audio_session: ^0.2.3
   rxdart: ^0.28.0
-  # Linux desktop MPRIS media controls
-  dbus: ^0.7.14
-
-  # Utilities
   device_info_plus: ^11.5.0
   json_annotation: ^4.9.0
   logger: ^2.7.0
@@ -117,13 +94,6 @@ dependencies:
   # for the achievement avatars to wear. Tree shaking keeps only the glyphs
   # actually named.
   material_symbols_icons: ^4.2960.0
-  # Direct because restoring a window needs the work areas of the attached
-  # displays to keep it on screen. Keep in step with what window_manager, which
-  # already pulls it in, resolves.
-  screen_retriever: ^0.2.0
-  window_manager: ^0.5.1
-
-  # Local packages
   server_core:
     path: packages/server_core
   server_jellyfin:
@@ -154,25 +124,10 @@ dependencies:
   file_picker: ^11.0.2
   emoji_picker_flutter: ^4.5.4
   webview_flutter: ^4.13.1
-  flutter_inappwebview: ^6.1.5
-  webview_win_floating: ^3.0.3
   webview_flutter_android: ^4.12.0
-  webview_flutter_wkwebview: ^3.25.1
   youtube_player_iframe: ^6.0.0
-  pdfrx: ^2.6.1
-  flutter_widget_from_html_core: ^0.16.1
-  # Vendored fork of kindle_unpack 0.1.1 (MOBI/AZW/AZW3 -> EPUB), patched to
-  # build against archive 4.x. See packages/kindle_unpack/pubspec.yaml.
-  kindle_unpack:
-    path: packages/kindle_unpack
-  archive: ^4.2.0
-  rar:
-    path: packages/rar_fork
-  archive_extract:
-    path: packages/archive_extract
   screen_brightness_platform_interface: ^2.1.0
   screen_brightness_android: ^2.1.3
-  screen_brightness_ios: ^2.1.2
   wakelock_plus: ^1.3.3
   volume_controller: ^3.6.1
   web: ^1.1.1
@@ -183,13 +138,6 @@ dependencies:
 
   # 1.1.1 fixed a startup race where the configure call could be silently
   # lost, leaving the engine's aggressive default remote tuning active.
-  flutter_tvos: ^1.1.2
-  path_provider_tvos: 0.0.2
-  shared_preferences_tvos: 0.0.2
-  flutter_secure_storage_tvos: 0.0.2
-  sqflite_tvos: any
-  firebase_core: ^4.11.0
-  firebase_messaging: ^16.4.1
   pointer_interceptor: ^0.10.1+2
   flutter_markdown_plus: ^1.0.12
   markdown: ^7.3.1
@@ -210,7 +158,6 @@ dev_dependencies:
   # stands in for a disk hit has to build one. Keep in step with what the
   # cache manager resolves.
   file: ^7.0.1
-  msix: ^3.16.12
   wakelock_plus_platform_interface: ^1.5.1
   # Lets a test stand in for the Android side of path_provider.
   path_provider_platform_interface: ^2.1.2
@@ -223,41 +170,6 @@ dependency_overrides:
   objective_c: ^9.4.1
   media_kit_libs_android_video:
     path: packages/media_kit_libs_android_video_full
-  # Fork of 1.0.12 keeping shinchiro's newer libmpv over the media-kit archives,
-  # which build with a decoder allowlist that leaves out pgssub and so listed
-  # PGS tracks that could never render. Also carries the ARM64 ANGLE build and
-  # the libc++ it links, neither of which upstream ships. Meant to go upstream,
-  # so drop this once a published version covers it.
-  media_kit_libs_windows_video:
-    git:
-      url: https://github.com/RadicalMuffinMan/media-kit.git
-      path: libs/windows/media_kit_libs_windows_video
-      ref: 50013aee7429633ae2df656982167ca6d21237ce
-  # Vendored 0.6.0 with a Windows texture_bridge.cc fix for scroll/resize and
-  # tab-switch crashes (null-visual guard + WGC Recreate moved off the
-  # capture-thread mutex). Both changed sites carry their reasoning inline in
-  # packages/flutter_inappwebview_windows/windows/custom_platform_view/
-  # texture_bridge.cc. On upgrade, re-vendor the matching version and diff that
-  # file against the pub.dev release to carry the fix forward.
-  flutter_inappwebview_windows:
-    path: packages/flutter_inappwebview_windows
-  # Vendored 0.1.2 that degrades instead of throwing from its detached input
-  # thread, which aborted the app at startup when /dev/input was missing or
-  # could not be watched. The changed sites carry their reasoning inline in
-  # packages/gamepads_linux/linux/connection_listener.cc. Upstream 0.1.3 still
-  # throws, so on upgrade re-vendor the matching version and diff that file
-  # against the pub.dev release to carry the fix forward.
-  gamepads_linux:
-    path: packages/gamepads_linux
-  # Fork of 9.6.0 whose desktop finalize renames the staged download onto its
-  # destination instead of copying it, falling back to copy across volumes.
-  # With staging configured onto the destination volume this makes completion
-  # instant instead of a full second copy of the file. Also widens the
-  # connectivity_plus bound to allow the v7 the app already uses, which 9.6.1
-  # took upstream, so re-basing the fork past it drops that half. The delta is
-  # the fork's own commit at the pinned ref. Upstream 9.6.2 still copies, so
-  # this is meant to go upstream: drop the fork once a published version
-  # carries the rename.
   background_downloader:
     git:
       url: https://github.com/RadicalMuffinMan/background_downloader.git
@@ -276,7 +188,6 @@ dependency_overrides:
   synchronized: 3.3.1
   wakelock_plus: 1.3.3
   screen_brightness_android: 2.1.3
-  screen_brightness_ios: 2.1.2
   screen_brightness_platform_interface: 2.1.0
   volume_controller: 3.6.1
   universal_platform: 1.1.0
@@ -297,8 +208,6 @@ flutter:
     - assets/icons/social/
     - assets/fonts/
     - assets/subtitle_fonts/
-    - assets/licenses/cores/
-    - assets/reader/
 
   fonts:
     # The web engine fetches Roboto from fonts.gstatic.com unless it finds a
@@ -333,14 +242,3 @@ flutter:
         - asset: assets/fonts/Literata-SemiBold.ttf
           weight: 600
 
-# The identity has to match Partner Center's Product identity page or the Store
-# rejects the upload.
-msix_config:
-  display_name: Moonfin
-  publisher_display_name: Moonfin
-  identity_name: Moonfin.Moonfin
-  publisher: CN=4E670673-D47F-4792-94F7-65B4918F6E4C
-  logo_path: assets/icons/app_icon.png
-  capabilities: internetClient, internetClientServer, privateNetworkClientServer
-  languages: en-us
-  protocol_activation: moonfin
