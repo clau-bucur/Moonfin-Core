@@ -58,9 +58,10 @@
     "apkSha256": "07d5a11ae7c06cdd1800b55bf2456891a14a314ba4f054d86efef098a3450a5c"
   },
   "shield": {
-    "installedThisRevision": false,
-    "testedThisRevision": false,
-    "gate": "Await user OK"
+    "installedThisRevision": true,
+    "testedThisRevision": true,
+    "gate": "User approved on 2026-11-02",
+    "followUp": "shield-validation.md records the test-discovered fixes and final installed build"
   },
   "preservedUncommittedFiles": [
     "lib/l10n/app_localizations_fi.dart",

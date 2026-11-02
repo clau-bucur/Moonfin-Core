@@ -46,7 +46,7 @@ Each Home row remembers its selected card and horizontal position during the
 current app session, including row changes and returns from details. This memory
 is not written to disk across app restarts.
 
-## Shield gate
+## Release and Shield validation
 
 The combined Android TV ARM64 release build passed for source commit
 `31bce8df1f79b323e5185981d1b69391b3edfde9`. APK signature verification and package
@@ -57,6 +57,8 @@ contains 66,372,384 bytes (63.30 MiB). SHA-256:
 
 See [validation results](local-validation.json) and [APK inventory](experiment-apk.json).
 
-The combined revision has not been installed or tested on the Shield. Wait for
-the user's next OK, then check card bounce, text anchoring, row transitions,
-selection restoration, details loading, and Movie/Episode Restart.
+The user approved Shield testing. Testing exposed and resolved passive-pointer
+hover and duplicate row-spacing issues. The latest installed build is
+`8a6b1f14ad272344f75710a79700e5e251da7593`; the preceding inventory describes the
+initial combined candidate. See the [final Shield validation](shield-validation.md)
+for results, installed APK identity, and coverage limits.

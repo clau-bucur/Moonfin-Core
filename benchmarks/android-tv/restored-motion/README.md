@@ -68,10 +68,7 @@ See [local validation](local-validation.json) and [APK inventory](experiment-apk
 
 ## Shield status
 
-This revision has not been installed or tested on the Shield. Device testing
-waits for the user's next OK. Visual smoothness and perceived weight still need
-the user's assessment; local geometry tests are not frame-time measurements.
-
-Device checks to run after approval: rapid Left/Right and held repeats, immediate
-reversals, Up/Down across cached and lazy rows, selection restoration, text and
-artwork anchoring, Movie/Episode Restart placement and action, and play/back.
+The standalone artifact above was superseded before installation. Its recovered
+motion code was checked in the combined experiment after user approval; see the
+[final Shield report](../details-loading/shield-validation.md). Perceived smoothness
+still needs the user's assessment; these checks are not frame-time measurements.

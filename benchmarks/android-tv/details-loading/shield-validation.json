@@ -1,0 +1,92 @@
+{
+  "date": "2026-11-02",
+  "timezone": "Europe/Bucharest",
+  "branch": "experiment/android-tv-video",
+  "sourceRevision": "8a6b1f14ad272344f75710a79700e5e251da7593",
+  "apk": {
+    "bytes": 66371232,
+    "sha256": "4696ce63651d07885ef8196d1502bde45374caaab3444bf8a85d46d9e29f2028",
+    "installedHashMatched": true
+  },
+  "device": {
+    "model": "NVIDIA SHIELD",
+    "android": 11,
+    "package": "org.moonfin.androidtv.videoexperiment",
+    "signInPreserved": true
+  },
+  "results": {
+    "animation": {
+      "rapidHorizontalReversals": "passed",
+      "injectedLongPressRepeat": "passed",
+      "verticalRowChanges": "passed",
+      "artworkAndTextAnchoring": "reviewed in captures; no height bounce observed",
+      "frameTimeBenchmark": false
+    },
+    "rowMemory": {
+      "independentRowsChecked": 3,
+      "selectedCardsRestored": true,
+      "horizontalPositionsRestored": true,
+      "detailsReturnRestored": true,
+      "lowerRowHeadingsVisible": true,
+      "persistentAcrossAppRestarts": false
+    },
+    "detailsLoading": {
+      "movieColdAndWarm": "passed",
+      "episode": "passed",
+      "seriesOpenBack": "passed",
+      "skeletonControlFlashObserved": false,
+      "slowIndicatorObservedOnShield": false,
+      "limitation": "LAN responses completed before the delayed indicator appeared; the 600 ms behavior is covered by 44 preceding local checks."
+    },
+    "restart": {
+      "sourceVerifiedOnDevice": "9c26a707ebc1903d52226cac4c9018320ace32dd",
+      "movie": {
+        "firstTransportControl": true,
+        "fromPausedNonzeroPosition": true,
+        "afterState": 3,
+        "afterPositionMs": 0,
+        "sameItem": true
+      },
+      "episode": {
+        "firstTransportControl": true,
+        "fromPausedNonzeroPosition": true,
+        "afterState": 3,
+        "afterPositionMs": 0,
+        "sameItem": true
+      },
+      "movieResumeRestored": "near original 4-minute position",
+      "episodeResumeRestoredMs": 0,
+      "finalDelta": "Only Home cached row offsets changed after these playback checks."
+    }
+  },
+  "discoveredAndFixed": [
+    {
+      "commit": "9c26a707ebc1903d52226cac4c9018320ace32dd",
+      "problem": "Parked virtual pointer could show or expand a second card after remote navigation/details return.",
+      "resolution": "TV hover activation requires real pointer movement and ends on remote input.",
+      "regressionFailedBeforeFix": true,
+      "localChecksPassed": 19,
+      "shieldRetest": "passed"
+    },
+    {
+      "commit": "8a6b1f14ad272344f75710a79700e5e251da7593",
+      "problem": "Internal TV row padding was counted twice in cached vertical offsets, clipping lower headings.",
+      "resolution": "Sum actual fixed sliver extents without adding internal padding again.",
+      "localChecksPassed": 23,
+      "shieldRetest": "passed across three rows and details return"
+    }
+  ],
+  "diagnostics": {
+    "crashesOrLayoutExceptions": 0,
+    "playbackStopped": true,
+    "finalScreen": "Home"
+  },
+  "validationScope": "Scripted pass after user left the remote idle; earlier overlapping manual-input captures excluded. Visual review and functional checks, not an FPS benchmark.",
+  "mainRevision": "f95909b13187c0d7168c96ac0e3e09982b2ac96b",
+  "preservedUncommittedFiles": [
+    "lib/l10n/app_localizations_fi.dart",
+    "lib/l10n/app_localizations_it.dart",
+    "lib/l10n/app_localizations_zh.dart"
+  ],
+  "privateEvidence": "Screenshots, recordings, media-session dumps, and raw logs remain under C:/Development/temp; no media titles or credentials included here."
+}

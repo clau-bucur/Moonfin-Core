@@ -174,7 +174,8 @@ behavior until that compatibility matrix passes.
 The original Modern motion has been recovered and adapted for the video branch;
 see [restored motion validation](../benchmarks/android-tv/restored-motion/README.md).
 Home uses coordinated finite card transitions and exact row widths rather than
-RowGlide springs. Device testing of this revision is gated on the user's OK.
+RowGlide springs. Approved [Shield checks](../benchmarks/android-tv/details-loading/shield-validation.md)
+cover motion, row memory, details return, and Restart, with the reported limits.
 The [details-loading follow-up](../benchmarks/android-tv/details-loading/README.md)
 adds PR #1541 and verifies the recovered motion against PR #1542.
 
