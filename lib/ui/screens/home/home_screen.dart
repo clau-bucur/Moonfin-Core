@@ -52,6 +52,7 @@ import '../../widgets/focus/context_menu_sheet.dart';
 import '../../widgets/focus/locked_focus_row.dart';
 import '../../widgets/focus/modern_row_navigation.dart';
 import '../../widgets/modern_card_transition.dart';
+import '../../widgets/modern_card_artwork.dart';
 import '../../widgets/modern_card_frame.dart';
 import '../../widgets/modern_row_visibility.dart';
 import '../../../util/focus/dpad_keys.dart';
@@ -5438,6 +5439,15 @@ class _ContentRowsState extends State<_ContentRows>
           motionKey(item),
           delay: delay,
           immediateExpansion: _verticalNavInFlight,
+          onSettled: () {
+            _resolveV2FocusedImageUrl(
+              item,
+              widget.viewModel.imageApiForServer(item.serverId),
+              v2ImageHeight,
+              useSeriesThumbs,
+              MediaQuery.devicePixelRatioOf(context).clamp(1.0, 2.0),
+            );
+          },
         );
       }
 
@@ -5575,6 +5585,8 @@ class _ContentRowsState extends State<_ContentRows>
             late final double width;
             late final String? imageUrl;
             double? v2SourceAspect;
+            String? modernPosterUrl;
+            String? modernExpandedUrl;
             final canUseExpandedV2Card =
                 isRowsV2 &&
                 v2Open > 0 &&
@@ -5612,16 +5624,19 @@ class _ContentRowsState extends State<_ContentRows>
                   requestScale,
                   isMyMediaRow: row.rowType == HomeRowType.libraryTiles,
                 );
-                // One image and one decode throughout the width animation.
-                // Cover-fit crops it when collapsed and reveals it on focus.
+                // Restore the original poster-to-landscape blend. Endpoint
+                // decodes stay fixed while the bounds share the row's clock.
                 final wideUrl = _resolveV2FocusedImageUrl(
                   item,
                   imageApi,
                   v2ImageHeight,
                   useSeriesThumbs,
                   requestScale,
+                  isPrefetch: true,
                 );
-                imageUrl = wideUrl ?? posterUrl;
+                modernPosterUrl = posterUrl;
+                modernExpandedUrl = wideUrl ?? posterUrl;
+                imageUrl = canUseExpandedV2Card ? modernExpandedUrl : posterUrl;
                 v2SourceAspect = wideUrl != null
                     ? v2FocusedAspect
                     : v2PortraitAspect;
@@ -5783,6 +5798,23 @@ class _ContentRowsState extends State<_ContentRows>
                             ]
                           : const <Widget>[],
                       imageSourceAspectRatio: v2SourceAspect,
+                      artworkBuilder:
+                          isRowsV2 && !row.isAudio && !isModernMyMediaStatic
+                          ? (placeholder) => ModernCardArtwork(
+                              placeholder: placeholder,
+                              posterImageUrl: modernPosterUrl,
+                              expandedImageUrl: modernExpandedUrl,
+                              collapsedWidth: v2PortraitWidth,
+                              expandedWidth: v2FocusedWidthForCurrentViewport,
+                              imageHeight: v2ImageHeight,
+                              expansionProgress: v2Open,
+                              duration: modernDuration,
+                              fit:
+                                  item.type == 'Network' || item.type == 'Studio'
+                                  ? BoxFit.contain
+                                  : BoxFit.cover,
+                            )
+                          : null,
                       subtitle: cardSubtitle,
                       subtitleWidget: cardSubtitleWidget,
                       imageUrl: imageUrl,

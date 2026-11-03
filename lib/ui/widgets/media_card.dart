@@ -100,6 +100,9 @@ class MediaCard extends StatefulWidget {
   final String? subtitle;
   final Widget? subtitleWidget;
   final String? imageUrl;
+
+  /// Artwork inside the existing clip, indicators and focus border.
+  final Widget Function(Widget placeholder)? artworkBuilder;
   final double width;
   final double aspectRatio;
   final VoidCallback? onTap;
@@ -173,6 +176,7 @@ class MediaCard extends StatefulWidget {
     this.subtitle,
     this.subtitleWidget,
     this.imageUrl,
+    this.artworkBuilder,
     this.width = 150,
     this.aspectRatio = 2 / 3,
     this.onTap,
@@ -438,7 +442,8 @@ class _MediaCardState extends State<MediaCard> with FocusStateMixin {
     final labelGap = classic ? tvPx(16) : MediaCard._labelGap;
     final externallyDriven = widget.externalIsFocused != null;
     final hasNodeFocus = widget.focusNode?.hasFocus ?? false;
-    final activeHover = hovered &&
+    final activeHover =
+        hovered &&
         (!PlatformDetection.isTV || InputModeTracker.pointerIsLive(context));
     final effectiveFocused = externallyDriven
         ? (widget.externalIsFocused! || activeHover)
@@ -482,6 +487,7 @@ class _MediaCardState extends State<MediaCard> with FocusStateMixin {
                         ? Alignment.bottomCenter
                         : Alignment.center,
                     child: _CardImage(
+                      artworkBuilder: widget.artworkBuilder,
                       imageUrl: widget.imageUrl,
                       title: widget.title,
                       aspectRatio: widget.aspectRatio,
@@ -629,6 +635,7 @@ class _MediaCardState extends State<MediaCard> with FocusStateMixin {
 
 class _CardImage extends StatelessWidget {
   final String? imageUrl;
+  final Widget Function(Widget placeholder)? artworkBuilder;
   final String? title;
   final double aspectRatio;
   final bool isFavorite;
@@ -655,6 +662,7 @@ class _CardImage extends StatelessWidget {
 
   const _CardImage({
     this.imageUrl,
+    this.artworkBuilder,
     this.title,
     required this.aspectRatio,
     required this.isFavorite,
@@ -742,27 +750,35 @@ class _CardImage extends StatelessWidget {
                   padding: (itemType == 'Network' || itemType == 'Studio')
                       ? const EdgeInsets.all(8.0)
                       : EdgeInsets.zero,
-                  child: imageUrl != null
+                  child: artworkBuilder != null || imageUrl != null
                       ? Stack(
                           fit: StackFit.expand,
                           children: [
-                            BoundedNetworkImage(
-                              imageUrl: imageUrl!,
-                              fit:
-                                  (itemType == 'Network' ||
-                                      itemType == 'Studio')
-                                  ? BoxFit.contain
-                                  : BoxFit.cover,
-                              fadeInDuration: Duration.zero,
-                              maxWidth: MediaCard.decodeMaxWidthFor(
-                                imageSourceAspectRatio ?? aspectRatio,
-                              ),
-                              sourceAspectRatio: imageSourceAspectRatio,
-                              errorBuilder: (_, _, _) => _PlaceholderIcon(
-                                itemType: itemType,
-                                title: title,
-                              ),
-                            ),
+                            artworkBuilder?.call(
+                                  ExcludeSemantics(
+                                    child: _PlaceholderIcon(
+                                      itemType: itemType,
+                                      title: title,
+                                    ),
+                                  ),
+                                ) ??
+                                BoundedNetworkImage(
+                                  imageUrl: imageUrl!,
+                                  fit:
+                                      (itemType == 'Network' ||
+                                          itemType == 'Studio')
+                                      ? BoxFit.contain
+                                      : BoxFit.cover,
+                                  fadeInDuration: Duration.zero,
+                                  maxWidth: MediaCard.decodeMaxWidthFor(
+                                    imageSourceAspectRatio ?? aspectRatio,
+                                  ),
+                                  sourceAspectRatio: imageSourceAspectRatio,
+                                  errorBuilder: (_, _, _) => _PlaceholderIcon(
+                                    itemType: itemType,
+                                    title: title,
+                                  ),
+                                ),
                             ...imageUnderlays,
                             if (isGenreFallback) ...[
                               Container(
