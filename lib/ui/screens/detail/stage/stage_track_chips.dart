@@ -108,7 +108,9 @@ class _StageTrackChipsState extends State<StageTrackChips> {
                   ),
                   const SizedBox(width: 8),
                   ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 240),
+                    constraints: BoxConstraints(
+                      maxWidth: choice.kind == DetailButton.version ? 320 : 240,
+                    ),
                     child: Text(
                       choice.current,
                       maxLines: 1,

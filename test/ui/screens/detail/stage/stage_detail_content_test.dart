@@ -207,7 +207,14 @@ void main() {
 
   Map<String, dynamic> movieWithTracks() {
     const streams = [
-      {'Type': 'Video', 'Index': 0, 'Codec': 'hevc'},
+      {
+        'Type': 'Video',
+        'Index': 0,
+        'Codec': 'hevc',
+        'Width': 3840,
+        'Height': 1600,
+        'VideoRangeType': 'HDR10',
+      },
       {
         'Type': 'Audio',
         'Index': 1,
@@ -232,7 +239,12 @@ void main() {
       ...itemData('Movie'),
       'MediaStreams': streams,
       'MediaSources': [
-        {'Id': 'source-1', 'Name': '4K', 'MediaStreams': streams},
+        {
+          'Id': 'source-1',
+          'Name': 'movie.2160p.very.long.filename.mkv',
+          'Bitrate': 61600000,
+          'MediaStreams': streams,
+        },
       ],
     };
   }
@@ -275,7 +287,20 @@ void main() {
     tester,
   ) async {
     final raw = movieWithTracks();
-    (raw['MediaSources'] as List).add({'Id': 'source-2', 'Name': '1080p'});
+    (raw['MediaSources'] as List).add({
+      'Id': 'source-2',
+      'Name': 'movie.1080p.another.long.filename.mkv',
+      'Bitrate': 17500000,
+      'MediaStreams': [
+        {
+          'Type': 'Video',
+          'Codec': 'h264',
+          'Width': 1920,
+          'Height': 800,
+          'VideoRange': 'SDR',
+        },
+      ],
+    });
     await pumpContent(tester, viewModel('Movie', data: raw));
     await tester.pumpAndSettle();
     final chips = tester
@@ -287,6 +312,8 @@ void main() {
         )
         .toList();
     expect(chips, hasLength(3));
+    expect(find.text('4K · 61.6 Mbps · HDR10'), findsOneWidget);
+    expect(find.text('movie.2160p.very.long.filename.mkv'), findsNothing);
     chips.first.focusNode!.requestFocus();
     await tester.pump();
     for (var i = 1; i < chips.length; i++) {
@@ -304,6 +331,8 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
     expect(find.text('Select Version'), findsOneWidget);
+    expect(find.text('1080p · 17.5 Mbps · SDR'), findsOneWidget);
+    expect(find.text('movie.1080p.another.long.filename.mkv'), findsNothing);
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(chips.last.focusNode!.hasPrimaryFocus, isTrue);

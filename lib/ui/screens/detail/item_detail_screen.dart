@@ -21,6 +21,7 @@ import 'package:playback_core/playback_core.dart';
 import 'package:server_core/server_core.dart';
 
 import '../../../data/models/aggregated_item.dart';
+import '../../../util/media_source_summary.dart';
 import '../../../data/repositories/item_mutation_repository.dart';
 import '../../../data/repositories/mdblist_repository.dart';
 import '../../../data/repositories/tmdb_repository.dart';
@@ -10446,24 +10447,32 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
     final currentIdx = widget.selectedMediaSourceId != null
         ? sources.indexWhere((s) => s['Id'] == widget.selectedMediaSourceId)
         : 0;
+    final l10n = AppLocalizations.of(context);
+    final labels = [
+      for (final (index, source) in sources.indexed)
+        mediaSourceVersionLabel(source, fallback: l10n.versionNumber(index + 1)),
+    ];
     final result = await TrackSelectorDialog.show(
       context,
       title: AppLocalizations.of(context).selectVersion,
       options: sources.asMap().entries.map((entry) {
         final s = entry.value;
-        final name =
-            s['Name'] as String? ??
-            AppLocalizations.of(context).versionNumber(entry.key + 1);
-        final bitrate = s['Bitrate'] as int?;
+        final name = labels[entry.key];
+        final video = mediaSourceStreams(s)
+            .where((stream) => stream['Type'] == 'Video')
+            .firstOrNull;
+        final codec = video?['Codec']?.toString();
         final container = s['Container'] as String?;
         final subtitle = [
+          if (labels.where((label) => label == name).length > 1)
+            l10n.versionNumber(entry.key + 1),
+          if (codec != null && codec.isNotEmpty) codec.toUpperCase(),
           if (container != null) container.toUpperCase(),
-          if (bitrate != null) '${(bitrate / 1000000).toStringAsFixed(1)} Mbps',
-        ].join(' | ');
+        ].join(' · ');
         return TrackOption(
           label: name,
           subtitle: subtitle.isNotEmpty ? subtitle : null,
-          labelMaxLines: null,
+          labelMaxLines: 2,
         );
       }).toList(),
       selectedIndex: currentIdx >= 0 ? currentIdx : 0,
@@ -10536,10 +10545,14 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
     }
     if (item.mediaSources.length > 1 && shows(DetailButton.version)) {
       final current = source ?? item.mediaSources.first;
+      final index = item.mediaSources.indexWhere((s) => s['Id'] == current['Id']);
       choices.add(
         DetailTrackChoice(
           DetailButton.version,
-          current['Name'] as String? ?? l10n.versionNumber(1),
+          mediaSourceVersionLabel(
+            current,
+            fallback: l10n.versionNumber(index >= 0 ? index + 1 : 1),
+          ),
         ),
       );
     }
@@ -10971,26 +10984,7 @@ String? _endsAt(
 }
 
 String? resolutionFromStreams(List<Map<String, dynamic>> streams) {
-  final video = streams.where((s) => s['Type'] == 'Video').firstOrNull;
-  if (video == null) {
-    return null;
-  }
-  final width = video['Width'] as int?;
-  final height = video['Height'] as int?;
-  if (width == null || height == null || width <= 0 || height <= 0) {
-    return null;
-  }
-
-  final interlaced = video['IsInterlaced'] == true;
-  final suffix = interlaced ? 'i' : 'p';
-
-  if (width >= 7600 || height >= 4300) return '8K';
-  if (width >= 3800 || height >= 2000) return '4K';
-  if (width >= 2500 || height >= 1400) return '1440$suffix';
-  if (width >= 1800 || height >= 1000) return '1080$suffix';
-  if (width >= 1200 || height >= 700) return '720$suffix';
-  if (width >= 600 || height >= 400) return '480$suffix';
-  return 'SD';
+  return videoResolutionFromStreams(streams);
 }
 
 String? hdrFromStreams(List<Map<String, dynamic>> streams) {
