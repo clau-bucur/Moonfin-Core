@@ -54,6 +54,7 @@ void main() {
   Widget artwork(
     double progress, {
     bool withLogo = true,
+    bool? selected,
     String? title = 'A movie',
     String? url = 'background',
   }) => MaterialApp(
@@ -71,7 +72,7 @@ void main() {
             collapsedWidth: 200,
             expandedWidth: 533,
             imageHeight: 300,
-            expansionProgress: progress,
+            isSelected: selected ?? progress > 0.5,
             placeholder: const Text('Artwork unavailable'),
             imageProviderBuilder: providerBuilder,
           ),
@@ -101,7 +102,7 @@ void main() {
     }
     expect(background.loads, 1);
     expect(logo.loads, 1);
-    expect(requests, [('background', 960), ('logo', 360)]);
+    expect(requests, [('background', 960), ('logo', 640)]);
     expect(tester.takeException(), isNull);
   });
 
@@ -122,13 +123,54 @@ void main() {
       if (progress == 0) expect(title.center.dx, closeTo(card.center.dx, 0.01));
       if (progress == 1) {
         expect(title.left, closeTo(card.left + 12, 0.01));
-        expect(title.bottom, closeTo(card.bottom - 12, 0.01));
+        expect(title.bottom, closeTo(card.bottom - 28, 0.01));
         expect(title.bottom - card.top, greaterThan(firstBottom));
       }
     }
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('logo snaps on selection without waiting for card expansion', (
+    tester,
+  ) async {
+    await tester.pumpWidget(artwork(0, selected: false));
+    await tester.pumpWidget(artwork(0, selected: true));
+    final earlyCard = tester.getRect(find.byKey(const ValueKey('card')));
+    final earlyTitle = tester.getRect(
+      find.byKey(const ValueKey('modern-card-title')),
+    );
+    expect(earlyTitle.left - earlyCard.left, 12);
+    expect(earlyCard.bottom - earlyTitle.bottom, 28);
+    await tester.pumpWidget(artwork(0.3, selected: true));
+    final card = tester.getRect(find.byKey(const ValueKey('card')));
+    final title = tester.getRect(
+      find.byKey(const ValueKey('modern-card-title')),
+    );
+    expect(title.left - card.left, 12);
+    expect(card.bottom - title.bottom, 28);
+    await tester.pumpWidget(artwork(0.3, selected: false));
+    final collapsedTitle = tester.getRect(
+      find.byKey(const ValueKey('modern-card-title')),
+    );
+    expect(collapsedTitle.center.dx, closeTo(card.center.dx, 0.01));
+    final logoImage = tester.widgetList<Image>(find.byType(Image)).last;
+    expect(logoImage.filterQuality, FilterQuality.high);
+  });
+
+  testWidgets('text-only title uses landscape width and stays on one line', (
+    tester,
+  ) async {
+    await tester.pumpWidget(artwork(1, withLogo: false, title: 'The Clone'));
+    final title = tester.widget<Text>(find.text('The Clone'));
+    expect(title.maxLines, 1);
+    expect(title.softWrap, false);
+    expect(title.overflow, TextOverflow.ellipsis);
+    final card = tester.getRect(find.byKey(const ValueKey('card')));
+    final box = tester.getRect(find.byKey(const ValueKey('modern-card-title')));
+    expect(box.width, card.width - 24);
+    expect(box.bottom, card.bottom - 28);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('late logo does not replace or reload the background', (
     tester,
   ) async {

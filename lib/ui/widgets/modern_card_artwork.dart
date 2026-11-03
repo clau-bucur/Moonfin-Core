@@ -5,7 +5,7 @@ import 'bounded_network_image.dart';
 import 'image_source.dart';
 
 /// One background is cropped at rest and revealed as the card widens.
-/// Independent title artwork follows the same clock, outside the image crop.
+/// Independent title artwork snaps to its selected position outside the crop.
 class ModernCardArtwork extends StatefulWidget {
   final String? imageUrl;
   final String? logoImageUrl;
@@ -13,7 +13,7 @@ class ModernCardArtwork extends StatefulWidget {
   final double collapsedWidth;
   final double expandedWidth;
   final double imageHeight;
-  final double expansionProgress;
+  final bool isSelected;
   final BoxFit fit;
   final Widget placeholder;
 
@@ -29,7 +29,7 @@ class ModernCardArtwork extends StatefulWidget {
     required this.collapsedWidth,
     required this.expandedWidth,
     required this.imageHeight,
-    required this.expansionProgress,
+    required this.isSelected,
     this.fit = BoxFit.cover,
     this.placeholder = const SizedBox.shrink(),
     this.imageProviderBuilder,
@@ -66,37 +66,50 @@ class _ModernCardArtworkState extends State<ModernCardArtwork> {
     }
   }
 
-  ImageProvider? _provider(String? url, double width, int maxWidth) {
+  ImageProvider? _provider(
+    String? url,
+    double width,
+    int maxWidth, {
+    int? decodeWidth,
+  }) {
     if (url == null || url.isEmpty) return null;
-    final cacheWidth = BoundedNetworkImage.cacheWidthFor(
-      width,
-      _devicePixelRatio!,
-      maxWidth: maxWidth,
-    );
+    final cacheWidth =
+        decodeWidth ??
+        BoundedNetworkImage.cacheWidthFor(
+          width,
+          _devicePixelRatio!,
+          maxWidth: maxWidth,
+        );
     return widget.imageProviderBuilder?.call(url, cacheWidth) ??
         offlineAwareImageProvider(url, maxWidth: cacheWidth);
   }
 
   void _resolveProviders() {
     _background = _provider(widget.imageUrl, widget.expandedWidth, 960);
-    _logo = _provider(widget.logoImageUrl, widget.collapsedWidth - 24, 640);
+    // Keep crisp transparent lettering even on a 4K output where the TV app's
+    // logical density can understate the final display scale.
+    _logo = _provider(
+      widget.logoImageUrl,
+      widget.collapsedWidth - 24,
+      640,
+      decodeWidth: 640,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final progress = widget.expansionProgress.clamp(0.0, 1.0);
+    final titleAlignment = widget.isSelected
+        ? Alignment.bottomLeft
+        : Alignment.center;
     final title = widget.fallbackTitle;
     final fallback = title == null || title.isEmpty
         ? const SizedBox.shrink()
         : Align(
-            alignment: Alignment.lerp(
-              Alignment.center,
-              Alignment.bottomLeft,
-              progress,
-            )!,
+            alignment: titleAlignment,
             child: Text(
               title,
-              maxLines: 3,
+              maxLines: 1,
+              softWrap: false,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.left,
               style: const TextStyle(
@@ -146,32 +159,36 @@ class _ModernCardArtworkState extends State<ModernCardArtwork> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.fromLTRB(
+              12,
+              12,
+              12,
+              widget.isSelected ? 28 : 12,
+            ),
             child: Align(
-              alignment: Alignment.lerp(
-                const Alignment(0, 0.55),
-                Alignment.bottomLeft,
-                progress,
-              )!,
-              child: SizedBox(
-                key: const ValueKey('modern-card-title'),
-                width: widget.collapsedWidth - 24,
-                height: widget.imageHeight * 0.25,
-                child: _logo == null
-                    ? fallback
-                    : Image(
-                        image: _logo!,
-                        fit: BoxFit.contain,
-                        alignment: Alignment.lerp(
-                          Alignment.center,
-                          Alignment.bottomLeft,
-                          progress,
-                        )!,
-                        excludeFromSemantics: true,
-                        frameBuilder: (_, child, frame, synchronous) =>
-                            frame != null || synchronous ? child : fallback,
-                        errorBuilder: (_, _, _) => fallback,
-                      ),
+              alignment: widget.isSelected
+                  ? Alignment.bottomLeft
+                  : const Alignment(0, 0.55),
+              child: LayoutBuilder(
+                builder: (context, constraints) => SizedBox(
+                  key: const ValueKey('modern-card-title'),
+                  width: _logo == null && widget.isSelected
+                      ? constraints.maxWidth
+                      : widget.collapsedWidth - 24,
+                  height: widget.imageHeight * 0.25,
+                  child: _logo == null
+                      ? fallback
+                      : Image(
+                          image: _logo!,
+                          fit: BoxFit.contain,
+                          alignment: titleAlignment,
+                          filterQuality: FilterQuality.high,
+                          excludeFromSemantics: true,
+                          frameBuilder: (_, child, frame, synchronous) =>
+                              frame != null || synchronous ? child : fallback,
+                          errorBuilder: (_, _, _) => fallback,
+                        ),
+                ),
               ),
             ),
           ),

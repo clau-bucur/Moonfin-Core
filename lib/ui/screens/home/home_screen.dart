@@ -5811,7 +5811,7 @@ class _ContentRowsState extends State<_ContentRows>
                               collapsedWidth: v2PortraitWidth,
                               expandedWidth: v2FocusedWidthForCurrentViewport,
                               imageHeight: v2ImageHeight,
-                              expansionProgress: v2Open,
+                              isSelected: v2Highlighted,
                               fit:
                                   item.type == 'Network' || item.type == 'Studio'
                                   ? BoxFit.contain
