@@ -311,6 +311,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
   bool _seerrRedirectDone = false;
   String? _selectedMediaSourceId;
   bool _showNavbar = true;
+  bool _stageReady = false;
   bool _actionsExpanded = false;
   Timer? _focusedBackdropDebounce;
   String? _lastFocusedBackdropItemId;
@@ -486,7 +487,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
       });
       return;
     }
-    setState(() {});
+    setState(() {
+      if (_viewModel.state != ItemDetailState.ready) _stageReady = false;
+    });
     final item = _viewModel.item;
     if (item != null) {
       bool needInitialBackdrop = _lastDetailBackdropItemId != item.id;
@@ -622,8 +625,13 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
     // Albums/playlists hide the chrome on TV/desktop (their split hero owns the
     // top area); on mobile they need the back arrow like every other screen.
     final isAlbumOrPlaylist = type == 'MusicAlbum' || type == 'Playlist';
+    final stagePending =
+        _prefs.effectiveDetailScreenStyle == DetailScreenStyle.stage &&
+        StageDetailContent.hasPresentationGate(type) &&
+        !_stageReady;
     final showNavigationChrome =
         _viewModel.state == ItemDetailState.ready &&
+        !stagePending &&
         _showNavbar &&
         (!isAlbumOrPlaylist || _isCompact(context));
     // Follows the scroll flag rather than the chrome. Albums and playlists
@@ -890,6 +898,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
         ),
 
         DetailScreenStyle.stage => StageDetailContent(
+          onReady: () {
+            if (mounted && !_stageReady) setState(() => _stageReady = true);
+          },
           viewModel: _viewModel,
           prefs: _prefs,
           backdropUrl: _backdropUrl,

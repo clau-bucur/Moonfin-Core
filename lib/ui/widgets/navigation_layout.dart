@@ -502,7 +502,10 @@ class _NavigationLayoutState extends State<NavigationLayout>
           duration: const Duration(milliseconds: 200),
           child: IgnorePointer(
             ignoring: !show,
-            child: child,
+            child: ExcludeFocus(
+              excluding: !widget.showNavigationChrome,
+              child: child!,
+            ),
           ),
         );
       },

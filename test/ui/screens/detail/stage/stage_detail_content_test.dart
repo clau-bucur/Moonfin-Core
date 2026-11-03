@@ -153,6 +153,7 @@ void main() {
     WidgetTester tester,
     ItemDetailViewModel vm, {
     Size size = const Size(1920, 1080),
+    ValueChanged<FocusNode>? onReady,
   }) async {
     // The surface as well as the MediaQuery. A faked MediaQuery alone steers
     // which layout the screen picks but leaves it laying out against the
@@ -189,6 +190,7 @@ void main() {
                 backdropUrl: ValueNotifier<String?>(null),
                 selectedMediaSourceId: null,
                 initialFocusNode: playFocus,
+                onReady: () => onReady?.call(playFocus),
                 onSelectedMediaSourceChanged: (_) {},
                 actionsExpanded: false,
                 onActionsExpandedChanged: (_) {},
@@ -241,6 +243,21 @@ void main() {
 
     expect(find.byKey(const ValueKey('stage-poster')), findsOneWidget);
     expect(find.text('Movie title'), findsOneWidget);
+  });
+
+  testWidgets('Stage announces readiness after Play has taken focus', (
+    tester,
+  ) async {
+    var readyEvents = 0;
+    await pumpContent(
+      tester,
+      viewModel('Movie', data: movieWithTracks()),
+      onReady: (node) {
+        expect(node.hasPrimaryFocus, isTrue);
+        readyEvents++;
+      },
+    );
+    expect(readyEvents, 1);
   });
 
   testWidgets('a movie with tracks to pick between shows them as chips', (
@@ -315,6 +332,8 @@ void main() {
       find.byType(DetailActionButtons),
     );
     final more = actions.actionRowRightFocusNode!;
+    final poster = find.byKey(const ValueKey('stage-poster'));
+    final initialPosterTop = tester.getTopLeft(poster).dy;
     more.requestFocus();
     await tester.pumpAndSettle();
     expect(more.hasPrimaryFocus, isTrue);
@@ -340,6 +359,11 @@ void main() {
     final top = box.localToGlobal(Offset.zero).dy;
     expect(top, greaterThanOrEqualTo(0));
     expect(top + box.size.height, lessThanOrEqualTo(720));
+    final posterRect = tester.getRect(poster);
+    expect(posterRect.bottom, greaterThan(posterRect.height * 0.75));
+    actions.tvPlayFocusNode!.requestFocus();
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(poster).dy, closeTo(initialPosterTop, 1));
   });
 
   testWidgets('hiding the Audio button hides its chip too', (tester) async {

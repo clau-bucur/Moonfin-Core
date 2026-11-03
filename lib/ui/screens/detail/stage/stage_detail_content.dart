@@ -60,6 +60,8 @@ const _stageTypes = {
 /// A title that is only in Seerr gets the same page with Request in place of
 /// play, its seasons as request cards and Seerr's own rows underneath.
 class StageDetailContent extends StatefulWidget {
+  static bool hasPresentationGate(String? type) => _stageTypes.contains(type);
+
   final ItemDetailViewModel viewModel;
   final UserPreferences prefs;
   final ValueListenable<String?> backdropUrl;
@@ -74,6 +76,9 @@ class StageDetailContent extends StatefulWidget {
   /// over the rows the viewer moved down to.
   final ValueChanged<bool>? onToggleNavbar;
 
+  /// The prepared page has mounted and its initial focus handoff has settled.
+  final VoidCallback? onReady;
+
   const StageDetailContent({
     super.key,
     required this.viewModel,
@@ -86,6 +91,7 @@ class StageDetailContent extends StatefulWidget {
     required this.actionsExpanded,
     required this.onActionsExpandedChanged,
     this.onToggleNavbar,
+    this.onReady,
   });
 
   @override
@@ -179,9 +185,13 @@ class _StageDetailContentState extends State<StageDetailContent> {
       if (!mounted || _preparingItem != item.id) return;
       setState(() => _presentationReady = true);
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && ModalRoute.of(context)?.isCurrent != false) {
+        if (!mounted) return;
+        if (ModalRoute.of(context)?.isCurrent != false) {
           widget.initialFocusNode?.requestFocus();
         }
+        scheduleMicrotask(() {
+          if (mounted) widget.onReady?.call();
+        });
       });
     });
   }
@@ -215,9 +225,48 @@ class _StageDetailContentState extends State<StageDetailContent> {
     final target = node.context;
     if (target != null &&
         target.findAncestorStateOfType<_StageDetailContentState>() == this) {
-      _reveal(target);
+      if (_focusIsInActions()) {
+        _lastActionFocus = node;
+        _revealAction(node);
+      } else {
+        _reveal(target);
+      }
     }
-    if (_focusIsInActions()) _lastActionFocus = node;
+  }
+
+  void _revealAction(FocusNode node) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          FocusManager.instance.primaryFocus != node ||
+          !_scroll.hasClients)
+        return;
+      final box = node.context?.findRenderObject();
+      final page = _scroll.position.context.notificationContext
+          ?.findRenderObject();
+      if (box is! RenderBox ||
+          page is! RenderBox ||
+          !box.attached ||
+          !page.attached)
+        return;
+      // Return to the poster. A wrapped More button may extend below the
+      // first viewport, so retain only the offset needed to keep it visible.
+      final bottom =
+          _scroll.offset +
+          box.localToGlobal(Offset.zero, ancestor: page).dy +
+          box.size.height;
+      final target = node == widget.initialFocusNode
+          ? 0.0
+          : (bottom - page.size.height + 8).clamp(
+              0.0,
+              _scroll.position.maxScrollExtent,
+            );
+      if ((_scroll.offset - target).abs() < 1) return;
+      _scroll.animateTo(
+        target,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   /// Up from a circle goes to the button above it. Up from Play goes to the
@@ -392,21 +441,6 @@ class _StageDetailContentState extends State<StageDetailContent> {
   void _go(FocusNode? node) {
     if (node == null || node.context?.mounted != true) return;
     node.requestFocus();
-    // The episodes bring their whole section into view as focus arrives.
-    if (node == _nodes['episodes']) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ctx = node.context;
-      if (!mounted || ctx == null || !ctx.mounted || _offScreen(ctx) == 0) {
-        return;
-      }
-      Scrollable.ensureVisible(
-        ctx,
-        alignment: 0.3,
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOut,
-        alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
-      );
-    });
   }
 
   /// Which way [target] runs out of the page: -1 above it, 1 below it, and
