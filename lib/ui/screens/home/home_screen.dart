@@ -5585,8 +5585,9 @@ class _ContentRowsState extends State<_ContentRows>
             late final double width;
             late final String? imageUrl;
             double? v2SourceAspect;
-            String? modernPosterUrl;
-            String? modernExpandedUrl;
+            String? modernLogoUrl;
+            String? modernFallbackTitle;
+            String? modernImageUrl;
             final canUseExpandedV2Card =
                 isRowsV2 &&
                 v2Open > 0 &&
@@ -5624,8 +5625,7 @@ class _ContentRowsState extends State<_ContentRows>
                   requestScale,
                   isMyMediaRow: row.rowType == HomeRowType.libraryTiles,
                 );
-                // Restore the original poster-to-landscape blend. Endpoint
-                // decodes stay fixed while the bounds share the row's clock.
+                // Keep one background throughout expansion.
                 final wideUrl = _resolveV2FocusedImageUrl(
                   item,
                   imageApi,
@@ -5634,9 +5634,12 @@ class _ContentRowsState extends State<_ContentRows>
                   requestScale,
                   isPrefetch: true,
                 );
-                modernPosterUrl = posterUrl;
-                modernExpandedUrl = wideUrl ?? posterUrl;
-                imageUrl = canUseExpandedV2Card ? modernExpandedUrl : posterUrl;
+                modernImageUrl = wideUrl ?? posterUrl;
+                imageUrl = modernImageUrl;
+                if (_hasV2Backdrop(item, useSeriesThumbs)) {
+                  modernLogoUrl = _resolveV2LogoImageUrl(item, imageApi);
+                  modernFallbackTitle = item.seriesName ?? item.name;
+                }
                 v2SourceAspect = wideUrl != null
                     ? v2FocusedAspect
                     : v2PortraitAspect;
@@ -5802,13 +5805,13 @@ class _ContentRowsState extends State<_ContentRows>
                           isRowsV2 && !row.isAudio && !isModernMyMediaStatic
                           ? (placeholder) => ModernCardArtwork(
                               placeholder: placeholder,
-                              posterImageUrl: modernPosterUrl,
-                              expandedImageUrl: modernExpandedUrl,
+                              imageUrl: modernImageUrl,
+                              logoImageUrl: modernLogoUrl,
+                              fallbackTitle: modernFallbackTitle,
                               collapsedWidth: v2PortraitWidth,
                               expandedWidth: v2FocusedWidthForCurrentViewport,
                               imageHeight: v2ImageHeight,
                               expansionProgress: v2Open,
-                              duration: modernDuration,
                               fit:
                                   item.type == 'Network' || item.type == 'Studio'
                                   ? BoxFit.contain
@@ -6475,6 +6478,25 @@ class _ContentRowsState extends State<_ContentRows>
     }
   }
 
+  bool _hasV2Backdrop(AggregatedItem item, bool useSeriesThumbs) =>
+      !(item.type == 'Episode' && !useSeriesThumbs) &&
+      (item.backdropImageTags.isNotEmpty ||
+          (item.parentBackdropItemId != null &&
+              item.parentBackdropImageTags.isNotEmpty));
+
+  String? _resolveV2LogoImageUrl(AggregatedItem item, ImageApi imageApi) {
+    final ownTag = item.logoImageTag;
+    if (ownTag != null) {
+      return imageApi.getLogoImageUrl(item.id, maxWidth: 640, tag: ownTag);
+    }
+    final parentId = item.rawData['ParentLogoItemId']?.toString();
+    final parentTag = item.seriesLogoImageTag;
+    if (parentId != null && parentTag != null) {
+      return imageApi.getLogoImageUrl(parentId, maxWidth: 640, tag: parentTag);
+    }
+    return null;
+  }
+
   String? _resolveV2FocusedImageUrl(
     AggregatedItem item,
     ImageApi imageApi,
@@ -6535,6 +6557,24 @@ class _ContentRowsState extends State<_ContentRows>
         }
       }
     }
+    if (item.backdropImageTags.isNotEmpty) {
+      return imageApi.getBackdropImageUrl(
+        item.id,
+        maxWidth: maxW,
+        tag: item.backdropImageTags.first,
+      );
+    }
+
+    final parentBackdropItemId = item.parentBackdropItemId;
+    final parentBackdropTags = item.parentBackdropImageTags;
+    if (parentBackdropItemId != null && parentBackdropTags.isNotEmpty) {
+      return imageApi.getBackdropImageUrl(
+        parentBackdropItemId,
+        maxWidth: maxW,
+        tag: parentBackdropTags.first,
+      );
+    }
+
     final itemThumbTag = _tagForType(item, 'Thumb');
     if (itemThumbTag != null) {
       return imageApi.getThumbImageUrl(
@@ -6551,24 +6591,6 @@ class _ContentRowsState extends State<_ContentRows>
         parentThumbItemId,
         maxWidth: maxW,
         tag: parentThumbTag,
-      );
-    }
-
-    if (item.backdropImageTags.isNotEmpty) {
-      return imageApi.getBackdropImageUrl(
-        item.id,
-        maxWidth: maxW,
-        tag: item.backdropImageTags.first,
-      );
-    }
-
-    final parentBackdropItemId = item.parentBackdropItemId;
-    final parentBackdropTags = item.parentBackdropImageTags;
-    if (parentBackdropItemId != null && parentBackdropTags.isNotEmpty) {
-      return imageApi.getBackdropImageUrl(
-        parentBackdropItemId,
-        maxWidth: maxW,
-        tag: parentBackdropTags.first,
       );
     }
 

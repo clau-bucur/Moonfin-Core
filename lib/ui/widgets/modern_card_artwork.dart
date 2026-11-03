@@ -1,22 +1,19 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../theme/vibrance.dart';
 import 'bounded_network_image.dart';
 import 'image_source.dart';
 
-/// Artwork for a modern home card whose bounds expand from poster to landscape.
-/// Decode dimensions come from the two endpoints, never the animated width.
-/// The poster remains underneath until the landscape has a decoded frame.
+/// One background is cropped at rest and revealed as the card widens.
+/// Independent title artwork follows the same clock, outside the image crop.
 class ModernCardArtwork extends StatefulWidget {
-  final String? posterImageUrl;
-  final String? expandedImageUrl;
+  final String? imageUrl;
+  final String? logoImageUrl;
+  final String? fallbackTitle;
   final double collapsedWidth;
   final double expandedWidth;
   final double imageHeight;
   final double expansionProgress;
-  final Duration duration;
   final BoxFit fit;
   final Widget placeholder;
 
@@ -26,13 +23,13 @@ class ModernCardArtwork extends StatefulWidget {
 
   const ModernCardArtwork({
     super.key,
-    required this.posterImageUrl,
-    required this.expandedImageUrl,
+    required this.imageUrl,
+    this.logoImageUrl,
+    this.fallbackTitle,
     required this.collapsedWidth,
     required this.expandedWidth,
     required this.imageHeight,
     required this.expansionProgress,
-    required this.duration,
     this.fit = BoxFit.cover,
     this.placeholder = const SizedBox.shrink(),
     this.imageProviderBuilder,
@@ -43,20 +40,9 @@ class ModernCardArtwork extends StatefulWidget {
 }
 
 class _ModernCardArtworkState extends State<ModernCardArtwork> {
-  ImageProvider? _poster;
-  ImageProvider? _expanded;
-  bool _loadExpanded = false;
-  String? _resolvedBaseUrl;
-  bool _posterHasFrame = false;
+  ImageProvider? _background;
+  ImageProvider? _logo;
   double? _devicePixelRatio;
-
-  String? _usableUrl(String? url) => url == null || url.isEmpty ? null : url;
-
-  String? get _posterUrl => _usableUrl(widget.posterImageUrl);
-  String? get _expandedUrl => _usableUrl(widget.expandedImageUrl);
-
-  bool get _hasSeparateLandscape =>
-      _posterUrl != null && _expandedUrl != null && _posterUrl != _expandedUrl;
 
   @override
   void didChangeDependencies() {
@@ -71,17 +57,17 @@ class _ModernCardArtworkState extends State<ModernCardArtwork> {
   @override
   void didUpdateWidget(covariant ModernCardArtwork oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.posterImageUrl != widget.posterImageUrl ||
-        oldWidget.expandedImageUrl != widget.expandedImageUrl ||
+    if (oldWidget.imageUrl != widget.imageUrl ||
+        oldWidget.logoImageUrl != widget.logoImageUrl ||
         oldWidget.collapsedWidth != widget.collapsedWidth ||
         oldWidget.expandedWidth != widget.expandedWidth ||
         oldWidget.imageProviderBuilder != widget.imageProviderBuilder) {
-      _loadExpanded = false;
       _resolveProviders();
     }
   }
 
-  ImageProvider _provider(String url, double width, int maxWidth) {
+  ImageProvider? _provider(String? url, double width, int maxWidth) {
+    if (url == null || url.isEmpty) return null;
     final cacheWidth = BoundedNetworkImage.cacheWidthFor(
       width,
       _devicePixelRatio!,
@@ -92,195 +78,105 @@ class _ModernCardArtworkState extends State<ModernCardArtwork> {
   }
 
   void _resolveProviders() {
-    final baseUrl = _posterUrl ?? _expandedUrl;
-    if (baseUrl != _resolvedBaseUrl) {
-      _resolvedBaseUrl = baseUrl;
-      _posterHasFrame = false;
-    }
-    _poster = baseUrl == null
-        ? null
-        : _provider(
-            baseUrl,
-            _hasSeparateLandscape
-                ? widget.collapsedWidth
-                : widget.expandedWidth,
-            _hasSeparateLandscape ? 640 : 960,
-          );
-    _expanded = _hasSeparateLandscape
-        ? _provider(_expandedUrl!, widget.expandedWidth, 960)
-        : null;
+    _background = _provider(widget.imageUrl, widget.expandedWidth, 960);
+    _logo = _provider(widget.logoImageUrl, widget.collapsedWidth - 24, 640);
   }
 
   @override
   Widget build(BuildContext context) {
-    _loadExpanded = _loadExpanded || widget.expansionProgress > 0;
-    final landscape = _loadExpanded && _expanded != null
-        ? _LandscapeImage(
-            key: ValueKey(_expanded),
-            image: _expanded!,
-            expansionProgress: widget.expansionProgress,
-            duration: widget.duration,
-            fit: widget.fit,
-          )
-        : null;
-    return Vibrance.wrap(
-      Stack(
-        fit: StackFit.expand,
-        children: [
-          if (_poster != null)
-            Image(
-              key: ValueKey(_posterUrl ?? _expandedUrl),
-              image: _poster!,
-              fit: widget.fit,
-              // A newly discovered landscape can change the fallback's
-              // endpoint decode size; keep its current frame in that case.
-              gaplessPlayback: true,
-              excludeFromSemantics: true,
-              // A hidden text/gradient fallback still costs layout and paint.
-              // Drop it once the image has a frame, including during resizing.
-              frameBuilder: (_, child, frame, synchronous) {
-                _posterHasFrame =
-                    _posterHasFrame || frame != null || synchronous;
-                // gaplessPlayback keeps the old frame when only the decode
-                // size changes, even though the new stream's frame is null.
-                return _posterHasFrame ? child : widget.placeholder;
-              },
-              errorBuilder: (_, _, _) => widget.placeholder,
-            )
-          else
-            widget.placeholder,
-          if (landscape != null)
-            ClipRect(
-              child: widget.fit == BoxFit.cover
-                  ? OverflowBox(
-                      alignment: Alignment.center,
-                      minWidth: widget.expandedWidth,
-                      maxWidth: widget.expandedWidth,
-                      minHeight: widget.imageHeight,
-                      maxHeight: widget.imageHeight,
-                      child: landscape,
-                    )
-                  : landscape,
+    final progress = widget.expansionProgress.clamp(0.0, 1.0);
+    final title = widget.fallbackTitle;
+    final fallback = title == null || title.isEmpty
+        ? const SizedBox.shrink()
+        : Align(
+            alignment: Alignment.lerp(
+              Alignment.center,
+              Alignment.bottomLeft,
+              progress,
+            )!,
+            child: Text(
+              title,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.left,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                shadows: [Shadow(color: Colors.black, blurRadius: 6)],
+              ),
             ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Uses a second fade only for an image that arrives after expansion begins.
-/// Cached frames follow expansion directly, including immediate reversals.
-class _LandscapeImage extends StatefulWidget {
-  final ImageProvider image;
-  final double expansionProgress;
-  final Duration duration;
-  final BoxFit fit;
-
-  const _LandscapeImage({
-    super.key,
-    required this.image,
-    required this.expansionProgress,
-    required this.duration,
-    required this.fit,
-  });
-
-  @override
-  State<_LandscapeImage> createState() => _LandscapeImageState();
-}
-
-class _LandscapeImageState extends State<_LandscapeImage>
-    with SingleTickerProviderStateMixin {
-  late final _readiness = AnimationController(vsync: this);
-  bool _hasFrame = false;
-  bool _frameScheduled = false;
-  bool _failed = false;
-  bool _retrying = false;
-  int _attempt = 0;
-
-  @override
-  void didUpdateWidget(covariant _LandscapeImage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (_failed &&
-        !_retrying &&
-        oldWidget.expansionProgress <= 0 &&
-        widget.expansionProgress > 0) {
-      // An Image retains its error state when only its surrounding geometry
-      // changes. Retry at the next expansion, leaving healthy images intact.
-      unawaited(_retryLandscape());
-    }
-  }
-
-  Future<void> _retryLandscape() async {
-    _retrying = true;
-    try {
-      // The failed completer can remain in the live image cache while this
-      // widget is mounted. Evict it before resolving the same decode key.
-      await widget.image.evict();
-    } catch (_) {
-      _retrying = false;
-      return;
-    }
-    if (!mounted) return;
-    _readiness.value = 0;
-    setState(() {
-      _attempt++;
-      _retrying = false;
-      _failed = false;
-      _hasFrame = false;
-      _frameScheduled = false;
-    });
-  }
-
-  @override
-  void dispose() {
-    _readiness.dispose();
-    super.dispose();
-  }
-
-  void _onFrame(bool synchronous) {
-    if (_hasFrame || _frameScheduled) return;
-    _frameScheduled = true;
-    final attempt = _attempt;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || attempt != _attempt) return;
-      _hasFrame = true;
-      if (synchronous || widget.duration == Duration.zero) {
-        _readiness.value = 1;
-      } else {
-        _readiness.animateTo(
-          1,
-          duration: widget.duration,
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Image(
-      key: ValueKey(_attempt),
-      image: widget.image,
-      fit: widget.fit,
-      excludeFromSemantics: true,
-      errorBuilder: (_, _, _) {
-        _failed = true;
-        return const SizedBox.shrink();
-      },
-      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-        if (frame != null || wasSynchronouslyLoaded) {
-          _onFrame(wasSynchronouslyLoaded);
-        }
-        return AnimatedBuilder(
-          animation: _readiness,
-          child: child,
-          builder: (context, child) => Opacity(
-            opacity:
-                widget.expansionProgress.clamp(0.0, 1.0) * _readiness.value,
-            child: child,
+          );
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ClipRect(
+          child: OverflowBox(
+            alignment: Alignment.center,
+            minWidth: widget.expandedWidth,
+            maxWidth: widget.expandedWidth,
+            minHeight: widget.imageHeight,
+            maxHeight: widget.imageHeight,
+            child: Vibrance.wrap(
+              _background == null
+                  ? widget.placeholder
+                  : Image(
+                      image: _background!,
+                      fit: widget.fit,
+                      excludeFromSemantics: true,
+                      frameBuilder: (_, child, frame, synchronous) =>
+                          frame != null || synchronous
+                          ? child
+                          : widget.placeholder,
+                      errorBuilder: (_, _, _) => widget.placeholder,
+                    ),
+            ),
           ),
-        );
-      },
+        ),
+        if (_logo != null || title != null) ...[
+          const Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.center,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Color(0x99000000)],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Align(
+              alignment: Alignment.lerp(
+                const Alignment(0, 0.55),
+                Alignment.bottomLeft,
+                progress,
+              )!,
+              child: SizedBox(
+                key: const ValueKey('modern-card-title'),
+                width: widget.collapsedWidth - 24,
+                height: widget.imageHeight * 0.25,
+                child: _logo == null
+                    ? fallback
+                    : Image(
+                        image: _logo!,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.lerp(
+                          Alignment.center,
+                          Alignment.bottomLeft,
+                          progress,
+                        )!,
+                        excludeFromSemantics: true,
+                        frameBuilder: (_, child, frame, synchronous) =>
+                            frame != null || synchronous ? child : fallback,
+                        errorBuilder: (_, _, _) => fallback,
+                      ),
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
