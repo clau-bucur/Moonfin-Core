@@ -51,6 +51,9 @@ import 'nouveau/nouveau_detail_content.dart';
 import 'nouveau/hero/nouveau_action_buttons.dart';
 import 'modern/modern_detail_content.dart';
 import 'spotlight/spotlight_detail_content.dart';
+import 'frost/frost_detail_content.dart';
+import 'premiere/premiere_detail_content.dart';
+import 'quick_look/quick_look_detail_content.dart';
 import 'stage/stage_detail_content.dart';
 import 'person_links_row.dart';
 import 'playlist_sort_filter_bar.dart';
@@ -286,6 +289,10 @@ class ItemDetailScreen extends StatefulWidget {
   /// see [ItemDetailViewModel.contextSeasonId].
   final String? contextSeasonId;
 
+  /// Opens as Quick Look's drawer over the screen underneath, which keeps its
+  /// own backdrop and theme music.
+  final bool quickLook;
+
   const ItemDetailScreen({
     super.key,
     required this.itemId,
@@ -293,6 +300,7 @@ class ItemDetailScreen extends StatefulWidget {
     this.autoPlay = false,
     this.seerrTitle,
     this.contextSeasonId,
+    this.quickLook = false,
   });
 
   @override
@@ -316,6 +324,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
   bool _showNavbar = true;
   bool _stageReady = false;
   bool _actionsExpanded = false;
+  bool _fullPageOpened = false;
   Timer? _focusedBackdropDebounce;
   String? _lastFocusedBackdropItemId;
   String? _lastDetailBackdropItemId;
@@ -424,7 +433,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
     final nouveauHandled =
         nouveauState?.restoreBackdropAfterResume() ?? false;
 
-    if (!nouveauHandled) {
+    if (!nouveauHandled && !widget.quickLook) {
       final item = _viewModel.item;
       if (item != null) {
         _backgroundService.setBackground(item, context: BlurContext.details);
@@ -488,7 +497,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
     _themeMusicService.unregisterDetailScreen(this);
     _backgroundSub?.cancel();
     _focusedBackdropDebounce?.cancel();
-    if (_backgroundService.currentUrl == _backdropUrl.value) {
+    if (!widget.quickLook &&
+        _backgroundService.currentUrl == _backdropUrl.value) {
       _backgroundService.clearBackgrounds();
     }
     _backdropUrl.dispose();
@@ -525,6 +535,19 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
       if (_viewModel.state != ItemDetailState.ready) _stageReady = false;
     });
     final item = _viewModel.item;
+    if (item != null &&
+        widget.quickLook &&
+        !_fullPageOpened &&
+        _viewModel.state == ItemDetailState.ready &&
+        !detailPageDraws(item.type)) {
+      // Quick Look draws what Stage and Premiere do. Anything else gets its
+      // full page instead of a drawer.
+      _fullPageOpened = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openFullPage();
+      });
+      return;
+    }
     if (item != null) {
       bool needInitialBackdrop = _lastDetailBackdropItemId != item.id;
       if (item.type == 'Playlist' &&
@@ -540,18 +563,42 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
         final target = (item.type == 'Playlist' && _viewModel.tracks.isNotEmpty)
             ? _viewModel.tracks.first
             : item;
-        _backgroundService.setBackground(target, context: BlurContext.details);
-        _backdropUrl.value = _backgroundService.currentUrl;
+        if (!widget.quickLook) {
+          _backgroundService.setBackground(
+            target,
+            context: BlurContext.details,
+          );
+          _backdropUrl.value = _backgroundService.currentUrl;
+        }
 
         if (item.type == 'Playlist' && _viewModel.tracks.isNotEmpty) {
           _onBackdropItemFocused(_viewModel.tracks.first);
         }
       }
-      if (!_themeMusicStarted) {
+      if (!_themeMusicStarted && !widget.quickLook) {
         _themeMusicStarted = true;
         _themeMusicService.playForItem(item);
       }
     }
+  }
+
+  /// Swaps Quick Look's drawer for the full page at the same address.
+  void _openFullPage() {
+    final uri = GoRouterState.of(context).uri;
+    context.pushReplacement(
+      uri
+          .replace(queryParameters: {...uri.queryParameters, 'full': 'true'})
+          .toString(),
+    );
+  }
+
+  /// Quick Look's full page is Modern.
+  DetailScreenStyle get _style {
+    if (widget.quickLook) return DetailScreenStyle.quickLook;
+    final style = _prefs.effectiveDetailScreenStyle;
+    return style == DetailScreenStyle.quickLook
+        ? DetailScreenStyle.modern
+        : style;
   }
 
   void _onBackdropItemFocused(AggregatedItem focusedItem) {
@@ -631,7 +678,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
 
   void _resumeThemeMusicIfEligible() {
     final item = _viewModel.item;
-    if (item == null) return;
+    if (item == null || widget.quickLook) return;
     // There is no theme song on a server that has never heard of this title.
     if (_viewModel.isSeerrOnly) return;
 
@@ -652,6 +699,13 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
 
     final showBackButton =
         _viewModel.state != ItemDetailState.ready || _showNavbar;
+
+    if (widget.quickLook) {
+      return RequestInitialFocus(
+        targetNode: node,
+        child: QuickLookFrame(child: _buildBody(context)),
+      );
+    }
 
     Widget body = Stack(
       children: [
@@ -764,7 +818,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
   Widget _buildBody(BuildContext context) {
     return switch (_viewModel.state) {
       ItemDetailState.loading => DetailScreenSkeleton(
-        style: _prefs.effectiveDetailScreenStyle,
+        style: _style,
         prefs: _prefs,
       ),
       // Nothing about the title, deliberately. No artwork, no name, and no
@@ -808,7 +862,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
           ],
         ),
       ),
-      ItemDetailState.ready => switch (_prefs.effectiveDetailScreenStyle) {
+      ItemDetailState.ready => switch (_style) {
         DetailScreenStyle.classic => _DetailContent(
           viewModel: _viewModel,
           prefs: _prefs,
@@ -867,6 +921,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
         ),
 
         DetailScreenStyle.stage => StageDetailContent(
+          onCollapseBiography: () => setState(() {}),
           onReady: () {
             if (mounted && !_stageReady) setState(() => _stageReady = true);
           },
@@ -882,6 +937,53 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
               setState(() => _actionsExpanded = val),
           onToggleNavbar: (show) => setState(() => _showNavbar = show),
         ),
+        DetailScreenStyle.premiere =>
+          detailPageDraws(_viewModel.item?.type)
+            ? PremiereDetailContent(
+                viewModel: _viewModel,
+                prefs: _prefs,
+                backdropUrl: _backdropUrl,
+                selectedMediaSourceId: _selectedMediaSourceId,
+                initialFocusNode: _ensureInitialFocusNode(),
+                onSelectedMediaSourceChanged: _onSelectedMediaSourceChanged,
+                autoPlay: widget.autoPlay,
+                actionsExpanded: _actionsExpanded,
+                onActionsExpandedChanged: (val) =>
+                    setState(() => _actionsExpanded = val),
+                onToggleNavbar: (show) => setState(() => _showNavbar = show),
+              )
+            : _buildModernContent(),
+
+        DetailScreenStyle.quickLook =>
+          detailPageDraws(_viewModel.item?.type)
+            ? QuickLookDetailContent(
+                viewModel: _viewModel,
+                prefs: _prefs,
+                selectedMediaSourceId: _selectedMediaSourceId,
+                initialFocusNode: _ensureInitialFocusNode(),
+                onSelectedMediaSourceChanged: _onSelectedMediaSourceChanged,
+                autoPlay: widget.autoPlay,
+                actionsExpanded: _actionsExpanded,
+                onActionsExpandedChanged: (val) =>
+                    setState(() => _actionsExpanded = val),
+                onOpenFullPage: _openFullPage,
+              )
+            : const SizedBox.shrink(),
+
+        DetailScreenStyle.frost =>
+          detailPageDraws(_viewModel.item?.type)
+            ? FrostDetailContent(
+                viewModel: _viewModel,
+                prefs: _prefs,
+                selectedMediaSourceId: _selectedMediaSourceId,
+                initialFocusNode: _ensureInitialFocusNode(),
+                onSelectedMediaSourceChanged: _onSelectedMediaSourceChanged,
+                autoPlay: widget.autoPlay,
+                actionsExpanded: _actionsExpanded,
+                onActionsExpandedChanged: (val) =>
+                    setState(() => _actionsExpanded = val),
+              )
+            : _buildModernContent(),
       },
     };
   }
@@ -4219,6 +4321,9 @@ class DetailMetadataRow extends StatelessWidget {
   /// Trailing badges from elsewhere, laid out with the technical chips.
   final List<Widget> extraBadges;
 
+  /// Centers both lines on any screen, for a title block that's centered.
+  final bool centered;
+
   const DetailMetadataRow({
     required this.item,
     this.selectedMediaSource,
@@ -4226,6 +4331,7 @@ class DetailMetadataRow extends StatelessWidget {
     this.seerrStatus,
     this.technicalOnly = false,
     this.extraBadges = const [],
+    this.centered = false,
   });
 
   @override
@@ -4328,16 +4434,16 @@ class DetailMetadataRow extends StatelessWidget {
 
     final badges = tech?.badges ?? const <String>[];
 
-    final compact = !_useDesktopDetailLayout(context);
+    final center = centered || !_useDesktopDetailLayout(context);
 
     return Column(
-      crossAxisAlignment: compact
+      crossAxisAlignment: center
           ? CrossAxisAlignment.center
           : CrossAxisAlignment.start,
       children: [
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
-          alignment: compact ? WrapAlignment.center : WrapAlignment.start,
+          alignment: center ? WrapAlignment.center : WrapAlignment.start,
           spacing: 2,
           runSpacing: 4,
           children: separated,
@@ -4346,7 +4452,7 @@ class DetailMetadataRow extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 6),
             child: Wrap(
-              alignment: compact ? WrapAlignment.center : WrapAlignment.start,
+              alignment: center ? WrapAlignment.center : WrapAlignment.start,
               crossAxisAlignment: WrapCrossAlignment.center,
               spacing: 6,
               runSpacing: 4,
@@ -4516,6 +4622,13 @@ class DetailActionButtons extends StatefulWidget {
   /// The hosting layout reveals its own focused controls instead of resetting
   /// its scroll position whenever an action gains focus.
   final bool suppressAutoScrollToTop;
+  /// Centers the modern row under a centered title instead of starting it at
+  /// the leading edge.
+  final bool centerRow;
+
+  /// Frost's toolbar: Play is a white pill and the rest are bare icons that
+  /// take a lighter platter when focused, with the label floating above.
+  final bool frosted;
 
   const DetailActionButtons({
     super.key,
@@ -4546,6 +4659,8 @@ class DetailActionButtons extends StatefulWidget {
     this.omitTrackButtons = false,
     this.labelsUnderCircles = false,
     this.suppressAutoScrollToTop = false,
+    this.centerRow = false,
+    this.frosted = false,
   });
 
   @override
@@ -5563,9 +5678,11 @@ class _HorizontalActionRowState extends State<_HorizontalActionRow> {
         const double horizontalPadding = 14.0;
         const double totalPadding = horizontalPadding * 2;
 
-        final double availableWidth = constraints.maxWidth - totalPadding;
         final double stride = bWidth + spacing;
-        int fitCount = ((availableWidth + spacing) / stride).floor();
+        // With no width limit there's nothing to scroll, so every button fits.
+        int fitCount = constraints.hasBoundedWidth
+            ? ((constraints.maxWidth - totalPadding + spacing) / stride).floor()
+            : widget.children.length;
         fitCount = fitCount.clamp(1, widget.children.length);
         _fitCount = fitCount;
 
@@ -7348,7 +7465,8 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
           },
         );
       }).toList();
-      final rowAlignment = widget.modernStyle
+      final startsRow = widget.modernStyle && !widget.centerRow;
+      final rowAlignment = startsRow
           ? AlignmentDirectional.centerStart
           : Alignment.center;
       // A classic tile grows a line when its label wraps, so the tiles line
@@ -7371,7 +7489,7 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
                 crossAxisAlignment: widget.modernStyle
                     ? WrapCrossAlignment.center
                     : WrapCrossAlignment.start,
-                alignment: widget.modernStyle
+                alignment: startsRow
                     ? WrapAlignment.start
                     : WrapAlignment.center,
                 children: normalizedButtons,
@@ -7582,7 +7700,9 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
           // Primary row keeps the More/Less button pinned at its end; the extra
           // buttons reveal in a second wrap below, so More/Less never moves.
           rowContent = Align(
-            alignment: AlignmentDirectional.centerStart,
+            alignment: widget.centerRow
+                ? Alignment.center
+                : AlignmentDirectional.centerStart,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -7662,7 +7782,8 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
     // Under the row rather than in it, so a bar never takes a focus slot. The
     // row is left exactly as it was when nothing is downloading, since a Column
     // around it would re-align it.
-    final downloads = seerrItemDownloads(viewModel);
+    // Frost shows them in its own status line.
+    final downloads = widget.frosted ? null : seerrItemDownloads(viewModel);
     final withDownloads = downloads == null
         ? rowContent
         : Column(
@@ -11191,6 +11312,196 @@ class _StarFillIcon extends StatelessWidget {
   }
 }
 
+class _FrostedButtonFace extends StatefulWidget {
+  final String label;
+  final IconData? icon;
+  final Widget Function(double size, Color color)? iconBuilder;
+  final bool isPrimary;
+  final bool isActive;
+  final Color? activeColor;
+  final bool focused;
+
+  /// A phone has no focus to show the label for, and less room.
+  final bool compact;
+
+  /// Play takes its own row, with the circles under it.
+  final bool fill;
+
+  const _FrostedButtonFace({
+    required this.label,
+    required this.icon,
+    required this.iconBuilder,
+    required this.isPrimary,
+    required this.isActive,
+    required this.activeColor,
+    required this.focused,
+    required this.compact,
+    required this.fill,
+  });
+
+  @override
+  State<_FrostedButtonFace> createState() => _FrostedButtonFaceState();
+}
+
+class _FrostedButtonFaceState extends State<_FrostedButtonFace> {
+  // The label is drawn in the overlay, since the glass under the toolbar
+  // clips anything that reaches past it.
+  final _tip = OverlayPortalController();
+  final _link = LayerLink();
+
+  @override
+  void initState() {
+    super.initState();
+    _tip.show();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const duration = Duration(milliseconds: 180);
+    final focused = widget.focused;
+    final compact = widget.compact;
+    final size = compact ? 46.0 : 60.0;
+
+    if (widget.isPrimary) {
+      // Filled the way Modern fills its labeled Play, in the accent until it
+      // has focus.
+      final ink = focused
+          ? AppColorScheme.onButtonFocused
+          : AppColorScheme.onAccent;
+      return AnimatedScale(
+        scale: focused ? 1.06 : 1,
+        duration: duration,
+        child: AnimatedContainer(
+          duration: duration,
+          height: compact ? 48 : size,
+          width: widget.fill ? double.infinity : null,
+          constraints: BoxConstraints(minWidth: compact ? 140 : 200),
+          padding: EdgeInsets.symmetric(horizontal: compact ? 20 : 28),
+          decoration: BoxDecoration(
+            color: focused
+                ? AppColorScheme.buttonFocused
+                : AppColorScheme.accent,
+            borderRadius: AppRadius.circular(size / 2),
+            boxShadow: [
+              if (focused)
+                BoxShadow(
+                  color: AppColorScheme.buttonFocused.withValues(alpha: 0.3),
+                  spreadRadius: 4,
+                ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AdaptiveIcon(
+                widget.icon ?? Icons.play_arrow,
+                color: ink,
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              // Capped rather than flexible, so the toolbar can measure it.
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 300),
+                child: Text(
+                  widget.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: ink,
+                    fontSize: compact ? 17 : 19,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final Color color;
+    if (widget.isActive && widget.icon == Icons.favorite) {
+      color = const Color(0xFFFF375F);
+    } else if (widget.isActive) {
+      color = widget.activeColor ?? AppColorScheme.accent;
+    } else {
+      color = AppColorScheme.onButtonNormal;
+    }
+    final face = AnimatedScale(
+      scale: focused ? 1.12 : 1,
+      duration: duration,
+      child: AnimatedContainer(
+        duration: duration,
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColorScheme.buttonFocused.withValues(
+            alpha: focused ? 0.32 : 0,
+          ),
+        ),
+        child: Center(
+          child: widget.iconBuilder != null
+              ? widget.iconBuilder!(30, color)
+              : AdaptiveIcon(
+                  widget.icon!,
+                  color: color,
+                  size: compact ? 22 : 25,
+                ),
+        ),
+      ),
+    );
+    if (compact) return face;
+
+    return OverlayPortal(
+      controller: _tip,
+      overlayChildBuilder: (context) => Align(
+        alignment: Alignment.topLeft,
+        child: CompositedTransformFollower(
+          link: _link,
+          showWhenUnlinked: false,
+          targetAnchor: Alignment.topCenter,
+          followerAnchor: Alignment.bottomCenter,
+          offset: const Offset(0, -16),
+          child: IgnorePointer(
+            child: AnimatedOpacity(
+              opacity: focused ? 1 : 0,
+              duration: duration,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColorScheme.surface.withValues(alpha: 0.95),
+                  borderRadius: AppRadius.circular(16),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x59000000),
+                      blurRadius: 20,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  widget.label,
+                  style: TextStyle(
+                    color: AppColorScheme.onSurface,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      child: CompositedTransformTarget(link: _link, child: face),
+    );
+  }
+}
+
 class _DetailActionButton extends StatefulWidget {
   final String label;
   final IconData? icon;
@@ -11261,8 +11572,23 @@ class _DetailActionButtonState extends State<_DetailActionButton>
     required Color labelColor,
   }) {
     final host = context.findAncestorWidgetOfExactType<DetailActionButtons>();
+    if (host?.frosted ?? false) {
+      return _FrostedButtonFace(
+        label: widget.label,
+        icon: widget.icon,
+        iconBuilder: widget.iconBuilder,
+        isPrimary: widget.isPrimary,
+        isActive: widget.isActive,
+        activeColor: widget.activeColor,
+        focused: showHighlight,
+        compact: isMobile,
+        fill: host!.fullWidthPrimary,
+      );
+    }
     final labelUnder = host?.labelsUnderCircles ?? false;
-    final isExpanded = showHighlight && !labelUnder;
+    // With the circles' labels under them, Play keeps its own in the pill.
+    final labeledPlay = widget.isPrimary && labelUnder;
+    final isExpanded = labeledPlay || (showHighlight && !labelUnder);
     final scale = _modernButtonScale(context);
     final double height = widget.isPrimary
         ? (isMobile ? 50.0 : 54.0 * scale)
@@ -11324,9 +11650,10 @@ class _DetailActionButtonState extends State<_DetailActionButton>
       return SizedBox(width: double.infinity, child: pillInner);
     }
 
-    // Only a compact layout keeps Play filled with the accent. Everywhere else
-    // it looks like the buttons beside it until it has focus.
-    final accentPrimary = widget.isPrimary && isMobile;
+    // Only a compact layout or a labeled Play keeps it filled with the
+    // accent. Everywhere else it looks like the buttons beside it until it
+    // has focus.
+    final accentPrimary = widget.isPrimary && (isMobile || labeledPlay);
 
     final containerColor = showHighlight
         ? AppColorScheme.buttonFocused
@@ -11407,7 +11734,11 @@ class _DetailActionButtonState extends State<_DetailActionButton>
     }
 
     final double minWidth = height;
-    final double maxWidth = isExpanded ? 200.0 * scale : height;
+    // A labeled Play keeps its label all the time, so it gets the room for
+    // one like "Resume from 1h 12m" without scrolling it.
+    final double maxWidth = isExpanded
+        ? (labeledPlay ? 280.0 : 200.0) * scale
+        : height;
     final double maxLabelWidth =
         (maxWidth -
                 (isExpanded ? 22.0 * scale : 0.0) -
@@ -11490,7 +11821,7 @@ class _DetailActionButtonState extends State<_DetailActionButton>
           child: OverflowBox(
             maxWidth: 160 * scale,
             child: Text(
-              showHighlight ? widget.label : '',
+              showHighlight && !labeledPlay ? widget.label : '',
               maxLines: 1,
               softWrap: false,
               overflow: TextOverflow.ellipsis,
@@ -12693,6 +13024,11 @@ class _ChapterListCardState extends State<_ChapterListCard>
   }
 }
 
+/// A group's share of the width, from the length of its names. The floor keeps
+/// a single name on one line.
+int detailGroupWeight(Iterable<String> names) =>
+    names.fold(0, (sum, name) => sum + name.length).clamp(20, 60);
+
 class _MetadataItem {
   final String name;
   final String? id;
@@ -12927,6 +13263,10 @@ class DetailMetadataSection extends StatefulWidget {
   final FocusNode? downTarget;
   final KeyEventResult Function(FocusNode? target)? onRequestFocus;
 
+  /// Gives each group a share of the width by how much it has to say, so a
+  /// long list of studios sits side by side rather than one to a line.
+  final bool weighByText;
+
   const DetailMetadataSection({
     required this.viewModel,
     this.showCrew = true,
@@ -12935,6 +13275,7 @@ class DetailMetadataSection extends StatefulWidget {
     this.upTarget,
     this.downTarget,
     this.onRequestFocus,
+    this.weighByText = false,
   });
 
   @override
@@ -13202,6 +13543,9 @@ class DetailMetadataSectionState extends State<DetailMetadataSection> {
                   final groupIndex = e.key;
                   final group = e.value;
                   return Expanded(
+                    flex: widget.weighByText
+                        ? detailGroupWeight(group.items.map((i) => i.name))
+                        : 1,
                     child: Row(
                       children: [
                         if (groupIndex > 0)
@@ -13452,11 +13796,12 @@ class DetailSeasonsRow extends StatelessWidget {
             SizedBox(width: isMobile ? 8 : 12 * desktopScale),
         itemBuilder: (context, index) {
           final season = seasons[index];
-          final showAvailabilityBadges =
-              prefs.get(UserPreferences.showSeerrAvailabilityBadges);
           final seerrStatus = seerrSeasonStatus?[season.indexNumber];
-          final hasSeerrDot =
-              showAvailabilityBadges && SeerrMediaStatus.hasDot(seerrStatus);
+          final seerrStyle = SeerrMediaStatus.hasDot(seerrStatus)
+              ? seerrBadgeStyle(prefs)
+              : null;
+          final hasSeerrDot = seerrStyle == SeerrBadgeStyle.badge;
+          final hasSeerrBanner = seerrStyle == SeerrBadgeStyle.banner;
           return MediaCard(
             title: season.name,
             subtitle: _progressText(season),
@@ -13467,6 +13812,9 @@ class DetailSeasonsRow extends StatelessWidget {
             imageUrl: _seasonImageUrl(season, isMobile: isMobile),
             width: cardWidth,
             aspectRatio: 2 / 3,
+            // The card draws a banner itself, while its own dot would take the
+            // watched corner, so the dot goes top left here.
+            seerrStatus: hasSeerrBanner ? seerrStatus : null,
             overlayOccupiesTopLeft: hasSeerrDot,
             imageOverlays: [
               if (hasSeerrDot)
@@ -13475,10 +13823,12 @@ class DetailSeasonsRow extends StatelessWidget {
                   left: 6,
                   child: SeerrStatusDot(status: seerrStatus, size: 18),
                 ),
-              // Top left, dropped below the Seerr dot when there is one so the two stack
-              // rather than overlap.
+              // Top left, dropped below the Seerr dot or banner when there is one so
+              // the two stack rather than overlap.
               Positioned(
-                top: hasSeerrDot ? 30 : 6,
+                top: hasSeerrDot
+                    ? 30
+                    : (hasSeerrBanner ? kSeerrStatusBannerHeight : 0) + 6,
                 left: 6,
                 child: AnimeSeasonAudioBadge(
                   seriesId: season.seriesId,

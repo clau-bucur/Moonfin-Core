@@ -637,7 +637,7 @@ abstract class AppLocalizations {
   /// Explanation under the detail screen style setting
   ///
   /// In en, this message translates to:
-  /// **'Classic is the original centered moonfin layout. Modern is a responsive cinematic layout. Spotlight is a hero-first layout with pop-up content cards. Nouveau is a full-screen layout with sections stacked down the page. Minimalist is artwork, one play button and the episodes. Stage leads with the poster, with play under it and the details beside it.'**
+  /// **'Classic is the original centered moonfin layout. Modern is a responsive cinematic layout. Spotlight is a hero-first layout with pop-up content cards. Nouveau is a full-screen layout with sections stacked down the page. Minimalist is artwork, one play button and the episodes. Stage leads with the poster, with play under it and the details beside it. Premiere centers the title over a backdrop that fills the screen, with every section down the page under it. Quick Look opens a drawer over the screen you were on, with the full page a press away. Frost floats the title in a glass window over a blurred copy of its art, with its parts in tabs under the buttons.'**
   String get detailScreenStyleSubtitle;
 
   /// Detail screen style option: the classic centered layout
@@ -843,6 +843,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stage'**
   String get detailScreenStyleStage;
+
+  /// Detail screen style option: the title centered over a full screen backdrop, with every section down the page under it
+  ///
+  /// In en, this message translates to:
+  /// **'Premiere'**
+  String get detailScreenStylePremiere;
+
+  /// Detail screen style option: a drawer over the screen the title was picked on, instead of a full page
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Look'**
+  String get detailScreenStyleQuickLook;
+
+  /// Detail screen style option: the title in a glass window over a blurred copy of its art, with tabs under the buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Frost'**
+  String get detailScreenStyleFrost;
+
+  /// Button at the foot of the Quick Look drawer that opens the title's full details page
+  ///
+  /// In en, this message translates to:
+  /// **'Open full page'**
+  String get quickLookOpenFullPage;
+
+  /// Hint on the Quick Look drawer telling a TV viewer that the Back button closes it
+  ///
+  /// In en, this message translates to:
+  /// **'Back to close'**
+  String get quickLookBackToClose;
+
+  /// How many of a season's episodes have been watched, on a season card in the Quick Look drawer
+  ///
+  /// In en, this message translates to:
+  /// **'{played} of {total}'**
+  String quickLookSeasonPlayed(int played, int total);
 
   /// Label for the detail screen expanded tabs setting
   ///
@@ -2986,6 +3022,12 @@ abstract class AppLocalizations {
   /// **'Audio Track'**
   String get audioTrack;
 
+  /// Shown when the remote's Audio button is pressed and the channel has one audio track or none
+  ///
+  /// In en, this message translates to:
+  /// **'No other audio tracks'**
+  String get noOtherAudioTracks;
+
   /// Dialog title for subtitle track selection
   ///
   /// In en, this message translates to:
@@ -4713,6 +4755,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reconnecting… ({attempt} of {total})'**
   String liveReconnecting(int attempt, int total);
+
+  /// Shown while playback waits for the TV to switch to the video's frame rate, like 23.976 or 59.94
+  ///
+  /// In en, this message translates to:
+  /// **'Matching display to {fps} fps…'**
+  String playerMatchingDisplayRate(String fps);
 
   /// Error when recordings fail to load
   ///
@@ -6736,6 +6784,138 @@ abstract class AppLocalizations {
   /// **'Tomorrow'**
   String get upcomingEpisodeTomorrow;
 
+  /// Home row title for upcoming movies from the Radarr calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Movies (Radarr)'**
+  String get radarrCalendarRow;
+
+  /// Home row title for upcoming episodes from the Sonarr calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming TV Shows (Sonarr)'**
+  String get sonarrCalendarRow;
+
+  /// Home row title when the Radarr and Sonarr calendars are merged
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Releases'**
+  String get mergedCalendarRow;
+
+  /// Subtitle under the home row that merges the Radarr and Sonarr calendars
+  ///
+  /// In en, this message translates to:
+  /// **'Radarr and Sonarr Calendars'**
+  String get arrCalendarsRowSubtitle;
+
+  /// Subtitle under the Radarr calendar home row
+  ///
+  /// In en, this message translates to:
+  /// **'Radarr Calendar'**
+  String get radarrCalendarRowSubtitle;
+
+  /// Subtitle under the Sonarr calendar home row
+  ///
+  /// In en, this message translates to:
+  /// **'Sonarr Calendar'**
+  String get sonarrCalendarRowSubtitle;
+
+  /// Release date under a movie in the Radarr calendar row, e.g. 'In 2 days (Oct 29)'
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =0{Today} =1{Tomorrow} other{In {days} days}} ({date})'**
+  String calendarReleaseIn(int days, String date);
+
+  /// Release format before the date in the Radarr calendar row, e.g. 'Cinema · Tomorrow (Nov 4)'
+  ///
+  /// In en, this message translates to:
+  /// **'Cinema'**
+  String get calendarReleaseCinema;
+
+  /// Release format before the date in the Radarr calendar row, e.g. 'Digital · Tomorrow (Nov 4)'
+  ///
+  /// In en, this message translates to:
+  /// **'Digital'**
+  String get calendarReleaseDigital;
+
+  /// Release format before the date in the Radarr calendar row, e.g. 'Physical · Tomorrow (Nov 4)'
+  ///
+  /// In en, this message translates to:
+  /// **'Physical'**
+  String get calendarReleasePhysical;
+
+  /// Settings screen for the Radarr and Sonarr calendar home rows
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Calendars'**
+  String get upcomingCalendars;
+
+  /// Subtitle of the Upcoming Calendars settings entry
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle Upcoming Calendars from Radarr/Sonarr.'**
+  String get upcomingCalendarsDescription;
+
+  /// Turns on the Radarr calendar home row
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Radarr\'s Upcoming Calendar'**
+  String get enableRadarrCalendar;
+
+  /// Includes cinema release dates in the Radarr calendar row
+  ///
+  /// In en, this message translates to:
+  /// **'Show Upcoming Cinema Releases'**
+  String get radarrCalendarShowCinema;
+
+  /// Includes digital release dates in the Radarr calendar row
+  ///
+  /// In en, this message translates to:
+  /// **'Show Upcoming Digital Releases'**
+  String get radarrCalendarShowDigital;
+
+  /// Includes physical release dates in the Radarr calendar row
+  ///
+  /// In en, this message translates to:
+  /// **'Show Upcoming Physical Releases'**
+  String get radarrCalendarShowPhysical;
+
+  /// Shows the release date under each item of a calendar row
+  ///
+  /// In en, this message translates to:
+  /// **'Show Release Date on Home Screen'**
+  String get calendarShowReleaseDate;
+
+  /// Leaves out movies Radarr already downloaded from the calendar row
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Movies Already on the Server'**
+  String get radarrCalendarHideDownloaded;
+
+  /// Turns on the Sonarr calendar home row
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Sonarr\'s Upcoming Calendar'**
+  String get enableSonarrCalendar;
+
+  /// Shows the season and episode number in the Sonarr calendar row
+  ///
+  /// In en, this message translates to:
+  /// **'Display Episode Information'**
+  String get sonarrCalendarShowEpisodeInfo;
+
+  /// Leaves out episodes Sonarr already downloaded from the calendar row
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Episodes Already on the Server'**
+  String get sonarrCalendarHideDownloaded;
+
+  /// Shows the Radarr and Sonarr calendars as a single home row
+  ///
+  /// In en, this message translates to:
+  /// **'Merge Sonarr and Radarr Calendars'**
+  String get mergeRadarrSonarrCalendars;
+
   /// Moves a button one place earlier in its row
   ///
   /// In en, this message translates to:
@@ -8704,6 +8884,54 @@ abstract class AppLocalizations {
   /// **'Random'**
   String get mediaBarSourceRandom;
 
+  /// Media bar source: series with episodes that aired recently
+  ///
+  /// In en, this message translates to:
+  /// **'New Seasons & Episodes'**
+  String get mediaBarSourceNewReleases;
+
+  /// Setting that flags series in the media bar when new episodes aired recently
+  ///
+  /// In en, this message translates to:
+  /// **'New Release Banner'**
+  String get mediaBarNewReleaseBanner;
+
+  /// No description provided for @mediaBarNewReleaseBannerDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag series with a new season or new episodes that aired recently.'**
+  String get mediaBarNewReleaseBannerDescription;
+
+  /// Setting for how many days an episode counts as new in the media bar
+  ///
+  /// In en, this message translates to:
+  /// **'New Release Window'**
+  String get mediaBarNewReleaseDays;
+
+  /// No description provided for @mediaBarNewReleaseDaysDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'How long after an episode airs it still counts as new.'**
+  String get mediaBarNewReleaseDaysDescription;
+
+  /// Media bar label on a series whose first season was released recently
+  ///
+  /// In en, this message translates to:
+  /// **'New Series'**
+  String get mediaBarNewSeries;
+
+  /// Media bar label on a series whose latest season was released all at once recently
+  ///
+  /// In en, this message translates to:
+  /// **'New Season'**
+  String get mediaBarNewSeason;
+
+  /// Media bar label on a series with one or more episodes that aired recently
+  ///
+  /// In en, this message translates to:
+  /// **'New Episodes'**
+  String get mediaBarNewEpisodes;
+
   /// Content type: movies and TV shows
   ///
   /// In en, this message translates to:
@@ -9442,6 +9670,36 @@ abstract class AppLocalizations {
   /// **'Additional Ratings'**
   String get additionalRatings;
 
+  /// Title of the Watching on MDBList home row
+  ///
+  /// In en, this message translates to:
+  /// **'Watching on MDBList'**
+  String get mdblistWatchingNow;
+
+  /// Description for the Watching on MDBList setting
+  ///
+  /// In en, this message translates to:
+  /// **'Show what MDBList users are currently watching'**
+  String get mdblistWatchingNowDescription;
+
+  /// Badge on Watching on MDBList card showing current watchers count
+  ///
+  /// In en, this message translates to:
+  /// **'{count} watching'**
+  String watchingNowWatchersCount(int count);
+
+  /// Subtitle for Watching on MDBList home row showing live site statistics
+  ///
+  /// In en, this message translates to:
+  /// **'{users} watching now · {movies} movies · {shows} shows'**
+  String watchingNowLiveSummary(String users, String movies, String shows);
+
+  /// Subtitle for Watching on MDBList home row showing 24-hour fallback site statistics
+  ///
+  /// In en, this message translates to:
+  /// **'{users} watched today · {movies} movies · {shows} shows'**
+  String watchingNowLiveSummaryToday(String users, String movies, String shows);
+
   /// Description for additional ratings
   ///
   /// In en, this message translates to:
@@ -9736,17 +9994,35 @@ abstract class AppLocalizations {
   /// **'Include missing items on Collection pages'**
   String get showMissingCollectionItemsDesc;
 
-  /// Setting title for showing Seerr availability badges on media details pages
+  /// Setting title for showing Seerr availability badges on posters across the app
   ///
   /// In en, this message translates to:
   /// **'Show Seerr Availability Badges'**
   String get showSeerrAvailabilityBadges;
 
-  /// Setting description for showing Seerr availability badges on media details pages
+  /// Setting description for showing Seerr availability badges on posters across the app
   ///
   /// In en, this message translates to:
-  /// **'Show season availability badges on media details pages'**
+  /// **'Show the Seerr status on posters and seasons across the app'**
   String get showSeerrAvailabilityBadgesDescription;
+
+  /// Setting title for how posters show their Seerr status
+  ///
+  /// In en, this message translates to:
+  /// **'Badge Style'**
+  String get seerrBadgeStyle;
+
+  /// Setting description for the Seerr badge style choices
+  ///
+  /// In en, this message translates to:
+  /// **'Badge puts Seerr\'s dot in a corner. Banner runs the status across the top of the poster.'**
+  String get seerrBadgeStyleDescription;
+
+  /// Seerr badge style that shows a status dot in a poster corner
+  ///
+  /// In en, this message translates to:
+  /// **'Badge'**
+  String get seerrBadgeStyleBadge;
 
   /// Header for the Seerr notifications settings section
   ///
@@ -21562,6 +21838,126 @@ abstract class AppLocalizations {
   /// **'Show Studio row in Home Sections.'**
   String get displayStudiosRowsSubtitle;
 
+  /// Settings section header for the Since You Watched rows
+  ///
+  /// In en, this message translates to:
+  /// **'Since You Watched'**
+  String get sinceYouWatched;
+
+  /// Home row title for a Since You Watched row before its source item is known
+  ///
+  /// In en, this message translates to:
+  /// **'Since you watched'**
+  String get sinceYouWatchedRowTitle;
+
+  /// Home row title for recommendations based on an item the user watched
+  ///
+  /// In en, this message translates to:
+  /// **'Since you watched \"{title}\"'**
+  String sinceYouWatchedItemRowTitle(String title);
+
+  /// Name of one of the Since You Watched rows in the home sections list
+  ///
+  /// In en, this message translates to:
+  /// **'Since You Watched Row {number}'**
+  String sinceYouWatchedRowNumber(int number);
+
+  /// No description provided for @displaySinceYouWatchedRows.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Since You Watched Rows'**
+  String get displaySinceYouWatchedRows;
+
+  /// No description provided for @displaySinceYouWatchedRowsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show and customize Since You Watched rows in Home Sections.'**
+  String get displaySinceYouWatchedRowsSubtitle;
+
+  /// No description provided for @sinceYouWatchedSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendation Source'**
+  String get sinceYouWatchedSource;
+
+  /// No description provided for @sinceYouWatchedSourceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose recommendation source (Moonfin Recommends custom local algorithm, Jellyfin Recommends server engine, or TMDb\'s similarity metrics. Note: Online recommendations require Seerr integration).'**
+  String get sinceYouWatchedSourceDescription;
+
+  /// No description provided for @sinceYouWatchedSourceLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Moonfin Recommends'**
+  String get sinceYouWatchedSourceLocal;
+
+  /// No description provided for @sinceYouWatchedSourceServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Jellyfin Recommends'**
+  String get sinceYouWatchedSourceServer;
+
+  /// No description provided for @sinceYouWatchedSourceOnline.
+  ///
+  /// In en, this message translates to:
+  /// **'TMDb Similarity'**
+  String get sinceYouWatchedSourceOnline;
+
+  /// No description provided for @sinceYouWatchedSourceType.
+  ///
+  /// In en, this message translates to:
+  /// **'Source Type'**
+  String get sinceYouWatchedSourceType;
+
+  /// No description provided for @sinceYouWatchedSourceTypeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose type of items to recommend'**
+  String get sinceYouWatchedSourceTypeDescription;
+
+  /// No description provided for @sinceYouWatchedSourceItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Source Item'**
+  String get sinceYouWatchedSourceItem;
+
+  /// No description provided for @sinceYouWatchedSourceItemDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which source item to base recommendations on'**
+  String get sinceYouWatchedSourceItemDescription;
+
+  /// No description provided for @sinceYouWatchedRecentlyWatched.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently Watched'**
+  String get sinceYouWatchedRecentlyWatched;
+
+  /// No description provided for @sinceYouWatchedNumRows.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of Rows to Add'**
+  String get sinceYouWatchedNumRows;
+
+  /// No description provided for @sinceYouWatchedNumRowsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how many Since You Watched rows to display (1-5)'**
+  String get sinceYouWatchedNumRowsDescription;
+
+  /// No description provided for @sinceYouWatchedIncludeWatched.
+  ///
+  /// In en, this message translates to:
+  /// **'Include Previously Watched'**
+  String get sinceYouWatchedIncludeWatched;
+
+  /// No description provided for @sinceYouWatchedIncludeWatchedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Include watched items in recommendations'**
+  String get sinceYouWatchedIncludeWatchedSubtitle;
+
   /// No description provided for @studiosRowSorting.
   ///
   /// In en, this message translates to:
@@ -21993,6 +22389,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Play AV1 above 1080p, including HDR10, from the original file instead of asking the server to transcode it. This device decodes AV1 in software, so heavy 4K or high bitrate files may stutter.'**
   String get av1SoftwareUhdDirectPlaySubtitle;
+
+  /// No description provided for @cadenceSlowdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth 24 fps on a 60 Hz TV'**
+  String get cadenceSlowdown;
+
+  /// No description provided for @cadenceSlowdownSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When Match Frame Rate is off, play 24 fps video 0.1% slower so it fits the TV without dropped frames. Not used when audio is passed through to a receiver.'**
+  String get cadenceSlowdownSubtitle;
+
+  /// No description provided for @cadenceTipTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn On Match Frame Rate'**
+  String get cadenceTipTitle;
+
+  /// No description provided for @cadenceTipMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This video can\'t play smoothly at your TV\'s current refresh rate. On your Apple TV, open Settings > Video and Audio > Match Content and turn on Match Frame Rate.'**
+  String get cadenceTipMessage;
+
+  /// No description provided for @cadenceTipSlowdownHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Or turn on Smooth 24 fps on a 60 Hz TV in Moonfin under Playback > Quality & Decoding.'**
+  String get cadenceTipSlowdownHint;
 
   /// No description provided for @useExternalPlayer.
   ///
@@ -22551,6 +22977,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start for everyone'**
   String get watchPartyStartForEveryone;
+
+  /// Host button that starts the staged item for the whole Watch Party part way through, at the earliest point any member reached. The time is a position like 42:10
+  ///
+  /// In en, this message translates to:
+  /// **'Resume at {time}'**
+  String watchPartyResumeAt(String time);
+
+  /// Host button beside Resume at that starts the staged item for the whole Watch Party from the start
+  ///
+  /// In en, this message translates to:
+  /// **'Start from the beginning'**
+  String get watchPartyStartFromBeginning;
+
+  /// Note under the Watch Party resume button naming the member whose position it resumes from
+  ///
+  /// In en, this message translates to:
+  /// **'Where {name} left off, the earliest anyone here has reached.'**
+  String watchPartyResumeWhere(String name);
+
+  /// Note under the Watch Party resume button when the member it resumes from isn't named
+  ///
+  /// In en, this message translates to:
+  /// **'The earliest point anyone here has reached.'**
+  String get watchPartyResumeEarliest;
+
+  /// Added to the Watch Party resume note: how many members haven't begun the title, whom resuming takes past its start
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 person hasn\'t started it yet.} other{{count} people haven\'t started it yet.}}'**
+  String watchPartyResumeNotStarted(int count);
 
   /// Host button that stops Watch Party playback
   ///
@@ -26059,6 +26515,42 @@ abstract class AppLocalizations {
   /// **'The poster up front, with play under it and the details beside it.'**
   String get setupDetailStageHint;
 
+  /// Name of the detail layout that centers the title over a full screen backdrop, offered in the setup wizard
+  ///
+  /// In en, this message translates to:
+  /// **'Premiere'**
+  String get setupStylePremiere;
+
+  /// What the Premiere detail screen style gives you
+  ///
+  /// In en, this message translates to:
+  /// **'The title centered over a full screen backdrop, with everything else down the page.'**
+  String get setupDetailPremiereHint;
+
+  /// Name of the detail layout that opens a drawer over the current screen, offered in the setup wizard
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Look'**
+  String get setupStyleQuickLook;
+
+  /// What the Quick Look detail screen style gives you
+  ///
+  /// In en, this message translates to:
+  /// **'A drawer over the screen you were on, with play and the basics, and the full page a press away.'**
+  String get setupDetailQuickLookHint;
+
+  /// Name of the detail layout that floats the title in a glass window, offered in the setup wizard
+  ///
+  /// In en, this message translates to:
+  /// **'Frost'**
+  String get setupStyleFrost;
+
+  /// What the Frost detail screen style gives you
+  ///
+  /// In en, this message translates to:
+  /// **'The title in a glass window over its blurred art, with tabs under the buttons.'**
+  String get setupDetailFrostHint;
+
   /// Setup question asking which style the bottom navigation bar should use
   ///
   /// In en, this message translates to:
@@ -27389,6 +27881,18 @@ abstract class AppLocalizations {
   /// **'Why'**
   String get playbackInfoWhy;
 
+  /// Playback information row label for reasons retained from a server compatibility check during live relay
+  ///
+  /// In en, this message translates to:
+  /// **'Server compatibility check'**
+  String get playbackInfoServerCompatibilityCheck;
+
+  /// Playback information value when an incomplete live source prevents a reliable aggregate bitrate
+  ///
+  /// In en, this message translates to:
+  /// **'Bitrate unavailable'**
+  String get playbackInfoBitrateUnavailable;
+
   /// Playback information row label: the maximum streaming bitrate the user picked
   ///
   /// In en, this message translates to:
@@ -27489,6 +27993,102 @@ abstract class AppLocalizations {
   /// **'The server is repackaging the file without converting it.'**
   String get playbackInfoNoteDirectStream;
 
+  /// Playback information note under the play method for a live TV channel the server passes through
+  ///
+  /// In en, this message translates to:
+  /// **'The server is relaying the channel without converting it.'**
+  String get playbackInfoNoteLiveRelay;
+
+  /// Playback information frame rate with where the player got it
+  ///
+  /// In en, this message translates to:
+  /// **'{rate} fps ({source})'**
+  String playbackInfoFrameRateFrom(String rate, String source);
+
+  /// Playback information: the frame rate came from the video stream's own header
+  ///
+  /// In en, this message translates to:
+  /// **'stream header'**
+  String get playbackInfoRateSourceHeader;
+
+  /// Playback information: the frame rate was measured from the video's frame timing
+  ///
+  /// In en, this message translates to:
+  /// **'measured'**
+  String get playbackInfoRateSourceMeasured;
+
+  /// Playback information: the frame rate came from the server's description of the media
+  ///
+  /// In en, this message translates to:
+  /// **'server'**
+  String get playbackInfoRateSourceServer;
+
+  /// Playback information row: the frame rate the server reports, shown when it differs from what is playing
+  ///
+  /// In en, this message translates to:
+  /// **'Server Frame Rate'**
+  String get playbackInfoServerFrameRate;
+
+  /// Playback information row: whether the video is progressive or interlaced
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get playbackInfoScan;
+
+  /// Playback information scan type
+  ///
+  /// In en, this message translates to:
+  /// **'Progressive'**
+  String get playbackInfoProgressive;
+
+  /// Playback information scan type
+  ///
+  /// In en, this message translates to:
+  /// **'Interlaced'**
+  String get playbackInfoInterlaced;
+
+  /// Playback information scan type: film carried in an interlaced stream with repeated fields
+  ///
+  /// In en, this message translates to:
+  /// **'Telecined (repeated fields)'**
+  String get playbackInfoRepeatedFields;
+
+  /// Playback information row: the display mode the device is sending
+  ///
+  /// In en, this message translates to:
+  /// **'HDMI Output'**
+  String get playbackInfoHdmiOutput;
+
+  /// Playback information display mode, for example 1920×1080 @ 59.94 Hz
+  ///
+  /// In en, this message translates to:
+  /// **'{width}×{height} @ {rate} Hz'**
+  String playbackInfoDisplayMode(String width, String height, String rate);
+
+  /// Playback information row: how many times live TV changed the display rate after it started
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Corrections'**
+  String get playbackInfoRateCorrections;
+
+  /// Playback information row in the Audio section: how the audio leaves the device
+  ///
+  /// In en, this message translates to:
+  /// **'Output'**
+  String get playbackInfoAudioOutput;
+
+  /// Playback information audio output: the bitstream goes to the receiver undecoded
+  ///
+  /// In en, this message translates to:
+  /// **'Passthrough ({codec})'**
+  String playbackInfoPassthroughOf(String codec);
+
+  /// Playback information audio output: the device decodes the audio, with its channel layout
+  ///
+  /// In en, this message translates to:
+  /// **'Decoded ({channels})'**
+  String playbackInfoDecodedTo(String channels);
+
   /// Playback information note under the play method when only the video is transcoded
   ///
   /// In en, this message translates to:
@@ -27584,6 +28184,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This device can\'t play {codec} video'**
   String playbackInfoWhyVideoCodec(String codec);
+
+  /// Playback information reason when the server could not determine the video profile
+  ///
+  /// In en, this message translates to:
+  /// **'The server couldn\'t verify this stream\'s {codec} profile.'**
+  String playbackInfoWhyVideoProfileUnknown(String codec);
 
   /// Playback information reason: the video codec's profile, like HEVC Main 10, isn't supported
   ///
@@ -28568,6 +29174,444 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved'**
   String get settingsPreviewSaved;
+
+  /// Title of the search results row with library titles the server's natural-language search matched to a vague query
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Search'**
+  String get smartSearch;
+
+  /// Title of the search results row with titles not in the library that the server's natural-language search found, which open in Seerr
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Search on {seerr}'**
+  String smartSearchOnSeerr(String seerr);
+
+  /// Name of the screen of upcoming episodes and movies from Sonarr and Radarr, on the navigation bar and as the screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar'**
+  String get calendar;
+
+  /// Settings toggle that adds the Calendar button to the navigation bar
+  ///
+  /// In en, this message translates to:
+  /// **'Show Calendar Button'**
+  String get showCalendarButton;
+
+  /// Subtitle of the Show Calendar Button setting
+  ///
+  /// In en, this message translates to:
+  /// **'Show the calendar of upcoming episodes and movies in the navigation bar'**
+  String get showCalendarButtonSubtitle;
+
+  /// Button on the calendar that opens the month grid
+  ///
+  /// In en, this message translates to:
+  /// **'Full calendar'**
+  String get calendarFullCalendar;
+
+  /// Calendar tab listing episodes and movies that haven't aired yet
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get calendarUpcoming;
+
+  /// Calendar tab listing episodes and movies from the last few days
+  ///
+  /// In en, this message translates to:
+  /// **'Recently aired'**
+  String get calendarRecentlyAired;
+
+  /// Button that asks for a notification when an episode or movie lands in the library
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me'**
+  String get calendarRemindMe;
+
+  /// Button label once a reminder is set. Pressing it again removes the reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder set'**
+  String get calendarReminderSet;
+
+  /// Message when setting or removing a calendar reminder fails
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the reminder'**
+  String get calendarReminderFailed;
+
+  /// Calendar row of recent episodes and movies that are already in the library
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to watch'**
+  String get calendarReadyToWatch;
+
+  /// Calendar row of episodes and movies airing in the next seven days
+  ///
+  /// In en, this message translates to:
+  /// **'Coming up this week'**
+  String get calendarComingUpThisWeek;
+
+  /// Calendar message when no episodes or movies are scheduled
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing coming up'**
+  String get calendarNothingUpcoming;
+
+  /// Calendar message when nothing aired in the last few days
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing aired recently'**
+  String get calendarNothingRecent;
+
+  /// Calendar message under a day with no episodes or movies
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on this day'**
+  String get calendarEmptyDay;
+
+  /// Label over the countdown to the next episode or movie
+  ///
+  /// In en, this message translates to:
+  /// **'Starts in'**
+  String get calendarStartsIn;
+
+  /// Unit under the days number of the calendar countdown
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get calendarUnitDays;
+
+  /// Unit under the hours number of the calendar countdown
+  ///
+  /// In en, this message translates to:
+  /// **'hr'**
+  String get calendarUnitHours;
+
+  /// Unit under the minutes number of the calendar countdown
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get calendarUnitMinutes;
+
+  /// When an episode airs, like Today at 9:00 PM
+  ///
+  /// In en, this message translates to:
+  /// **'{day} at {time}'**
+  String calendarDayAtTime(String day, String time);
+
+  /// Time column of a calendar entry with no time of day, like a movie release
+  ///
+  /// In en, this message translates to:
+  /// **'All day'**
+  String get calendarAllDay;
+
+  /// Tag on the first episode of a series
+  ///
+  /// In en, this message translates to:
+  /// **'Series premiere'**
+  String get calendarBadgeSeriesPremiere;
+
+  /// Tag on the first episode of a new season
+  ///
+  /// In en, this message translates to:
+  /// **'New season'**
+  String get calendarBadgeSeasonPremiere;
+
+  /// Tag on the last episode of a season
+  ///
+  /// In en, this message translates to:
+  /// **'Finale'**
+  String get calendarBadgeSeasonFinale;
+
+  /// Tag on the last episode before a season's mid-season break
+  ///
+  /// In en, this message translates to:
+  /// **'Midseason finale'**
+  String get calendarBadgeMidseasonFinale;
+
+  /// Tag on the last episode of a series
+  ///
+  /// In en, this message translates to:
+  /// **'Series finale'**
+  String get calendarBadgeSeriesFinale;
+
+  /// Short tag on a month grid day that has a premiere
+  ///
+  /// In en, this message translates to:
+  /// **'NEW'**
+  String get calendarBadgeNew;
+
+  /// Tag on a calendar entry that is already on the server
+  ///
+  /// In en, this message translates to:
+  /// **'In library'**
+  String get calendarStatusInLibrary;
+
+  /// Tag on a calendar entry that Sonarr or Radarr won't download
+  ///
+  /// In en, this message translates to:
+  /// **'Not monitored'**
+  String get calendarNotMonitored;
+
+  /// Button that opens a movie's details page from the calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Movie details'**
+  String get calendarMovieDetails;
+
+  /// Calendar message when the server admin keeps the calendar to admins
+  ///
+  /// In en, this message translates to:
+  /// **'The calendar is limited to admins on this server.'**
+  String get calendarProblemAdminsOnly;
+
+  /// Calendar message when the server can't reach Sonarr and Radarr yet
+  ///
+  /// In en, this message translates to:
+  /// **'An admin needs to sign in to Seerr in Moonfin before the calendar can load.'**
+  String get calendarProblemNeedsSeerr;
+
+  /// Calendar message when the server has no Sonarr or Radarr
+  ///
+  /// In en, this message translates to:
+  /// **'No Sonarr or Radarr server is linked yet.'**
+  String get calendarProblemNotConfigured;
+
+  /// Calendar message when loading fails
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the calendar.'**
+  String get calendarProblemFailed;
+
+  /// Subtitle of the Calendar entry under Integrations in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Style, filters and actions for the calendar'**
+  String get calendarSettingsSubtitle;
+
+  /// Calendar settings section header for how the calendar opens and lays out weeks
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get calendarSettingsView;
+
+  /// Calendar setting that picks what the Calendar button opens
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar style'**
+  String get calendarSettingsStyle;
+
+  /// Description of the Calendar style setting
+  ///
+  /// In en, this message translates to:
+  /// **'What the Calendar button opens. The full month is one button away in both.'**
+  String get calendarSettingsStyleDescription;
+
+  /// Calendar style that lists episodes and movies day by day
+  ///
+  /// In en, this message translates to:
+  /// **'Agenda'**
+  String get calendarSettingsStyleAgenda;
+
+  /// Calendar style that counts down to the next episode or movie
+  ///
+  /// In en, this message translates to:
+  /// **'Countdown'**
+  String get calendarSettingsStyleCountdown;
+
+  /// Calendar setting for the first day of the week in the month grid
+  ///
+  /// In en, this message translates to:
+  /// **'Week starts on'**
+  String get calendarSettingsWeekStart;
+
+  /// Calendar settings section header for which episodes and movies the calendar lists
+  ///
+  /// In en, this message translates to:
+  /// **'What shows'**
+  String get calendarSettingsWhatShows;
+
+  /// Calendar setting that limits the calendar to the user's own series. The choices are Everything and My shows
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get calendarSettingsScope;
+
+  /// Description of the calendar Show setting
+  ///
+  /// In en, this message translates to:
+  /// **'My shows keeps the series you favorited or started watching'**
+  String get calendarSettingsScopeDescription;
+
+  /// Calendar Show choice that lists every episode and movie
+  ///
+  /// In en, this message translates to:
+  /// **'Everything'**
+  String get calendarSettingsScopeEverything;
+
+  /// Calendar Show choice that lists only series the user favorited or started watching
+  ///
+  /// In en, this message translates to:
+  /// **'My shows'**
+  String get calendarSettingsScopeMyShows;
+
+  /// Calendar setting that also lists titles Sonarr and Radarr won't download
+  ///
+  /// In en, this message translates to:
+  /// **'Include unmonitored'**
+  String get calendarSettingsUnmonitored;
+
+  /// Subtitle of the Include unmonitored calendar setting
+  ///
+  /// In en, this message translates to:
+  /// **'Also list episodes and movies Sonarr and Radarr aren\'t set to download'**
+  String get calendarSettingsUnmonitoredSubtitle;
+
+  /// Calendar setting that lists special episodes, the ones in season 0
+  ///
+  /// In en, this message translates to:
+  /// **'Specials'**
+  String get calendarSettingsSpecials;
+
+  /// Subtitle of the Specials calendar setting
+  ///
+  /// In en, this message translates to:
+  /// **'Season 0 episodes, like extras and holiday specials'**
+  String get calendarSettingsSpecialsSubtitle;
+
+  /// Calendar setting that marks premieres and finales on the calendar
+  ///
+  /// In en, this message translates to:
+  /// **'Premiere and finale tags'**
+  String get calendarSettingsBadges;
+
+  /// Subtitle of the Premiere and finale tags calendar setting
+  ///
+  /// In en, this message translates to:
+  /// **'Mark premieres, finales and new seasons'**
+  String get calendarSettingsBadgesSubtitle;
+
+  /// Calendar setting for what the colors on calendar entries mean. The choices are Type and Status
+  ///
+  /// In en, this message translates to:
+  /// **'Color by'**
+  String get calendarSettingsColorBy;
+
+  /// Description of the Color by calendar setting
+  ///
+  /// In en, this message translates to:
+  /// **'Type tells episodes from movies. Status shows what\'s in your library, coming up or missing.'**
+  String get calendarSettingsColorByDescription;
+
+  /// Color by choice that colors episodes and movies differently
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get calendarSettingsColorByType;
+
+  /// Calendar setting for the artwork on the Countdown rows
+  ///
+  /// In en, this message translates to:
+  /// **'Card image'**
+  String get calendarSettingsImageType;
+
+  /// Description of the Card image calendar setting
+  ///
+  /// In en, this message translates to:
+  /// **'The artwork on the Countdown rows'**
+  String get calendarSettingsImageTypeDescription;
+
+  /// Calendar setting that hides episode details for shows the user hasn't caught up on
+  ///
+  /// In en, this message translates to:
+  /// **'Spoiler safe'**
+  String get calendarSettingsSpoilerSafe;
+
+  /// Subtitle of the Spoiler safe calendar setting
+  ///
+  /// In en, this message translates to:
+  /// **'Hide episode titles and stills for shows you\'re behind on'**
+  String get calendarSettingsSpoilerSafeSubtitle;
+
+  /// Calendar settings section header for what buttons and selecting an entry do
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get calendarSettingsActions;
+
+  /// Calendar setting for what OK or a tap does on an entry that is in the library
+  ///
+  /// In en, this message translates to:
+  /// **'Selecting an item'**
+  String get calendarSettingsSelectAction;
+
+  /// Description of the Selecting an item calendar setting
+  ///
+  /// In en, this message translates to:
+  /// **'What OK or a tap does on something that\'s already in your library'**
+  String get calendarSettingsSelectActionDescription;
+
+  /// Selecting an item choice that opens the details page
+  ///
+  /// In en, this message translates to:
+  /// **'Open details'**
+  String get calendarSettingsSelectDetails;
+
+  /// Selecting an item choice that starts playback when the episode or movie is in the library
+  ///
+  /// In en, this message translates to:
+  /// **'Play when in library'**
+  String get calendarSettingsSelectPlay;
+
+  /// Calendar setting that shows the request button on missing titles
+  ///
+  /// In en, this message translates to:
+  /// **'Request button'**
+  String get calendarSettingsRequestButton;
+
+  /// Subtitle of the Request button calendar setting. Seerr is a product name
+  ///
+  /// In en, this message translates to:
+  /// **'Show the Seerr request button on missing movies and seasons'**
+  String get calendarSettingsRequestButtonSubtitle;
+
+  /// Calendar setting that offers the Remind me button
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get calendarSettingsReminders;
+
+  /// Subtitle of the Reminders calendar setting
+  ///
+  /// In en, this message translates to:
+  /// **'Show Remind me, which sends a notification when a title lands in your library'**
+  String get calendarSettingsRemindersSubtitle;
+
+  /// Home Screen setting that ends the upcoming episode and movie rows with a card that opens the calendar
+  ///
+  /// In en, this message translates to:
+  /// **'See All card'**
+  String get calendarRowSeeAll;
+
+  /// Subtitle of the See All card setting
+  ///
+  /// In en, this message translates to:
+  /// **'End the upcoming rows with a card that opens the calendar'**
+  String get calendarRowSeeAllSubtitle;
+
+  /// Playback setting that says when the next episode airs at the end of an episode
+  ///
+  /// In en, this message translates to:
+  /// **'Next air date at the end'**
+  String get showNextAirDate;
+
+  /// Subtitle of the Next air date at the end setting
+  ///
+  /// In en, this message translates to:
+  /// **'When the next episode isn\'t in your library yet, the end of episode card says when it airs'**
+  String get showNextAirDateSubtitle;
 }
 
 class _AppLocalizationsDelegate

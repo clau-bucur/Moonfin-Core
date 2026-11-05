@@ -13,6 +13,7 @@ import '../../auth/repositories/user_repository.dart';
 import '../../auth/store/authentication_store.dart';
 import '../../auth/store/credential_store.dart';
 import '../../data/repositories/anime_marker_repository.dart';
+import '../../data/repositories/calendar_repository.dart';
 import '../../data/repositories/mdblist_repository.dart';
 import '../../data/repositories/multi_server_repository.dart';
 import '../../data/repositories/media_bar_repository.dart';
@@ -78,6 +79,7 @@ void resetUserScopedSingletons() {
   unregister<MediaBarRepository>();
   unregister<TmdbRepository>();
   unregister<MdbListRepository>();
+  unregister<CalendarRepository>();
   unregister<AnimeMarkerRepository>();
   unregister<RowDataSource>();
   RowDataSource.clearRecommendationCache();
@@ -272,6 +274,10 @@ void _registerUserScopedSingletons() {
   );
   _getIt.registerLazySingleton(
     () => TmdbRepository(_getIt<MediaServerClient>()),
+    dispose: (repository) => repository.dispose(),
+  );
+  _getIt.registerLazySingleton(
+    () => CalendarRepository(_getIt<MediaServerClient>()),
     dispose: (repository) => repository.dispose(),
   );
   _getIt.registerLazySingleton(

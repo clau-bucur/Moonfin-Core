@@ -18,6 +18,8 @@ class StageTrackChips extends StatefulWidget {
   /// Left off the first chip, back to the buttons beside the poster.
   final VoidCallback? onLeftEdge;
 
+  final bool shareRow;
+
   const StageTrackChips({
     super.key,
     required this.choices,
@@ -26,6 +28,7 @@ class StageTrackChips extends StatefulWidget {
     required this.onNavigateUp,
     required this.onNavigateDown,
     this.onLeftEdge,
+    this.shareRow = false,
   });
 
   @override
@@ -54,60 +57,58 @@ class _StageTrackChipsState extends State<StageTrackChips> {
     final textTheme = Theme.of(context).textTheme;
     final muted = AppColorScheme.onBackground.withValues(alpha: 0.62);
 
-    return Wrap(
-      key: const ValueKey('stage-track-chips'),
-      spacing: 10,
-      runSpacing: 10,
-      children: [
-        for (final (index, choice) in widget.choices.indexed)
-          FocusableButton(
-            focusNode: node(index),
-            onPressed: () async {
-              await widget.onOpen(choice.kind);
-              if (mounted &&
-                  index < widget.choices.length &&
-                  widget.choices[index].kind == choice.kind &&
-                  ModalRoute.of(context)?.isCurrent != false) {
-                node(index).requestFocus();
-              }
-            },
-            onNavigateUp: widget.onNavigateUp,
-            onNavigateDown: widget.onNavigateDown,
-            onNavigateLeft: () {
-              if (index == 0) {
-                widget.onLeftEdge?.call();
-              } else {
-                node(index - 1).requestFocus();
-              }
-            },
-            onNavigateRight: () {
-              if (index + 1 < widget.choices.length) {
-                node(index + 1).requestFocus();
-              }
-            },
-            borderRadius: 20,
-            padding: EdgeInsets.zero,
-            semanticLabel: '${choice.kind.label(l10n)}: ${choice.current}',
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-              decoration: BoxDecoration(
-                color: AppColorScheme.onBackground.withValues(alpha: 0.06),
-                borderRadius: AppRadius.circular(20),
-                border: Border.all(
-                  color: AppColorScheme.onBackground.withValues(alpha: 0.22),
-                ),
+    final chips = <Widget>[
+      for (final (index, choice) in widget.choices.indexed)
+        FocusableButton(
+          focusNode: node(index),
+          onPressed: () async {
+            await widget.onOpen(choice.kind);
+            if (mounted &&
+                index < widget.choices.length &&
+                widget.choices[index].kind == choice.kind &&
+                ModalRoute.of(context)?.isCurrent != false) {
+              node(index).requestFocus();
+            }
+          },
+          onNavigateUp: widget.onNavigateUp,
+          onNavigateDown: widget.onNavigateDown,
+          onNavigateLeft: () {
+            if (index == 0) {
+              widget.onLeftEdge?.call();
+            } else {
+              node(index - 1).requestFocus();
+            }
+          },
+          onNavigateRight: () {
+            if (index + 1 < widget.choices.length) {
+              node(index + 1).requestFocus();
+            }
+          },
+          borderRadius: 20,
+          padding: EdgeInsets.zero,
+          semanticLabel: '${choice.kind.label(l10n)}: ${choice.current}',
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+            decoration: BoxDecoration(
+              color: AppColorScheme.onBackground.withValues(alpha: 0.06),
+              borderRadius: AppRadius.circular(20),
+              border: Border.all(
+                color: AppColorScheme.onBackground.withValues(alpha: 0.22),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(choice.kind.icon, size: 18, color: muted),
-                  const SizedBox(width: 8),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(choice.kind.icon, size: 18, color: muted),
+                const SizedBox(width: 8),
+                if (!widget.shareRow)
                   Text(
                     choice.kind.label(l10n),
                     style: textTheme.bodySmall?.copyWith(color: muted),
                   ),
-                  const SizedBox(width: 8),
-                  ConstrainedBox(
+                if (!widget.shareRow) const SizedBox(width: 8),
+                Flexible(
+                  child: ConstrainedBox(
                     constraints: BoxConstraints(
                       maxWidth: choice.kind == DetailButton.version ? 320 : 240,
                     ),
@@ -121,11 +122,24 @@ class _StageTrackChipsState extends State<StageTrackChips> {
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-      ],
+        ),
+    ];
+    if (widget.shareRow) {
+      return Row(
+        key: const ValueKey('stage-track-chips'),
+        spacing: 8,
+        children: [for (final chip in chips) Flexible(child: chip)],
+      );
+    }
+    return Wrap(
+      key: const ValueKey('stage-track-chips'),
+      spacing: 10,
+      runSpacing: 10,
+      children: chips,
     );
   }
 }

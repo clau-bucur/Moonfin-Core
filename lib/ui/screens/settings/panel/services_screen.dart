@@ -18,8 +18,11 @@ class _ServicesScreenState extends State<_ServicesScreen> {
     super.initState();
     // A session switch clears the flag before it knows whether it will get far
     // enough to probe again, so ask here rather than trust what login left.
-    final achievements = GetIt.instance<AchievementsService>();
-    if (!achievements.available &&
+    final achievements = GetIt.instance.isRegistered<AchievementsService>()
+        ? GetIt.instance<AchievementsService>()
+        : null;
+    if (achievements != null &&
+        !achievements.available &&
         GetIt.instance.isRegistered<MediaServerClient>()) {
       unawaited(
         achievements.refreshAvailability(GetIt.instance<MediaServerClient>()),
@@ -36,7 +39,10 @@ class _ServicesScreenState extends State<_ServicesScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final achievementsService = GetIt.instance<AchievementsService>();
+    final achievementsService =
+        GetIt.instance.isRegistered<AchievementsService>()
+        ? GetIt.instance<AchievementsService>()
+        : null;
     return withCleanSettingsTypography(
       context,
       Scaffold(
@@ -47,7 +53,10 @@ class _ServicesScreenState extends State<_ServicesScreen> {
           // The plugin probe lands after sign in, so the list waits on it
           // rather than reading the flag once and never hearing the answer.
           child: ListenableBuilder(
-            listenable: achievementsService,
+            listenable: Listenable.merge([
+              if (achievementsService != null) achievementsService,
+              GetIt.instance<PluginSyncService>(),
+            ]),
             builder: (context, _) => _buildList(l10n, achievementsService),
           ),
         ),
@@ -55,11 +64,12 @@ class _ServicesScreenState extends State<_ServicesScreen> {
     );
   }
 
-  Widget _buildList(AppLocalizations l10n, AchievementsService achievements) {
+  Widget _buildList(AppLocalizations l10n, AchievementsService? achievements) {
     final seerrLabel = GetIt.instance<SeerrPreferences>().labelOrDefault(
       l10n.seerr,
     );
-    final seerrShown = seerrOnAnySignedInServer();
+    final seerrShown = !VideoAppProfile.enabled && seerrOnAnySignedInServer();
+    final calendarShown = GetIt.instance<PluginSyncService>().calendarAvailable;
     return ListView(
       children: [
         adaptiveListSection(
@@ -79,18 +89,26 @@ class _ServicesScreenState extends State<_ServicesScreen> {
                 onTap: () =>
                     context.pushSettingsScreen(const SeerrConfigScreen()),
               ),
-            if (achievements.available)
+            if (calendarShown)
               _TvSettingsListTile(
                 autofocus: !seerrShown,
+                leading: const Icon(Icons.calendar_month),
+                title: Text(l10n.calendar),
+                subtitle: Text(l10n.calendarSettingsSubtitle),
+                onTap: () =>
+                    context.pushSettingsScreen(const _CalendarSettingsScreen()),
+              ),
+            if (!VideoAppProfile.enabled && (achievements?.available ?? false))
+              _TvSettingsListTile(
+                autofocus: !seerrShown && !calendarShown,
                 leading: const Icon(
                   Icons.military_tech,
                   color: Color(0xFFFFC107),
                 ),
                 title: Text(l10n.achievementBadges),
                 subtitle: Text(l10n.achievementBadgesSubtitle),
-                onTap: () => context.pushSettingsScreen(
-                  const AchievementsScreen(),
-                ),
+                onTap: () =>
+                    context.pushSettingsScreen(const AchievementsScreen()),
               ),
           ],
         ),

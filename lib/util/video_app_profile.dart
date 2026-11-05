@@ -76,6 +76,7 @@ abstract final class VideoAppProfile {
     'pref_show_seerr_button': false,
     'pref_show_seerr_availability_badges': false,
     'seerr_enabled': false,
+    'mdblistWatchingNowEnabled': false,
     'seasonal_follower': false,
     'mediaPreviewMode': 'off',
     'seasonal_surprise': 'none',

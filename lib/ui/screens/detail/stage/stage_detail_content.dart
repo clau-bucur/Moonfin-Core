@@ -78,6 +78,7 @@ class StageDetailContent extends StatefulWidget {
 
   /// The prepared page has mounted and its initial focus handoff has settled.
   final VoidCallback? onReady;
+  final VoidCallback? onCollapseBiography;
 
   const StageDetailContent({
     super.key,
@@ -92,6 +93,7 @@ class StageDetailContent extends StatefulWidget {
     required this.onActionsExpandedChanged,
     this.onToggleNavbar,
     this.onReady,
+    this.onCollapseBiography,
   });
 
   @override
@@ -326,7 +328,15 @@ class _StageDetailContentState extends State<StageDetailContent> {
     // above and below it.
     final beside = _besideSections(item, sections, l10n);
     final below = _belowSections(item, sections, l10n);
-    _beside = [for (final s in beside) ?s.node];
+    final overview = cleanOverview(item.overview?.trim());
+    final showOverview = overview.isNotEmpty && !hidesMediaDescription(
+      itemType: item.type,
+      hideMediaDescription: widget.prefs.effectiveHideDetailsMediaDescription,
+    );
+    _beside = [
+      if (landscape && showOverview) _node('overview'),
+      for (final s in beside) ?s.node,
+    ];
     _below = [for (final s in below) ?s.node];
 
     final posterWidth = stagePosterWidth(
@@ -858,10 +868,13 @@ class _StageDetailContentState extends State<StageDetailContent> {
           const SizedBox(height: 12),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 860),
-            child: Text(
-              overview,
-              maxLines: landscape ? 4 : null,
-              overflow: landscape ? TextOverflow.ellipsis : null,
+            child: ExpandableBiography(
+              text: overview,
+              toggleFocusNode: _node('overview'),
+              onArrowUp: () => _moveUp(_node('overview')),
+              onArrowDown: () => _moveDown(_node('overview')),
+              onArrowLeft: _toActions,
+              onCollapse: widget.onCollapseBiography,
               style: textTheme.bodyMedium?.copyWith(color: muted, height: 1.5),
             ),
           ),

@@ -75,6 +75,11 @@ class Destinations {
   static const libraryBrowse = '/library/:libraryId';
   static const allGenres = '/genres';
   static const allFavorites = '/favorites';
+
+  /// Opens the user's calendar style. The month grid sits under it.
+  static const calendar = '/calendar';
+  static const calendarMonth = '/calendar/month';
+
   static const folderBrowse = '/folder/:folderId';
   static const collectionBrowse = '/collection/:collectionId';
   static const libraryViewRoute = '/library-view/:libraryId';
@@ -197,12 +202,14 @@ class Destinations {
   /// always the item's own season: a special inlined by
   /// DisplaySpecialsWithinSeasons is listed under a regular season while still
   /// living in Specials. Carrying it keeps the episode list and the play queue
-  /// on the season that was on screen.
+  /// on the season that was on screen. [full] opens the full page where Quick
+  /// Look would open its drawer.
   static String item(
     String itemId, {
     String? serverId,
     bool autoPlay = false,
     String? seasonContext,
+    bool full = false,
   }) {
     final base = '/item/$itemId';
     final params = <String>[
@@ -210,6 +217,7 @@ class Destinations {
       if (autoPlay) 'autoPlay=true',
       if (seasonContext != null && seasonContext.isNotEmpty)
         'seasonContext=${Uri.encodeQueryComponent(seasonContext)}',
+      if (full) 'full=true',
     ];
     return params.isEmpty ? base : '$base?${params.join('&')}';
   }

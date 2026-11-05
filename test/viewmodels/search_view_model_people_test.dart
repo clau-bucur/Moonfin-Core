@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:moonfin/util/video_app_profile.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:mocktail/mocktail.dart';
@@ -28,6 +29,7 @@ void main() {
     itemsApi = _MockItemsApi();
     when(() => client.itemsApi).thenReturn(itemsApi);
     when(() => client.gamesApi).thenReturn(null);
+    when(() => client.serverType).thenReturn(ServerType.jellyfin);
   });
 
   tearDown(() => GetIt.instance.reset());
@@ -38,6 +40,7 @@ void main() {
         searchTerm: term,
         parentId: any(named: 'parentId'),
         includeItemTypes: any(named: 'includeItemTypes'),
+        excludeItemTypes: any(named: 'excludeItemTypes'),
         limit: any(named: 'limit'),
         recursive: any(named: 'recursive'),
         fields: any(named: 'fields'),
@@ -199,7 +202,7 @@ void main() {
       async.flushMicrotasks();
 
       expect(vm.state, SearchState.ready);
-      expect(groupTypes(vm), ['Book', 'AudioBook']);
+      expect(groupTypes(vm), VideoAppProfile.enabled ? isEmpty : ['Book', 'AudioBook']);
       verifyNever(
         () => itemsApi.getPersons(
           searchTerm: any(named: 'searchTerm'),

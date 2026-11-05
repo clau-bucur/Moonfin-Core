@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:moonfin/util/video_app_profile.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:mocktail/mocktail.dart';
@@ -38,6 +39,7 @@ void main() {
     searchTerm: any(named: 'searchTerm'),
     parentId: any(named: 'parentId'),
     includeItemTypes: any(named: 'includeItemTypes'),
+    excludeItemTypes: any(named: 'excludeItemTypes'),
     limit: any(named: 'limit'),
     recursive: any(named: 'recursive'),
     fields: any(named: 'fields'),
@@ -71,6 +73,7 @@ void main() {
       when(() => client.itemsApi).thenReturn(itemsApi);
       when(() => client.imageApi).thenReturn(_MockImageApi());
       when(() => client.gamesApi).thenReturn(null);
+      when(() => client.serverType).thenReturn(ServerType.jellyfin);
       when(() => itemsApi.getPersons(
         searchTerm: any(named: 'searchTerm'),
         limit: any(named: 'limit'),
@@ -164,6 +167,23 @@ void main() {
       expect(item.channelId, 'c1');
     },
   );
+
+  test('audiobooks follow the active application profile', () async {
+    when(() => itemsSearch(itemsApis['a']!)).thenAnswer(
+      (_) async => {
+        'Items': [
+          {'Id': 'ab1', 'Type': 'AudioBook', 'Name': 'Chapter 01'},
+        ],
+      },
+    );
+    final vm = await search(query: 'chapter');
+    if (VideoAppProfile.enabled) {
+      expect(vm.results, isEmpty);
+    } else {
+      expect(vm.results.single.itemTypes, ['AudioBook']);
+      expect(vm.results.single.items.single.id, 'ab1');
+    }
+  });
 
   test('results come from every signed-in server, taking turns', () async {
     when(() => itemsSearch(itemsApis['a']!))

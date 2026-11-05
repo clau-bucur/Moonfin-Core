@@ -338,7 +338,7 @@
   "@detailScreenStyle": {
     "description": "Label for the media detail screen layout style setting"
   },
-  "detailScreenStyleSubtitle": "Classic is the original centered moonfin layout. Modern is a responsive cinematic layout. Spotlight is a hero-first layout with pop-up content cards. Nouveau is a full-screen layout with sections stacked down the page. Minimalist is artwork, one play button and the episodes. Stage leads with the poster, with play under it and the details beside it.",
+  "detailScreenStyleSubtitle": "Classic is the original centered moonfin layout. Modern is a responsive cinematic layout. Spotlight is a hero-first layout with pop-up content cards. Nouveau is a full-screen layout with sections stacked down the page. Minimalist is artwork, one play button and the episodes. Stage leads with the poster, with play under it and the details beside it. Premiere centers the title over a backdrop that fills the screen, with every section down the page under it. Quick Look opens a drawer over the screen you were on, with the full page a press away. Frost floats the title in a glass window over a blurred copy of its art, with its parts in tabs under the buttons.",
   "@detailScreenStyleSubtitle": {
     "description": "Explanation under the detail screen style setting"
   },
@@ -552,6 +552,38 @@
   "detailScreenStyleStage": "Stage",
   "@detailScreenStyleStage": {
     "description": "Detail screen style option: the poster leads, with play under it and the details beside it"
+  },
+  "detailScreenStylePremiere": "Premiere",
+  "@detailScreenStylePremiere": {
+    "description": "Detail screen style option: the title centered over a full screen backdrop, with every section down the page under it"
+  },
+  "detailScreenStyleQuickLook": "Quick Look",
+  "@detailScreenStyleQuickLook": {
+    "description": "Detail screen style option: a drawer over the screen the title was picked on, instead of a full page"
+  },
+  "detailScreenStyleFrost": "Frost",
+  "@detailScreenStyleFrost": {
+    "description": "Detail screen style option: the title in a glass window over a blurred copy of its art, with tabs under the buttons"
+  },
+  "quickLookOpenFullPage": "Open full page",
+  "@quickLookOpenFullPage": {
+    "description": "Button at the foot of the Quick Look drawer that opens the title's full details page"
+  },
+  "quickLookBackToClose": "Back to close",
+  "@quickLookBackToClose": {
+    "description": "Hint on the Quick Look drawer telling a TV viewer that the Back button closes it"
+  },
+  "quickLookSeasonPlayed": "{played} of {total}",
+  "@quickLookSeasonPlayed": {
+    "description": "How many of a season's episodes have been watched, on a season card in the Quick Look drawer",
+    "placeholders": {
+      "played": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
   },
   "expandedTabs": "Expanded Tabs",
   "@expandedTabs": {
@@ -2165,6 +2197,10 @@
   "@audioTrack": {
     "description": "Dialog title for audio track selection"
   },
+  "noOtherAudioTracks": "No other audio tracks",
+  "@noOtherAudioTracks": {
+    "description": "Shown when the remote's Audio button is pressed and the channel has one audio track or none"
+  },
   "subtitleTrack": "Subtitle Track",
   "@subtitleTrack": {
     "description": "Dialog title for subtitle track selection"
@@ -3644,6 +3680,15 @@
       },
       "total": {
         "type": "int"
+      }
+    }
+  },
+  "playerMatchingDisplayRate": "Matching display to {fps} fps…",
+  "@playerMatchingDisplayRate": {
+    "description": "Shown while playback waits for the TV to switch to the video's frame rate, like 23.976 or 59.94",
+    "placeholders": {
+      "fps": {
+        "type": "String"
       }
     }
   },
@@ -5135,6 +5180,98 @@
   "@upcomingEpisodeTomorrow": {
     "description": "Upcoming episode airs tomorrow"
   },
+  "radarrCalendarRow": "Upcoming Movies (Radarr)",
+  "@radarrCalendarRow": {
+    "description": "Home row title for upcoming movies from the Radarr calendar"
+  },
+  "sonarrCalendarRow": "Upcoming TV Shows (Sonarr)",
+  "@sonarrCalendarRow": {
+    "description": "Home row title for upcoming episodes from the Sonarr calendar"
+  },
+  "mergedCalendarRow": "Upcoming Releases",
+  "@mergedCalendarRow": {
+    "description": "Home row title when the Radarr and Sonarr calendars are merged"
+  },
+  "arrCalendarsRowSubtitle": "Radarr and Sonarr Calendars",
+  "@arrCalendarsRowSubtitle": {
+    "description": "Subtitle under the home row that merges the Radarr and Sonarr calendars"
+  },
+  "radarrCalendarRowSubtitle": "Radarr Calendar",
+  "@radarrCalendarRowSubtitle": {
+    "description": "Subtitle under the Radarr calendar home row"
+  },
+  "sonarrCalendarRowSubtitle": "Sonarr Calendar",
+  "@sonarrCalendarRowSubtitle": {
+    "description": "Subtitle under the Sonarr calendar home row"
+  },
+  "calendarReleaseIn": "{days, plural, =0{Today} =1{Tomorrow} other{In {days} days}} ({date})",
+  "@calendarReleaseIn": {
+    "description": "Release date under a movie in the Radarr calendar row, e.g. 'In 2 days (Oct 29)'",
+    "placeholders": {
+      "days": {"type": "int"},
+      "date": {"type": "String"}
+    }
+  },
+  "calendarReleaseCinema": "Cinema",
+  "@calendarReleaseCinema": {
+    "description": "Release format before the date in the Radarr calendar row, e.g. 'Cinema · Tomorrow (Nov 4)'"
+  },
+  "calendarReleaseDigital": "Digital",
+  "@calendarReleaseDigital": {
+    "description": "Release format before the date in the Radarr calendar row, e.g. 'Digital · Tomorrow (Nov 4)'"
+  },
+  "calendarReleasePhysical": "Physical",
+  "@calendarReleasePhysical": {
+    "description": "Release format before the date in the Radarr calendar row, e.g. 'Physical · Tomorrow (Nov 4)'"
+  },
+  "upcomingCalendars": "Upcoming Calendars",
+  "@upcomingCalendars": {
+    "description": "Settings screen for the Radarr and Sonarr calendar home rows"
+  },
+  "upcomingCalendarsDescription": "Toggle Upcoming Calendars from Radarr/Sonarr.",
+  "@upcomingCalendarsDescription": {
+    "description": "Subtitle of the Upcoming Calendars settings entry"
+  },
+  "enableRadarrCalendar": "Enable Radarr's Upcoming Calendar",
+  "@enableRadarrCalendar": {
+    "description": "Turns on the Radarr calendar home row"
+  },
+  "radarrCalendarShowCinema": "Show Upcoming Cinema Releases",
+  "@radarrCalendarShowCinema": {
+    "description": "Includes cinema release dates in the Radarr calendar row"
+  },
+  "radarrCalendarShowDigital": "Show Upcoming Digital Releases",
+  "@radarrCalendarShowDigital": {
+    "description": "Includes digital release dates in the Radarr calendar row"
+  },
+  "radarrCalendarShowPhysical": "Show Upcoming Physical Releases",
+  "@radarrCalendarShowPhysical": {
+    "description": "Includes physical release dates in the Radarr calendar row"
+  },
+  "calendarShowReleaseDate": "Show Release Date on Home Screen",
+  "@calendarShowReleaseDate": {
+    "description": "Shows the release date under each item of a calendar row"
+  },
+  "radarrCalendarHideDownloaded": "Hide Movies Already on the Server",
+  "@radarrCalendarHideDownloaded": {
+    "description": "Leaves out movies Radarr already downloaded from the calendar row"
+  },
+  "enableSonarrCalendar": "Enable Sonarr's Upcoming Calendar",
+  "@enableSonarrCalendar": {
+    "description": "Turns on the Sonarr calendar home row"
+  },
+  "sonarrCalendarShowEpisodeInfo": "Display Episode Information",
+  "@sonarrCalendarShowEpisodeInfo": {
+    "description": "Shows the season and episode number in the Sonarr calendar row"
+  },
+  "sonarrCalendarHideDownloaded": "Hide Episodes Already on the Server",
+  "@sonarrCalendarHideDownloaded": {
+    "description": "Leaves out episodes Sonarr already downloaded from the calendar row"
+  },
+  "mergeRadarrSonarrCalendars": "Merge Sonarr and Radarr Calendars",
+  "@mergeRadarrSonarrCalendars": {
+    "description": "Shows the Radarr and Sonarr calendars as a single home row"
+  },
   "moveUp": "Move Up",
   "@moveUp": {
     "description": "Moves a button one place earlier in its row"
@@ -6482,6 +6619,32 @@
   "@mediaBarSourceRandom": {
     "description": "Media bar source: any eligible title"
   },
+  "mediaBarSourceNewReleases": "New Seasons & Episodes",
+  "@mediaBarSourceNewReleases": {
+    "description": "Media bar source: series with episodes that aired recently"
+  },
+  "mediaBarNewReleaseBanner": "New Release Banner",
+  "@mediaBarNewReleaseBanner": {
+    "description": "Setting that flags series in the media bar when new episodes aired recently"
+  },
+  "mediaBarNewReleaseBannerDescription": "Flag series with a new season or new episodes that aired recently.",
+  "mediaBarNewReleaseDays": "New Release Window",
+  "@mediaBarNewReleaseDays": {
+    "description": "Setting for how many days an episode counts as new in the media bar"
+  },
+  "mediaBarNewReleaseDaysDescription": "How long after an episode airs it still counts as new.",
+  "mediaBarNewSeries": "New Series",
+  "@mediaBarNewSeries": {
+    "description": "Media bar label on a series whose first season was released recently"
+  },
+  "mediaBarNewSeason": "New Season",
+  "@mediaBarNewSeason": {
+    "description": "Media bar label on a series whose latest season was released all at once recently"
+  },
+  "mediaBarNewEpisodes": "New Episodes",
+  "@mediaBarNewEpisodes": {
+    "description": "Media bar label on a series with one or more episodes that aired recently"
+  },
   "moviesAndTvShows": "Movies & TV Shows",
   "@moviesAndTvShows": {
     "description": "Content type: movies and TV shows"
@@ -6987,6 +7150,53 @@
   "@additionalRatings": {
     "description": "Setting for additional ratings"
   },
+  "mdblistWatchingNow": "Watching on MDBList",
+  "@mdblistWatchingNow": {
+    "description": "Title of the Watching on MDBList home row"
+  },
+  "mdblistWatchingNowDescription": "Show what MDBList users are currently watching",
+  "@mdblistWatchingNowDescription": {
+    "description": "Description for the Watching on MDBList setting"
+  },
+  "watchingNowWatchersCount": "{count} watching",
+  "@watchingNowWatchersCount": {
+    "description": "Badge on Watching on MDBList card showing current watchers count",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "watchingNowLiveSummary": "{users} watching now · {movies} movies · {shows} shows",
+  "@watchingNowLiveSummary": {
+    "description": "Subtitle for Watching on MDBList home row showing live site statistics",
+    "placeholders": {
+      "users": {
+        "type": "String"
+      },
+      "movies": {
+        "type": "String"
+      },
+      "shows": {
+        "type": "String"
+      }
+    }
+  },
+  "watchingNowLiveSummaryToday": "{users} watched today · {movies} movies · {shows} shows",
+  "@watchingNowLiveSummaryToday": {
+    "description": "Subtitle for Watching on MDBList home row showing 24-hour fallback site statistics",
+    "placeholders": {
+      "users": {
+        "type": "String"
+      },
+      "movies": {
+        "type": "String"
+      },
+      "shows": {
+        "type": "String"
+      }
+    }
+  },
   "showMdbListAndTmdbRatings": "Show MDBList and TMDB ratings",
   "@showMdbListAndTmdbRatings": {
     "description": "Description for additional ratings"
@@ -7195,11 +7405,23 @@
   },
   "showSeerrAvailabilityBadges": "Show Seerr Availability Badges",
   "@showSeerrAvailabilityBadges": {
-    "description": "Setting title for showing Seerr availability badges on media details pages"
+    "description": "Setting title for showing Seerr availability badges on posters across the app"
   },
-  "showSeerrAvailabilityBadgesDescription": "Show season availability badges on media details pages",
+  "showSeerrAvailabilityBadgesDescription": "Show the Seerr status on posters and seasons across the app",
   "@showSeerrAvailabilityBadgesDescription": {
-    "description": "Setting description for showing Seerr availability badges on media details pages"
+    "description": "Setting description for showing Seerr availability badges on posters across the app"
+  },
+  "seerrBadgeStyle": "Badge Style",
+  "@seerrBadgeStyle": {
+    "description": "Setting title for how posters show their Seerr status"
+  },
+  "seerrBadgeStyleDescription": "Badge puts Seerr's dot in a corner. Banner runs the status across the top of the poster.",
+  "@seerrBadgeStyleDescription": {
+    "description": "Setting description for the Seerr badge style choices"
+  },
+  "seerrBadgeStyleBadge": "Badge",
+  "@seerrBadgeStyleBadge": {
+    "description": "Seerr badge style that shows a status dot in a poster corner"
   },
   "seerrNotificationsSection": "Notifications",
   "@seerrNotificationsSection": {
@@ -11098,6 +11320,48 @@
   "genresRowItemsDescription": "Show Movies, Series, or both in Genres rows.",
   "displayStudiosRows": "Display Studio Row",
   "displayStudiosRowsSubtitle": "Show Studio row in Home Sections.",
+  "sinceYouWatched": "Since You Watched",
+  "@sinceYouWatched": {
+    "description": "Settings section header for the Since You Watched rows"
+  },
+  "sinceYouWatchedRowTitle": "Since you watched",
+  "@sinceYouWatchedRowTitle": {
+    "description": "Home row title for a Since You Watched row before its source item is known"
+  },
+  "sinceYouWatchedItemRowTitle": "Since you watched \"{title}\"",
+  "@sinceYouWatchedItemRowTitle": {
+    "description": "Home row title for recommendations based on an item the user watched",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "sinceYouWatchedRowNumber": "Since You Watched Row {number}",
+  "@sinceYouWatchedRowNumber": {
+    "description": "Name of one of the Since You Watched rows in the home sections list",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "displaySinceYouWatchedRows": "Display Since You Watched Rows",
+  "displaySinceYouWatchedRowsSubtitle": "Show and customize Since You Watched rows in Home Sections.",
+  "sinceYouWatchedSource": "Recommendation Source",
+  "sinceYouWatchedSourceDescription": "Choose recommendation source (Moonfin Recommends custom local algorithm, Jellyfin Recommends server engine, or TMDb's similarity metrics. Note: Online recommendations require Seerr integration).",
+  "sinceYouWatchedSourceLocal": "Moonfin Recommends",
+  "sinceYouWatchedSourceServer": "Jellyfin Recommends",
+  "sinceYouWatchedSourceOnline": "TMDb Similarity",
+  "sinceYouWatchedSourceType": "Source Type",
+  "sinceYouWatchedSourceTypeDescription": "Choose type of items to recommend",
+  "sinceYouWatchedSourceItem": "Source Item",
+  "sinceYouWatchedSourceItemDescription": "Choose which source item to base recommendations on",
+  "sinceYouWatchedRecentlyWatched": "Recently Watched",
+  "sinceYouWatchedNumRows": "Number of Rows to Add",
+  "sinceYouWatchedNumRowsDescription": "Choose how many Since You Watched rows to display (1-5)",
+  "sinceYouWatchedIncludeWatched": "Include Previously Watched",
+  "sinceYouWatchedIncludeWatchedSubtitle": "Include watched items in recommendations",
   "studiosRowSorting": "Studio Row Sorting",
   "studiosRowSortingDescription": "Studio row by name, recently added, and more.",
   "studiosRowSortOrderDescription": "Choose Ascending or Descending sort order.",
@@ -11170,6 +11434,11 @@
   "hevcSoftwareDirectPlaySubtitle": "Play HEVC up to 1080p from the original file instead of asking the server to transcode it. This Apple TV decodes it in software, so heavy 10-bit or high bitrate files may stutter.",
   "av1SoftwareUhdDirectPlay": "Direct Play 4K AV1 (Software Decode)",
   "av1SoftwareUhdDirectPlaySubtitle": "Play AV1 above 1080p, including HDR10, from the original file instead of asking the server to transcode it. This device decodes AV1 in software, so heavy 4K or high bitrate files may stutter.",
+  "cadenceSlowdown": "Smooth 24 fps on a 60 Hz TV",
+  "cadenceSlowdownSubtitle": "When Match Frame Rate is off, play 24 fps video 0.1% slower so it fits the TV without dropped frames. Not used when audio is passed through to a receiver.",
+  "cadenceTipTitle": "Turn On Match Frame Rate",
+  "cadenceTipMessage": "This video can't play smoothly at your TV's current refresh rate. On your Apple TV, open Settings > Video and Audio > Match Content and turn on Match Frame Rate.",
+  "cadenceTipSlowdownHint": "Or turn on Smooth 24 fps on a 60 Hz TV in Moonfin under Playback > Quality & Decoding.",
   "useExternalPlayer": "Always Use External Player",
   "useExternalPlayerSubtitle": "Open video playback in your selected external app on Android TV.",
   "externalPlayerLiveTvOnly": "Live TV Only",
@@ -11365,6 +11634,41 @@
   "watchPartyStartForEveryone": "Start for everyone",
   "@watchPartyStartForEveryone": {
     "description": "Host button that starts the staged item for the whole Watch Party"
+  },
+  "watchPartyResumeAt": "Resume at {time}",
+  "@watchPartyResumeAt": {
+    "description": "Host button that starts the staged item for the whole Watch Party part way through, at the earliest point any member reached. The time is a position like 42:10",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyStartFromBeginning": "Start from the beginning",
+  "@watchPartyStartFromBeginning": {
+    "description": "Host button beside Resume at that starts the staged item for the whole Watch Party from the start"
+  },
+  "watchPartyResumeWhere": "Where {name} left off, the earliest anyone here has reached.",
+  "@watchPartyResumeWhere": {
+    "description": "Note under the Watch Party resume button naming the member whose position it resumes from",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyResumeEarliest": "The earliest point anyone here has reached.",
+  "@watchPartyResumeEarliest": {
+    "description": "Note under the Watch Party resume button when the member it resumes from isn't named"
+  },
+  "watchPartyResumeNotStarted": "{count, plural, =1{1 person hasn't started it yet.} other{{count} people haven't started it yet.}}",
+  "@watchPartyResumeNotStarted": {
+    "description": "Added to the Watch Party resume note: how many members haven't begun the title, whom resuming takes past its start",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "watchPartyBackToLobby": "Back to the lobby",
   "@watchPartyBackToLobby": {
@@ -13426,6 +13730,30 @@
   "@setupDetailStageHint": {
     "description": "What the Stage detail screen style gives you"
   },
+  "setupStylePremiere": "Premiere",
+  "@setupStylePremiere": {
+    "description": "Name of the detail layout that centers the title over a full screen backdrop, offered in the setup wizard"
+  },
+  "setupDetailPremiereHint": "The title centered over a full screen backdrop, with everything else down the page.",
+  "@setupDetailPremiereHint": {
+    "description": "What the Premiere detail screen style gives you"
+  },
+  "setupStyleQuickLook": "Quick Look",
+  "@setupStyleQuickLook": {
+    "description": "Name of the detail layout that opens a drawer over the current screen, offered in the setup wizard"
+  },
+  "setupDetailQuickLookHint": "A drawer over the screen you were on, with play and the basics, and the full page a press away.",
+  "@setupDetailQuickLookHint": {
+    "description": "What the Quick Look detail screen style gives you"
+  },
+  "setupStyleFrost": "Frost",
+  "@setupStyleFrost": {
+    "description": "Name of the detail layout that floats the title in a glass window, offered in the setup wizard"
+  },
+  "setupDetailFrostHint": "The title in a glass window over its blurred art, with tabs under the buttons.",
+  "@setupDetailFrostHint": {
+    "description": "What the Frost detail screen style gives you"
+  },
   "setupNavbarStyleQuestion": "How should the bottom bar look?",
   "@setupNavbarStyleQuestion": {
     "description": "Setup question asking which style the bottom navigation bar should use"
@@ -14442,6 +14770,14 @@
     "description": "Playback information row label: the Live TV program on now"
   },
   "playbackInfoWhy": "Why",
+  "playbackInfoServerCompatibilityCheck": "Server compatibility check",
+  "@playbackInfoServerCompatibilityCheck": {
+    "description": "Playback information row label for reasons retained from a server compatibility check during live relay"
+  },
+  "playbackInfoBitrateUnavailable": "Bitrate unavailable",
+  "@playbackInfoBitrateUnavailable": {
+    "description": "Playback information value when an incomplete live source prevents a reliable aggregate bitrate"
+  },
   "@playbackInfoWhy": {
     "description": "Playback information row label: why the server isn't sending the original file as is"
   },
@@ -14541,6 +14877,99 @@
   "@playbackInfoNoteDirectStream": {
     "description": "Playback information note under the play method for direct stream"
   },
+  "playbackInfoNoteLiveRelay": "The server is relaying the channel without converting it.",
+  "@playbackInfoNoteLiveRelay": {
+    "description": "Playback information note under the play method for a live TV channel the server passes through"
+  },
+  "playbackInfoFrameRateFrom": "{rate} fps ({source})",
+  "@playbackInfoFrameRateFrom": {
+    "description": "Playback information frame rate with where the player got it",
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackInfoRateSourceHeader": "stream header",
+  "@playbackInfoRateSourceHeader": {
+    "description": "Playback information: the frame rate came from the video stream's own header"
+  },
+  "playbackInfoRateSourceMeasured": "measured",
+  "@playbackInfoRateSourceMeasured": {
+    "description": "Playback information: the frame rate was measured from the video's frame timing"
+  },
+  "playbackInfoRateSourceServer": "server",
+  "@playbackInfoRateSourceServer": {
+    "description": "Playback information: the frame rate came from the server's description of the media"
+  },
+  "playbackInfoServerFrameRate": "Server Frame Rate",
+  "@playbackInfoServerFrameRate": {
+    "description": "Playback information row: the frame rate the server reports, shown when it differs from what is playing"
+  },
+  "playbackInfoScan": "Scan",
+  "@playbackInfoScan": {
+    "description": "Playback information row: whether the video is progressive or interlaced"
+  },
+  "playbackInfoProgressive": "Progressive",
+  "@playbackInfoProgressive": {
+    "description": "Playback information scan type"
+  },
+  "playbackInfoInterlaced": "Interlaced",
+  "@playbackInfoInterlaced": {
+    "description": "Playback information scan type"
+  },
+  "playbackInfoRepeatedFields": "Telecined (repeated fields)",
+  "@playbackInfoRepeatedFields": {
+    "description": "Playback information scan type: film carried in an interlaced stream with repeated fields"
+  },
+  "playbackInfoHdmiOutput": "HDMI Output",
+  "@playbackInfoHdmiOutput": {
+    "description": "Playback information row: the display mode the device is sending"
+  },
+  "playbackInfoDisplayMode": "{width}×{height} @ {rate} Hz",
+  "@playbackInfoDisplayMode": {
+    "description": "Playback information display mode, for example 1920×1080 @ 59.94 Hz",
+    "placeholders": {
+      "width": {
+        "type": "String"
+      },
+      "height": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackInfoRateCorrections": "Rate Corrections",
+  "@playbackInfoRateCorrections": {
+    "description": "Playback information row: how many times live TV changed the display rate after it started"
+  },
+  "playbackInfoAudioOutput": "Output",
+  "@playbackInfoAudioOutput": {
+    "description": "Playback information row in the Audio section: how the audio leaves the device"
+  },
+  "playbackInfoPassthroughOf": "Passthrough ({codec})",
+  "@playbackInfoPassthroughOf": {
+    "description": "Playback information audio output: the bitstream goes to the receiver undecoded",
+    "placeholders": {
+      "codec": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackInfoDecodedTo": "Decoded ({channels})",
+  "@playbackInfoDecodedTo": {
+    "description": "Playback information audio output: the device decodes the audio, with its channel layout",
+    "placeholders": {
+      "channels": {
+        "type": "String"
+      }
+    }
+  },
   "playbackInfoNoteTranscodeVideo": "The server is converting the video so this device can play it.",
   "@playbackInfoNoteTranscodeVideo": {
     "description": "Playback information note under the play method when only the video is transcoded"
@@ -14617,6 +15046,15 @@
   "playbackInfoWhyVideoCodec": "This device can't play {codec} video",
   "@playbackInfoWhyVideoCodec": {
     "description": "Playback information reason: the video codec, like HEVC or AV1, isn't supported",
+    "placeholders": {
+      "codec": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackInfoWhyVideoProfileUnknown": "The server couldn't verify this stream's {codec} profile.",
+  "@playbackInfoWhyVideoProfileUnknown": {
+    "description": "Playback information reason when the server could not determine the video profile",
     "placeholders": {
       "codec": {
         "type": "String"
@@ -15512,5 +15950,313 @@
   "settingsPreviewSaved": "Saved",
   "@settingsPreviewSaved": {
     "description": "Tag on the option that is saved while another option is being tried in the Settings live preview"
+  },
+  "smartSearch": "Smart Search",
+  "@smartSearch": {
+    "description": "Title of the search results row with library titles the server's natural-language search matched to a vague query"
+  },
+  "smartSearchOnSeerr": "Smart Search on {seerr}",
+  "@smartSearchOnSeerr": {
+    "description": "Title of the search results row with titles not in the library that the server's natural-language search found, which open in Seerr",
+    "placeholders": {
+      "seerr": {
+        "type": "String",
+        "example": "Seerr"
+      }
+    }
+  },
+  "calendar": "Calendar",
+  "@calendar": {
+    "description": "Name of the screen of upcoming episodes and movies from Sonarr and Radarr, on the navigation bar and as the screen title"
+  },
+  "showCalendarButton": "Show Calendar Button",
+  "@showCalendarButton": {
+    "description": "Settings toggle that adds the Calendar button to the navigation bar"
+  },
+  "showCalendarButtonSubtitle": "Show the calendar of upcoming episodes and movies in the navigation bar",
+  "@showCalendarButtonSubtitle": {
+    "description": "Subtitle of the Show Calendar Button setting"
+  },
+  "calendarFullCalendar": "Full calendar",
+  "@calendarFullCalendar": {
+    "description": "Button on the calendar that opens the month grid"
+  },
+  "calendarUpcoming": "Upcoming",
+  "@calendarUpcoming": {
+    "description": "Calendar tab listing episodes and movies that haven't aired yet"
+  },
+  "calendarRecentlyAired": "Recently aired",
+  "@calendarRecentlyAired": {
+    "description": "Calendar tab listing episodes and movies from the last few days"
+  },
+  "calendarRemindMe": "Remind me",
+  "@calendarRemindMe": {
+    "description": "Button that asks for a notification when an episode or movie lands in the library"
+  },
+  "calendarReminderSet": "Reminder set",
+  "@calendarReminderSet": {
+    "description": "Button label once a reminder is set. Pressing it again removes the reminder"
+  },
+  "calendarReminderFailed": "Couldn't save the reminder",
+  "@calendarReminderFailed": {
+    "description": "Message when setting or removing a calendar reminder fails"
+  },
+  "calendarReadyToWatch": "Ready to watch",
+  "@calendarReadyToWatch": {
+    "description": "Calendar row of recent episodes and movies that are already in the library"
+  },
+  "calendarComingUpThisWeek": "Coming up this week",
+  "@calendarComingUpThisWeek": {
+    "description": "Calendar row of episodes and movies airing in the next seven days"
+  },
+  "calendarNothingUpcoming": "Nothing coming up",
+  "@calendarNothingUpcoming": {
+    "description": "Calendar message when no episodes or movies are scheduled"
+  },
+  "calendarNothingRecent": "Nothing aired recently",
+  "@calendarNothingRecent": {
+    "description": "Calendar message when nothing aired in the last few days"
+  },
+  "calendarEmptyDay": "Nothing on this day",
+  "@calendarEmptyDay": {
+    "description": "Calendar message under a day with no episodes or movies"
+  },
+  "calendarStartsIn": "Starts in",
+  "@calendarStartsIn": {
+    "description": "Label over the countdown to the next episode or movie"
+  },
+  "calendarUnitDays": "days",
+  "@calendarUnitDays": {
+    "description": "Unit under the days number of the calendar countdown"
+  },
+  "calendarUnitHours": "hr",
+  "@calendarUnitHours": {
+    "description": "Unit under the hours number of the calendar countdown"
+  },
+  "calendarUnitMinutes": "min",
+  "@calendarUnitMinutes": {
+    "description": "Unit under the minutes number of the calendar countdown"
+  },
+  "calendarDayAtTime": "{day} at {time}",
+  "@calendarDayAtTime": {
+    "description": "When an episode airs, like Today at 9:00 PM",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "Today"
+      },
+      "time": {
+        "type": "String",
+        "example": "9:00 PM"
+      }
+    }
+  },
+  "calendarAllDay": "All day",
+  "@calendarAllDay": {
+    "description": "Time column of a calendar entry with no time of day, like a movie release"
+  },
+  "calendarBadgeSeriesPremiere": "Series premiere",
+  "@calendarBadgeSeriesPremiere": {
+    "description": "Tag on the first episode of a series"
+  },
+  "calendarBadgeSeasonPremiere": "New season",
+  "@calendarBadgeSeasonPremiere": {
+    "description": "Tag on the first episode of a new season"
+  },
+  "calendarBadgeSeasonFinale": "Finale",
+  "@calendarBadgeSeasonFinale": {
+    "description": "Tag on the last episode of a season"
+  },
+  "calendarBadgeMidseasonFinale": "Midseason finale",
+  "@calendarBadgeMidseasonFinale": {
+    "description": "Tag on the last episode before a season's mid-season break"
+  },
+  "calendarBadgeSeriesFinale": "Series finale",
+  "@calendarBadgeSeriesFinale": {
+    "description": "Tag on the last episode of a series"
+  },
+  "calendarBadgeNew": "NEW",
+  "@calendarBadgeNew": {
+    "description": "Short tag on a month grid day that has a premiere"
+  },
+  "calendarStatusInLibrary": "In library",
+  "@calendarStatusInLibrary": {
+    "description": "Tag on a calendar entry that is already on the server"
+  },
+  "calendarNotMonitored": "Not monitored",
+  "@calendarNotMonitored": {
+    "description": "Tag on a calendar entry that Sonarr or Radarr won't download"
+  },
+  "calendarMovieDetails": "Movie details",
+  "@calendarMovieDetails": {
+    "description": "Button that opens a movie's details page from the calendar"
+  },
+  "calendarProblemAdminsOnly": "The calendar is limited to admins on this server.",
+  "@calendarProblemAdminsOnly": {
+    "description": "Calendar message when the server admin keeps the calendar to admins"
+  },
+  "calendarProblemNeedsSeerr": "An admin needs to sign in to Seerr in Moonfin before the calendar can load.",
+  "@calendarProblemNeedsSeerr": {
+    "description": "Calendar message when the server can't reach Sonarr and Radarr yet"
+  },
+  "calendarProblemNotConfigured": "No Sonarr or Radarr server is linked yet.",
+  "@calendarProblemNotConfigured": {
+    "description": "Calendar message when the server has no Sonarr or Radarr"
+  },
+  "calendarProblemFailed": "Couldn't load the calendar.",
+  "@calendarProblemFailed": {
+    "description": "Calendar message when loading fails"
+  },
+  "calendarSettingsSubtitle": "Style, filters and actions for the calendar",
+  "@calendarSettingsSubtitle": {
+    "description": "Subtitle of the Calendar entry under Integrations in settings"
+  },
+  "calendarSettingsView": "View",
+  "@calendarSettingsView": {
+    "description": "Calendar settings section header for how the calendar opens and lays out weeks"
+  },
+  "calendarSettingsStyle": "Calendar style",
+  "@calendarSettingsStyle": {
+    "description": "Calendar setting that picks what the Calendar button opens"
+  },
+  "calendarSettingsStyleDescription": "What the Calendar button opens. The full month is one button away in both.",
+  "@calendarSettingsStyleDescription": {
+    "description": "Description of the Calendar style setting"
+  },
+  "calendarSettingsStyleAgenda": "Agenda",
+  "@calendarSettingsStyleAgenda": {
+    "description": "Calendar style that lists episodes and movies day by day"
+  },
+  "calendarSettingsStyleCountdown": "Countdown",
+  "@calendarSettingsStyleCountdown": {
+    "description": "Calendar style that counts down to the next episode or movie"
+  },
+  "calendarSettingsWeekStart": "Week starts on",
+  "@calendarSettingsWeekStart": {
+    "description": "Calendar setting for the first day of the week in the month grid"
+  },
+  "calendarSettingsWhatShows": "What shows",
+  "@calendarSettingsWhatShows": {
+    "description": "Calendar settings section header for which episodes and movies the calendar lists"
+  },
+  "calendarSettingsScope": "Show",
+  "@calendarSettingsScope": {
+    "description": "Calendar setting that limits the calendar to the user's own series. The choices are Everything and My shows"
+  },
+  "calendarSettingsScopeDescription": "My shows keeps the series you favorited or started watching",
+  "@calendarSettingsScopeDescription": {
+    "description": "Description of the calendar Show setting"
+  },
+  "calendarSettingsScopeEverything": "Everything",
+  "@calendarSettingsScopeEverything": {
+    "description": "Calendar Show choice that lists every episode and movie"
+  },
+  "calendarSettingsScopeMyShows": "My shows",
+  "@calendarSettingsScopeMyShows": {
+    "description": "Calendar Show choice that lists only series the user favorited or started watching"
+  },
+  "calendarSettingsUnmonitored": "Include unmonitored",
+  "@calendarSettingsUnmonitored": {
+    "description": "Calendar setting that also lists titles Sonarr and Radarr won't download"
+  },
+  "calendarSettingsUnmonitoredSubtitle": "Also list episodes and movies Sonarr and Radarr aren't set to download",
+  "@calendarSettingsUnmonitoredSubtitle": {
+    "description": "Subtitle of the Include unmonitored calendar setting"
+  },
+  "calendarSettingsSpecials": "Specials",
+  "@calendarSettingsSpecials": {
+    "description": "Calendar setting that lists special episodes, the ones in season 0"
+  },
+  "calendarSettingsSpecialsSubtitle": "Season 0 episodes, like extras and holiday specials",
+  "@calendarSettingsSpecialsSubtitle": {
+    "description": "Subtitle of the Specials calendar setting"
+  },
+  "calendarSettingsBadges": "Premiere and finale tags",
+  "@calendarSettingsBadges": {
+    "description": "Calendar setting that marks premieres and finales on the calendar"
+  },
+  "calendarSettingsBadgesSubtitle": "Mark premieres, finales and new seasons",
+  "@calendarSettingsBadgesSubtitle": {
+    "description": "Subtitle of the Premiere and finale tags calendar setting"
+  },
+  "calendarSettingsColorBy": "Color by",
+  "@calendarSettingsColorBy": {
+    "description": "Calendar setting for what the colors on calendar entries mean. The choices are Type and Status"
+  },
+  "calendarSettingsColorByDescription": "Type tells episodes from movies. Status shows what's in your library, coming up or missing.",
+  "@calendarSettingsColorByDescription": {
+    "description": "Description of the Color by calendar setting"
+  },
+  "calendarSettingsColorByType": "Type",
+  "@calendarSettingsColorByType": {
+    "description": "Color by choice that colors episodes and movies differently"
+  },
+  "calendarSettingsImageType": "Card image",
+  "@calendarSettingsImageType": {
+    "description": "Calendar setting for the artwork on the Countdown rows"
+  },
+  "calendarSettingsImageTypeDescription": "The artwork on the Countdown rows",
+  "@calendarSettingsImageTypeDescription": {
+    "description": "Description of the Card image calendar setting"
+  },
+  "calendarSettingsSpoilerSafe": "Spoiler safe",
+  "@calendarSettingsSpoilerSafe": {
+    "description": "Calendar setting that hides episode details for shows the user hasn't caught up on"
+  },
+  "calendarSettingsSpoilerSafeSubtitle": "Hide episode titles and stills for shows you're behind on",
+  "@calendarSettingsSpoilerSafeSubtitle": {
+    "description": "Subtitle of the Spoiler safe calendar setting"
+  },
+  "calendarSettingsActions": "Actions",
+  "@calendarSettingsActions": {
+    "description": "Calendar settings section header for what buttons and selecting an entry do"
+  },
+  "calendarSettingsSelectAction": "Selecting an item",
+  "@calendarSettingsSelectAction": {
+    "description": "Calendar setting for what OK or a tap does on an entry that is in the library"
+  },
+  "calendarSettingsSelectActionDescription": "What OK or a tap does on something that's already in your library",
+  "@calendarSettingsSelectActionDescription": {
+    "description": "Description of the Selecting an item calendar setting"
+  },
+  "calendarSettingsSelectDetails": "Open details",
+  "@calendarSettingsSelectDetails": {
+    "description": "Selecting an item choice that opens the details page"
+  },
+  "calendarSettingsSelectPlay": "Play when in library",
+  "@calendarSettingsSelectPlay": {
+    "description": "Selecting an item choice that starts playback when the episode or movie is in the library"
+  },
+  "calendarSettingsRequestButton": "Request button",
+  "@calendarSettingsRequestButton": {
+    "description": "Calendar setting that shows the request button on missing titles"
+  },
+  "calendarSettingsRequestButtonSubtitle": "Show the Seerr request button on missing movies and seasons",
+  "@calendarSettingsRequestButtonSubtitle": {
+    "description": "Subtitle of the Request button calendar setting. Seerr is a product name"
+  },
+  "calendarSettingsReminders": "Reminders",
+  "@calendarSettingsReminders": {
+    "description": "Calendar setting that offers the Remind me button"
+  },
+  "calendarSettingsRemindersSubtitle": "Show Remind me, which sends a notification when a title lands in your library",
+  "@calendarSettingsRemindersSubtitle": {
+    "description": "Subtitle of the Reminders calendar setting"
+  },
+  "calendarRowSeeAll": "See All card",
+  "@calendarRowSeeAll": {
+    "description": "Home Screen setting that ends the upcoming episode and movie rows with a card that opens the calendar"
+  },
+  "calendarRowSeeAllSubtitle": "End the upcoming rows with a card that opens the calendar",
+  "@calendarRowSeeAllSubtitle": {
+    "description": "Subtitle of the See All card setting"
+  },
+  "showNextAirDate": "Next air date at the end",
+  "@showNextAirDate": {
+    "description": "Playback setting that says when the next episode airs at the end of an episode"
+  },
+  "showNextAirDateSubtitle": "When the next episode isn't in your library yet, the end of episode card says when it airs",
+  "@showNextAirDateSubtitle": {
+    "description": "Subtitle of the Next air date at the end setting"
   }
 }

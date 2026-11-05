@@ -121,6 +121,9 @@ class UserPreferences extends ChangeNotifier {
   static const mediaBarSourceRandom = 'random';
   static const mediaBarSourceRecentlyAdded = 'recentlyAdded';
   static const mediaBarSourceRecentlyReleased = 'recentlyReleased';
+  // Series with episodes that aired lately, found from the episodes rather than
+  // the series, whose own date is its first season's.
+  static const mediaBarSourceNewReleases = 'newReleases';
 
   // What a focused home card plays. episodePreviewEnabled says whether it
   // plays anything, which older apps also read, and mediaPreviewMode says
@@ -558,6 +561,7 @@ class UserPreferences extends ChangeNotifier {
     'pref_home_rows_fullscreen',
     'pref_show_seerr_button',
     'pref_show_seerr_availability_badges',
+    'pref_seerr_badge_style',
     'pref_show_server_messages_button',
     'pref_show_friends_button',
     'pref_show_book_discover_tab',
@@ -655,6 +659,8 @@ class UserPreferences extends ChangeNotifier {
     'mediaBarContentType',
     'mediaBarSourceType',
     'mediaBarItemCount',
+    'mediaBarNewReleaseBanner',
+    'mediaBarNewReleaseDays',
     'mediaBarOverlayOpacity',
     'mediaBarOverlayColor',
     'navbarOpacity',
@@ -731,6 +737,7 @@ class UserPreferences extends ChangeNotifier {
     'tmdb_trending_tv_daily_enabled',
     'tmdb_trending_tv_weekly_enabled',
     'tmdb_trending_all_weekly_enabled',
+    'mdblistWatchingNowEnabled',
     'enable_radarr_calendar',
     'enable_sonarr_calendar',
     'radarr_calendar_show_cinema',
@@ -739,9 +746,29 @@ class UserPreferences extends ChangeNotifier {
     'radarr_calendar_show_date',
     'sonarr_calendar_show_date',
     'sonarr_calendar_show_episode_info',
+    'radarr_calendar_hide_downloaded',
+    'sonarr_calendar_hide_downloaded',
     'last_radarr_calendar_fetch_time',
     'last_sonarr_calendar_fetch_time',
     'merge_radarr_sonarr_calendars',
+    'pref_show_calendar_button',
+    'pref_calendar_style',
+    'pref_calendar_week_start',
+    'pref_calendar_scope',
+    'pref_calendar_show_episodes',
+    'pref_calendar_show_movies',
+    'pref_calendar_libraries',
+    'pref_calendar_unmonitored',
+    'pref_calendar_specials',
+    'pref_calendar_badges',
+    'pref_calendar_color_by',
+    'pref_calendar_image_type',
+    'pref_calendar_spoiler_safe',
+    'pref_calendar_select_action',
+    'pref_calendar_request_button',
+    'pref_calendar_reminders',
+    'pref_calendar_row_see_all',
+    'pref_show_next_air_date',
     'recently_released_series_type',
     'loading_animation_image',
     'loading_animation_size',
@@ -1265,7 +1292,7 @@ class UserPreferences extends ChangeNotifier {
 
   static final modernCardsOnMyMediaRow = Preference<bool>(
     key: 'pref_modern_cards_my_media',
-    defaultValue: true,
+    defaultValue: false,
   );
 
   /// How far a mouse wheel notch scrolls, as a percentage of what the platform
@@ -1999,6 +2026,12 @@ class UserPreferences extends ChangeNotifier {
     defaultValue: true,
   );
 
+  static final seerrBadgeStyle = EnumPreference(
+    key: 'pref_seerr_badge_style',
+    defaultValue: SeerrBadgeStyle.badge,
+    values: SeerrBadgeStyle.values,
+  );
+
   /// Off by default. An admin who wants it on for everyone can set it in the
   /// Moonbase default settings.
   static final showServerMessagesButton = Preference(
@@ -2332,6 +2365,11 @@ class UserPreferences extends ChangeNotifier {
 
   static final av1SoftwareUhdDirectPlay = Preference(
     key: 'av1_software_uhd_direct_play',
+    defaultValue: false,
+  );
+
+  static final cadenceSlowdown = Preference(
+    key: 'cadence_slowdown',
     defaultValue: false,
   );
 
@@ -2991,6 +3029,20 @@ class UserPreferences extends ChangeNotifier {
     defaultValue: '10',
   );
 
+  /// Flags a series slide whose episodes aired lately as a new season or new
+  /// episodes, whatever source put it on the bar.
+  static final mediaBarNewReleaseBanner = Preference(
+    key: 'mediaBarNewReleaseBanner',
+    defaultValue: true,
+  );
+
+  /// How many days back an episode's air date still counts as new, for the
+  /// banner and for the new releases source.
+  static final mediaBarNewReleaseDays = Preference(
+    key: 'mediaBarNewReleaseDays',
+    defaultValue: 30,
+  );
+
   static final navbarOpacity = Preference(
     key: 'navbarOpacity',
     defaultValue: 50,
@@ -3382,6 +3434,11 @@ class UserPreferences extends ChangeNotifier {
     defaultValue: false,
   );
 
+  static final mdblistWatchingNowEnabled = Preference<bool>(
+    key: 'mdblistWatchingNowEnabled',
+    defaultValue: false,
+  );
+
   static final tmdbTrendingAllWeeklyEnabled = Preference(
     key: 'tmdb_trending_all_weekly_enabled',
     defaultValue: false,
@@ -3445,6 +3502,115 @@ class UserPreferences extends ChangeNotifier {
 
   static final sonarrCalendarShowEpisodeInfo = Preference(
     key: 'sonarr_calendar_show_episode_info',
+    defaultValue: true,
+  );
+
+  /// Radarr and Sonarr also list what they already downloaded, which is on the
+  /// server and not upcoming.
+  static final radarrCalendarHideDownloaded = Preference(
+    key: 'radarr_calendar_hide_downloaded',
+    defaultValue: true,
+  );
+
+  static final sonarrCalendarHideDownloaded = Preference(
+    key: 'sonarr_calendar_hide_downloaded',
+    defaultValue: true,
+  );
+
+  static final showCalendarButton = Preference(
+    key: 'pref_show_calendar_button',
+    defaultValue: true,
+  );
+
+  static final calendarStyle = EnumPreference(
+    key: 'pref_calendar_style',
+    defaultValue: CalendarStyle.agenda,
+    values: CalendarStyle.values,
+  );
+
+  static final calendarWeekStart = EnumPreference(
+    key: 'pref_calendar_week_start',
+    defaultValue: CalendarWeekStart.locale,
+    values: CalendarWeekStart.values,
+  );
+
+  static final calendarScope = EnumPreference(
+    key: 'pref_calendar_scope',
+    defaultValue: CalendarScope.everything,
+    values: CalendarScope.values,
+  );
+
+  static final calendarShowEpisodes = Preference(
+    key: 'pref_calendar_show_episodes',
+    defaultValue: true,
+  );
+
+  static final calendarShowMovies = Preference(
+    key: 'pref_calendar_show_movies',
+    defaultValue: true,
+  );
+
+  /// Comma separated library ids. Empty means every library.
+  static final calendarLibraryIds = Preference(
+    key: 'pref_calendar_libraries',
+    defaultValue: '',
+  );
+
+  static final calendarIncludeUnmonitored = Preference(
+    key: 'pref_calendar_unmonitored',
+    defaultValue: false,
+  );
+
+  static final calendarShowSpecials = Preference(
+    key: 'pref_calendar_specials',
+    defaultValue: false,
+  );
+
+  static final calendarShowBadges = Preference(
+    key: 'pref_calendar_badges',
+    defaultValue: true,
+  );
+
+  static final calendarColorBy = EnumPreference(
+    key: 'pref_calendar_color_by',
+    defaultValue: CalendarColorBy.type,
+    values: CalendarColorBy.values,
+  );
+
+  static final calendarImageType = EnumPreference(
+    key: 'pref_calendar_image_type',
+    defaultValue: CalendarImageType.poster,
+    values: CalendarImageType.values,
+  );
+
+  static final calendarSpoilerSafe = Preference(
+    key: 'pref_calendar_spoiler_safe',
+    defaultValue: false,
+  );
+
+  static final calendarSelectAction = EnumPreference(
+    key: 'pref_calendar_select_action',
+    defaultValue: CalendarSelectAction.details,
+    values: CalendarSelectAction.values,
+  );
+
+  static final calendarRequestButton = Preference(
+    key: 'pref_calendar_request_button',
+    defaultValue: true,
+  );
+
+  static final calendarReminders = Preference(
+    key: 'pref_calendar_reminders',
+    defaultValue: true,
+  );
+
+  static final calendarRowSeeAll = Preference(
+    key: 'pref_calendar_row_see_all',
+    defaultValue: true,
+  );
+
+  static final showNextAirDate = Preference(
+    key: 'pref_show_next_air_date',
     defaultValue: true,
   );
 
@@ -3637,6 +3803,13 @@ class UserPreferences extends ChangeNotifier {
     key: 'syncplay_extra_time_offset',
     defaultValue: 0.0,
   );
+
+  /// Hides the live preview above the phone's settings list.
+  static final settingsPreviewHidden = Preference(
+    key: 'pref_settings_preview_hidden',
+    defaultValue: false,
+  );
+
   static final pluginSyncEnabled = Preference(
     key: 'pref_plugin_sync_enabled',
     defaultValue: false,

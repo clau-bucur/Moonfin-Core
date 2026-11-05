@@ -17,6 +17,7 @@ import 'package:moonfin/preference/user_preferences.dart';
 import 'package:moonfin/preference/preference_constants.dart'
     show DesktopUiScale;
 import 'package:moonfin/auth/repositories/session_repository.dart';
+import 'package:moonfin/ui/screens/detail/detail_layout_metrics.dart';
 import 'package:moonfin/ui/screens/detail/stage/stage_detail_content.dart';
 import 'package:moonfin/ui/screens/detail/stage/stage_track_chips.dart';
 import 'package:moonfin/ui/screens/detail/item_detail_screen.dart';
@@ -422,10 +423,40 @@ void main() {
     expect(find.byType(StageTrackChips), findsNothing);
   });
 
-  testWidgets('a playlist goes to Modern', (tester) async {
+  testWidgets('a long overview opens up with Read More', (tester) async {
+    final vm = viewModel(
+      'Movie',
+      data: {
+        ...itemData('Movie'),
+        'Overview': List.filled(80, 'A long overview runs on.').join(' '),
+      },
+    );
+    await pumpContent(tester, vm);
+    await tester.pump();
+
+    expect(find.text('Read More'), findsOneWidget);
+    await tester.tap(find.text('Read More'));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Show Less'), findsOneWidget);
+  });
+
+  testWidgets('a short overview has nothing to open', (tester) async {
+    final vm = viewModel('Movie');
+    await pumpContent(tester, vm);
+    await tester.pump();
+
+    expect(find.text('A useful detail overview'), findsOneWidget);
+    expect(find.text('Read More'), findsNothing);
+  });
+
+  test('a playlist is left to Modern', () {
+    expect(detailPageDraws('Playlist'), isFalse);
+    expect(detailPageDraws('Movie'), isTrue);
+  });
+
+  testWidgets('a playlist still renders Modern content', (tester) async {
     final vm = viewModel('Playlist');
     await pumpContent(tester, vm);
-
     expect(find.byType(ModernDetailContent), findsOneWidget);
     expect(find.byKey(const ValueKey('stage-poster')), findsNothing);
   });

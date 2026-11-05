@@ -13,6 +13,7 @@ import '../../di/injection.dart';
 import '../../playback/apple_player_ui.dart';
 import '../../playback/external_player_policy.dart';
 import '../../preference/user_preferences.dart';
+import '../../preference/preference_constants.dart';
 import '../../util/platform_detection.dart';
 import '../../util/video_app_profile.dart';
 import '../screens/auth/emby_connect_screen.dart';
@@ -23,6 +24,7 @@ import '../screens/auth/server_select_screen.dart';
 import '../screens/auth/startup_screen.dart';
 import '../screens/web_diagnostics_screen.dart';
 import '../screens/browse/all_genres_screen.dart';
+import '../screens/calendar/calendar_screen.dart';
 import '../screens/browse/collection_screen.dart';
 import '../screens/browse/favorites_screen.dart';
 import '../screens/browse/folder_browse_screen.dart';
@@ -126,6 +128,41 @@ CustomTransitionPage<T> _opaqueFullScreenPage<T>({
     transitionsBuilder: (context, animation, secondaryAnimation, child) =>
         child,
     child: child,
+  );
+}
+
+/// A title's page. Quick Look opens it as a drawer over the screen it was
+/// picked on, unless the full page was asked for, and anything else gets the
+/// page go_router builds for a plain route.
+Page<void> _detailPage(
+  GoRouterState state,
+  Widget Function({bool quickLook}) screen,
+) {
+  final quickLook =
+      GetIt.instance<UserPreferences>().effectiveDetailScreenStyle ==
+          DetailScreenStyle.quickLook &&
+      state.uri.queryParameters['full'] != 'true';
+  if (!quickLook) {
+    return MaterialPage<void>(
+      key: state.pageKey,
+      name: state.name ?? state.path,
+      arguments: <String, String>{
+        ...state.pathParameters,
+        ...state.uri.queryParameters,
+      },
+      restorationId: state.pageKey.value,
+      child: screen(),
+    );
+  }
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    name: state.name ?? state.path,
+    opaque: false,
+    transitionDuration: const Duration(milliseconds: 260),
+    reverseTransitionDuration: const Duration(milliseconds: 200),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        child,
+    child: screen(quickLook: true),
   );
 }
 
@@ -314,6 +351,16 @@ final appRouter = GoRouter(
       builder: (context, state) => const AllGenresScreen(),
     ),
     GoRoute(
+      path: Destinations.calendar,
+      builder: (context, state) => const CalendarScreen(),
+      routes: [
+        GoRoute(
+          path: 'month',
+          builder: (context, state) => const CalendarMonthScreen(),
+        ),
+      ],
+    ),
+    GoRoute(
       path: Destinations.allFavorites,
       builder: (context, state) => const FavoritesScreen(),
     ),
@@ -361,7 +408,7 @@ final appRouter = GoRouter(
     // Item details
     GoRoute(
       path: Destinations.itemDetail,
-      builder: (context, state) {
+      pageBuilder: (_, state) => _detailPage(state, ({quickLook = false}) {
         final itemId = state.pathParameters['itemId']!;
         final serverId = state.uri.queryParameters['serverId'];
         final autoPlay = state.uri.queryParameters['autoPlay'] == 'true';
@@ -374,8 +421,9 @@ final appRouter = GoRouter(
           serverId: serverId,
           autoPlay: autoPlay,
           contextSeasonId: contextSeasonId,
+          quickLook: quickLook,
         );
-      },
+      }),
       routes: [
         GoRoute(
           path: 'list',
