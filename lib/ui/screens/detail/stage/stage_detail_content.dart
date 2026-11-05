@@ -120,6 +120,13 @@ class _StageDetailContentState extends State<StageDetailContent> {
   // exist depends on what loaded.
   List<FocusNode> _beside = const [];
   List<FocusNode> _below = const [];
+  // Short overviews have no Read More control, so their node never attaches.
+  List<FocusNode> get _besideStops => [
+    for (final node in _beside)
+      if (node != _nodes['overview'] ||
+          (node.context?.mounted == true && node.canRequestFocus))
+        node,
+  ];
   bool _landscape = true;
   String? _preparingItem;
   bool _presentationReady = false;
@@ -567,9 +574,10 @@ class _StageDetailContentState extends State<StageDetailContent> {
 
   /// The stop under [node], or null at the bottom of the page.
   FocusNode? _stopBelow(FocusNode node) {
-    final b = _beside.indexOf(node);
+    final beside = _besideStops;
+    final b = beside.indexOf(node);
     if (b >= 0) {
-      return b + 1 < _beside.length ? _beside[b + 1] : _below.firstOrNull;
+      return b + 1 < beside.length ? beside[b + 1] : _below.firstOrNull;
     }
     final r = _below.indexOf(node);
     return r >= 0 && r + 1 < _below.length ? _below[r + 1] : null;
@@ -579,8 +587,9 @@ class _StageDetailContentState extends State<StageDetailContent> {
   /// so on a TV with the toolbar along the top it goes up to the toolbar
   /// rather than back to the buttons.
   void _moveUp(FocusNode node) {
-    final b = _beside.indexOf(node);
-    if (b > 0) return _go(_beside[b - 1]);
+    final beside = _besideStops;
+    final b = beside.indexOf(node);
+    if (b > 0) return _go(beside[b - 1]);
     if (b == 0) return _landscape && _navbarIsTop ? _toNavbar() : _toActions();
     final r = _below.indexOf(node);
     if (r > 0) return _go(_below[r - 1]);
@@ -588,7 +597,7 @@ class _StageDetailContentState extends State<StageDetailContent> {
       if (_landscape && _node('more').context?.mounted == true) {
         return _go(_node('more'));
       }
-      if (_beside.isNotEmpty) return _go(_beside.last);
+      if (beside.isNotEmpty) return _go(beside.last);
       _toActions();
     }
   }
@@ -752,8 +761,8 @@ class _StageDetailContentState extends State<StageDetailContent> {
     // Down from the buttons skips the column beside them on a TV, since that
     // column is reached by going right.
     final down = landscape
-        ? (_below.firstOrNull ?? _beside.firstOrNull)
-        : (_beside.firstOrNull ?? _below.firstOrNull);
+        ? (_below.firstOrNull ?? _besideStops.firstOrNull)
+        : (_besideStops.firstOrNull ?? _below.firstOrNull);
     // The row treats Play and the circles as one line, but here the circles
     // sit under Play, so Down tries the button below before leaving the row.
     final downProxy = _node('actions-down');
@@ -783,7 +792,7 @@ class _StageDetailContentState extends State<StageDetailContent> {
         return KeyEventResult.handled;
       },
       onArrowRightAtEnd: landscape && _beside.isNotEmpty
-          ? () => _go(_beside.first)
+          ? () => _go(_besideStops.firstOrNull)
           : null,
       autoPlay: widget.autoPlay,
       modernStyle: true,

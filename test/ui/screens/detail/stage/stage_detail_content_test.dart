@@ -284,6 +284,23 @@ void main() {
     expect(find.text('English TrueHD 7.1'), findsOneWidget);
   });
 
+  testWidgets('actions skip a short overview when entering track chips', (
+    tester,
+  ) async {
+    final vm = viewModel('Movie', data: movieWithTracks());
+    await pumpContent(tester, vm);
+    expect(find.text('Read More'), findsNothing);
+
+    final actions = tester.widget<DetailActionButtons>(
+      find.byType(DetailActionButtons),
+    );
+    actions.onArrowRightAtEnd!();
+    await tester.pump(const Duration(milliseconds: 250));
+
+    final tracks = tester.widget<StageTrackChips>(find.byType(StageTrackChips));
+    expect(tracks.firstFocusNode.hasPrimaryFocus, isTrue);
+  });
+
   testWidgets('remote reaches Version and returns through every track chip', (
     tester,
   ) async {

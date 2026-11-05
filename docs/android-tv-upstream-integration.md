@@ -12,7 +12,8 @@ The integration retains upstream merge ancestry for subsequent updates.
   presentation helpers and later upstream fixes. Quick Look opens over the
   previous page and can open the full Modern page.
 - Stage's expandable overview, adapted to the TV branch's existing focus,
-  presentation-ready callback, action-group and track-dialog behavior.
+  presentation-ready callback, action-group and track-dialog behavior. Short
+  overviews without a Read More control are skipped as focus targets.
 - Android ASS subtitle bitmap pooling/dialogue queue fixes, decoder/source
   recovery, cadence evidence, display-rate matching and playback diagnostics.
 - Dolby Vision Profile 5 transcoding constraints and smaller trickplay sheet
@@ -62,7 +63,7 @@ Search also runs with `MOONFIN_VIDEO_ONLY=false` to check retained compatibility
 behavior. Upstream test fixtures were adapted to the removed offline stack;
 video-only and compatibility expectations are both asserted.
 
-The selected Flutter runs passed **760 cases**, counting each selected case
+The selected Flutter runs passed **761 cases**, counting each selected case
 and application-profile configuration once. This includes **65** card-motion,
 row/prefetch/navigation and Back-to-exit cases.
 
