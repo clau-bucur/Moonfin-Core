@@ -47,7 +47,9 @@ include nearby artwork warmups; this does not request the whole library.
 
 Three new cover tests and thirteen deferred Home tests passed together.
 Targeted analysis reported no errors or warnings (two inherited informational
-lints in Home). This follow-up has not been built or deployed to the Shield.
+lints in Home). This follow-up is included in the release APK from the
+[upstream integration](android-tv-upstream-integration.md). It has not been
+deployed to the Shield.
 
 ### Remaining request work
 

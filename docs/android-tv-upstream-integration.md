@@ -72,9 +72,29 @@ failures, errors or skips. The complete Silo playback, Silo server and Plex
 server package suites passed **102**, **719** and **82** tests respectively.
 
 Full analysis, after preparing nested packages' development dependencies,
-reported **zero errors**. Its **11 warnings** match the pre-integration
+reported **zero errors**. Its **11 unique warnings** match the pre-integration
 baseline. Informational lints remain. This is selected application regression
 coverage, not a claim that the entire inherited application suite passed.
+
+## Release build
+
+The isolated release build passed using `build-android-tv-video.ps1` with the
+pinned Flutter 3.47.2 SDK. Its code revision is
+`422daf714eadd68db8633a14a25efa25f986131a`.
+
+- Package: `org.moonfin.androidtv.videoexperiment`
+- Label: `Moonfin Video Experiment`
+- Version: `3.0.0`, build `2000023`
+- APK: `artifacts/upstream-sync/release-android-arm64/moonfin-video-experiment.apk`
+  in the regular Android TV checkout; its size/provenance is beside it in
+  `apk-size.json`.
+- Size: 66,749,100 bytes.
+- SHA-256: `ac3362316324d7024c53233303bccea3b45825fc81a8b41538fdaa12cfc889ff`.
+
+Android's `aapt` verified the package, label, Leanback launcher and TV feature.
+Flutter's AOT target is ARM64. The inherited native-library packaging still
+includes ARM64, ARMv7 and x86_64 libraries; this is not an ARM64-only archive.
+The application was built without changing the original installed app.
 
 ## Device validation
 
