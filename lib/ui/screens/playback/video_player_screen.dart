@@ -278,7 +278,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     return backend is HtmlVideoBackend ? backend : null;
   }
 
-  bool _controlsVisible = true;
+  bool _controlsVisible = false;
   Timer? _hideTimer;
   bool _displayPlaying = false;
   Timer? _displayPlayingDebounce;
@@ -293,7 +293,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   // _wasPlayingBeforeScrubPause, doesn't imply resuming afterward.
   bool _isPausedScrubActive = false;
   final Set<int> _prefetchedTrickplayIndexes = {};
-  bool _touchTrickplayPrefetchStarted = false;
   Duration? _lastTrickplayPreviewPosition;
   Duration? _hoverPosition;
   double? _topOverlayHeight;
@@ -396,6 +395,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   EpisodeBrowserController? _episodeBrowser;
   ModalRoute<dynamic>? _episodeBrowserRoute;
   int _trickplayLoadGeneration = 0;
+  bool _trickplayLoadDeferred = false;
+  bool _trickplayDisabled = false;
   static const int _trickplayFrameWidth = 320;
 
   final _overlayFocus = FocusNode();
@@ -801,6 +802,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       // would put the HDR palette on an SDR title.
       if (state.phase == PlaybackBringupPhase.ready) {
         _applySubtitleStyle(force: true);
+        if (_controlsVisible) {
+          _showControls(focusSeekbar: true);
+        }
+        if (_trickplayLoadDeferred) {
+          unawaited(_loadTrickplayInfo(_queue.currentItem));
+        }
       }
       _syncCinemaSkip();
     });
@@ -811,7 +818,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _castChanges.addListener(_onCastChanged);
     _syncMediaQueuingPreference();
     _applySubtitleStyle();
-    _scheduleHide();
     _startEndsAtTicker();
     setImmersive(true);
     if (PlatformDetection.isMobile) {
@@ -858,7 +864,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       _tvSeekbarFocus.addListener(_onSeekbarFocusChange);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showControls(focusSeekbar: true);
+      if (!mounted) return;
       if (PlatformDetection.useNativeVideoSurface) {
         _syncSubtitleActive();
       }
@@ -899,7 +905,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       unawaited(_pushMedia3UiMetadata());
       _syncMedia3VolumeBoostLevel();
       unawaited(_syncAutoHdrSwitching());
-      final isPreroll = _isCurrentPreroll;
       _syncCinemaSkip();
       _resetSkipSegmentAutoHide();
       setState(() {
@@ -909,14 +914,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         // Stream indexes belong to the file they came from, so the next item
         // must not have a track from the last one put back on it.
         _subtitleIndexBeforeQuickOff = null;
-        if (isPreroll) {
-          _controlsVisible = false;
-          _isOsdLocked = false;
-        }
+        _controlsVisible = false;
+        _isOsdLocked = false;
       });
-      if (isPreroll) {
-        _hideTimer?.cancel();
-      }
+      _hideTimer?.cancel();
     });
 
     _media3ActivityActionSub = Media3PlayerBackend.activityActionStream.listen(
@@ -1952,13 +1953,25 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     final itemId = _itemIdForQueueItem(item);
     final mediaSourceId = _manager.currentResolution?.mediaSourceId;
     _prefetchedTrickplayIndexes.clear();
-    _touchTrickplayPrefetchStarted = false;
     _lastTrickplayPreviewPosition = null;
+    _trickplayLoadDeferred = false;
     if (mounted) {
       setState(() {
         _trickplayInfo = null;
         _trickplayMediaSourceId = mediaSourceId;
       });
+    }
+
+    _trickplayDisabled =
+        _prefs.get(UserPreferences.trickPlayMode) == TrickplayMode.disabled;
+    if (_trickplayDisabled) {
+      return;
+    }
+    // BIF/manifest requests are optional. Let PlaybackInfo and the stream open
+    // finish before asking the same server for seek-preview metadata.
+    if (_manager.bringupState.phase.isInProgress) {
+      _trickplayLoadDeferred = true;
+      return;
     }
 
     if (rawData != null && itemId != null) {
@@ -1968,6 +1981,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         rawData,
         mediaSourceId,
       );
+    }
+    // The manifest may finish after navigation or disabling previews. Do not
+    // start a second optional request for a load that no longer owns the UI.
+    if (!mounted ||
+        generation != _trickplayLoadGeneration ||
+        !identical(_queue.currentItem, item) ||
+        _manager.currentResolution?.mediaSourceId != mediaSourceId) {
+      return;
     }
     var info = rawData == null
         ? null
@@ -2004,15 +2025,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       _trickplayInfo = info?.isValid == true ? info : null;
       _trickplayMediaSourceId = mediaSourceId;
     });
-    if (_controlsVisible) {
-      // Precaching reads MediaQuery through the context, which initState
-      // can't do. Reopening a player whose item is already playing finds the
-      // info without awaiting anything, so this runs from initState then.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || generation != _trickplayLoadGeneration) return;
-        _prefetchTrickplayDirectional(_state.position, forward: true);
-      });
-    }
   }
 
   /// A replan or a version change can play another file than the one the
@@ -2024,6 +2036,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   void _refreshTrickplayIfNeeded() {
+    if (_manager.bringupState.phase.isInProgress) return;
     final item = _queue.currentItem;
     if (_rawDataForQueueItem(item) == null) return;
     final resolvedSourceId = _manager.currentResolution?.mediaSourceId;
@@ -2031,52 +2044,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         resolvedSourceId != _trickplayMediaSourceId) {
       unawaited(_loadTrickplayInfo(item));
     }
-  }
-
-  void _handleTrickplayAmbientPrefetch(Duration position) {
-    if (_controlsVisible) {
-      _prefetchTrickplayDirectional(position, forward: true);
-    }
-    if (_prefs.get(UserPreferences.trickPlayMode) == TrickplayMode.disabled) {
-      return;
-    }
-    final info = _trickplayInfo;
-    if (info == null || !info.isValid) return;
-    if (info.usesIndividualFrames) return;
-    final duration = _state.duration;
-    if (duration <= Duration.zero) return;
-
-    _precacheTrickplayIndexes(
-      TrickplayPrefetchPlanner.planImageIndexes(
-        info: info,
-        position: position,
-        totalDuration: duration,
-        directionForward: true,
-        sheetsAhead: 1,
-      ),
-    );
-  }
-
-  // Every sheet, nearest first. Held back until the first scrub or hover so
-  // a video that is only ever watched costs nothing here, and skipped on TV
-  // where the D-pad direction says which sheets are worth having.
-  void _prefetchAllTrickplaySheets(Duration position) {
-    if (PlatformDetection.isTV || _touchTrickplayPrefetchStarted) return;
-    if (_prefs.get(UserPreferences.trickPlayMode) == TrickplayMode.disabled) {
-      return;
-    }
-    final info = _trickplayInfo;
-    final duration = _state.duration;
-    if (info == null || !info.isValid || duration <= Duration.zero) return;
-    _touchTrickplayPrefetchStarted = true;
-    _precacheTrickplayIndexes(
-      TrickplayPrefetchPlanner.planAllImageIndexes(
-        info: info,
-        position: position,
-        totalDuration: duration,
-        maxSheets: info.usesIndividualFrames ? 7 : 128,
-      ),
-    );
   }
 
   // Waiting for the frame collapses a burst of drag events into one prefetch.
@@ -2163,7 +2130,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _refreshTrickplayIfNeeded();
     _refreshChaptersIfNeeded();
     _refreshCastPeopleIfNeeded();
-    _handleTrickplayAmbientPrefetch(position);
     _syncAirPlayPlaybackState(position: position);
     if (PlatformDetection.isIOS) {
       _pipService.updateIosTimeline(
@@ -2203,6 +2169,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _configureCinemaSkip();
     _syncMediaQueuingPreference();
     if (!mounted) return;
+    if ((_prefs.get(UserPreferences.trickPlayMode) == TrickplayMode.disabled) !=
+        _trickplayDisabled) {
+      unawaited(_loadTrickplayInfo(_queue.currentItem));
+    }
     _applySubtitleStyle();
     final zoom = _prefs.get(UserPreferences.playerZoomMode);
     if (zoom != _zoomMode) {
@@ -2892,11 +2862,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       _syncPrerollOsdState();
       return;
     }
-    final wasVisible = _controlsVisible;
     setState(() => _controlsVisible = true);
-    if (!wasVisible) {
-      _prefetchTrickplayDirectional(_state.position, forward: true);
-    }
+    // Stream-dependent buttons are incomplete until resolution and opening
+    // finish. Remember an early request without painting a temporary layout.
+    if (_isBringupInProgress(_bringupState.phase)) return;
     _scheduleHide();
     if (focusSeekbar) {
       _focusPreferredTvOverlayTarget();
@@ -2994,7 +2963,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         _state.duration.inMilliseconds,
       ),
     );
-    _prefetchTrickplayDirectional(clamped, forward: ms > 0);
     _seekDirect(clamped);
     _lastSeekTime = DateTime.now();
     if (showControls) {
@@ -3044,19 +3012,16 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     // resume()) out from under this new, still-active gesture, snapping the
     // frozen timeline back to live position mid-hold.
     _scrubSeekCommitId++;
-    if (_hasTrickplayPreview) {
-      _prefetchAllTrickplaySheets(_state.position);
-      if (_pauseDuringScrub) {
-        _isPausedScrubActive = true;
-        // If an earlier still-resolving commit already paused playback for
-        // this chain of overlapping gestures, _wasPlayingBeforeScrubPause is
-        // already correctly true - re-reading _state.isPlaying now would see
-        // "paused" and wrongly conclude nothing needs resuming later.
-        if (!_wasPlayingBeforeScrubPause) {
-          _wasPlayingBeforeScrubPause = _state.isPlaying;
-          if (_wasPlayingBeforeScrubPause) {
-            _manager.pause();
-          }
+    if (_pauseDuringScrub) {
+      _isPausedScrubActive = true;
+      // If an earlier still-resolving commit already paused playback for
+      // this chain of overlapping gestures, _wasPlayingBeforeScrubPause is
+      // already correctly true - re-reading _state.isPlaying now would see
+      // "paused" and wrongly conclude nothing needs resuming later.
+      if (!_wasPlayingBeforeScrubPause) {
+        _wasPlayingBeforeScrubPause = _state.isPlaying;
+        if (_wasPlayingBeforeScrubPause) {
+          _manager.pause();
         }
       }
     }
@@ -3974,6 +3939,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                         ),
                       _buildPausedDescriptionOverlay(),
                       if (_controlsVisible &&
+                          !_isBringupInProgress(_bringupState.phase) &&
                           !_isOsdLocked &&
                           !hideOsdForPreroll) ...[
                         const Positioned.fill(
@@ -5260,7 +5226,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       trackWidth,
       duration,
     );
-    if (_hoverPosition == null) _prefetchAllTrickplaySheets(position);
+    _prefetchVisibleTrickplayPreview(position);
     if (position != _hoverPosition) setState(() => _hoverPosition = position);
   }
 

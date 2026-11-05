@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../offline_aware_image.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:moonfin_design/moonfin_design.dart';
@@ -48,11 +49,14 @@ class BannerMediaBar extends StatefulWidget {
   State<BannerMediaBar> createState() => _BannerMediaBarState();
 }
 
-class _BannerMediaBarState extends State<BannerMediaBar> {
+class _BannerMediaBarState extends State<BannerMediaBar>
+    with WidgetsBindingObserver {
   static const _keyLongPressThreshold = Duration(milliseconds: 500);
   Timer? _autoAdvance;
   int _index = 0;
   bool _focused = false;
+  bool _isRouteCurrent = false;
+  bool _appInForeground = true;
   DateTime? _keyDownTime;
 
   @override
@@ -60,6 +64,15 @@ class _BannerMediaBarState extends State<BannerMediaBar> {
     super.initState();
     widget.viewModel.addListener(_onChanged);
     widget.prefs.addListener(_onChanged);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final current = ModalRoute.isCurrentOf(context) ?? true;
+    if (current == _isRouteCurrent) return;
+    _isRouteCurrent = current;
     _startAutoAdvance();
     _ensureRatingsForCurrent();
   }
@@ -69,22 +82,48 @@ class _BannerMediaBarState extends State<BannerMediaBar> {
     super.didUpdateWidget(oldWidget);
     if (widget.externallyPaused != oldWidget.externallyPaused) {
       _startAutoAdvance();
+      _ensureRatingsForCurrent();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _appInForeground = true;
+      _startAutoAdvance();
+      _ensureRatingsForCurrent();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        (state == AppLifecycleState.inactive && !PlatformDetection.isWeb)) {
+      _appInForeground = false;
+      _autoAdvance?.cancel();
     }
   }
 
   @override
   void dispose() {
     _autoAdvance?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     widget.viewModel.removeListener(_onChanged);
     widget.prefs.removeListener(_onChanged);
     super.dispose();
   }
 
   void _onChanged() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    final items = widget.viewModel.items;
+    if (items.isNotEmpty) _index = _index.clamp(0, items.length - 1);
+    setState(() {});
+    _ensureRatingsForCurrent();
   }
 
   void _ensureRatingsForCurrent() {
+    if (!mounted ||
+        !_isRouteCurrent ||
+        !_appInForeground ||
+        widget.externallyPaused) {
+      return;
+    }
     final items = widget.viewModel.items;
     if (_index < items.length) {
       unawaited(widget.viewModel.ensureRatings(items[_index].itemId));
@@ -93,7 +132,9 @@ class _BannerMediaBarState extends State<BannerMediaBar> {
 
   void _startAutoAdvance() {
     _autoAdvance?.cancel();
-    if (widget.externallyPaused) return;
+    if (widget.externallyPaused || !_isRouteCurrent || !_appInForeground) {
+      return;
+    }
     if (!widget.prefs.get(UserPreferences.mediaBarAutoAdvance)) return;
     final intervalMs = widget.prefs.get(UserPreferences.mediaBarIntervalMs);
     _autoAdvance = Timer.periodic(Duration(milliseconds: intervalMs), (_) {
@@ -122,7 +163,8 @@ class _BannerMediaBarState extends State<BannerMediaBar> {
       if (event is KeyUpEvent) {
         final downTime = _keyDownTime;
         _keyDownTime = null;
-        final longPress = downTime != null &&
+        final longPress =
+            downTime != null &&
             DateTime.now().difference(downTime) >= _keyLongPressThreshold;
         if (longPress) {
           widget.onPlay(item);
@@ -227,9 +269,8 @@ class _BannerMediaBarState extends State<BannerMediaBar> {
                     message,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColorScheme.onSurface,
-                    ),
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: AppColorScheme.onSurface),
                   ),
                 ),
                 TextButton(
@@ -270,9 +311,7 @@ class _BannerMediaBarState extends State<BannerMediaBar> {
           decoration: BoxDecoration(
             borderRadius: AppRadius.circular(16),
             border: Border.all(
-              color: _focused
-                  ? AppColorScheme.accent
-                  : Colors.transparent,
+              color: _focused ? AppColorScheme.accent : Colors.transparent,
               width: 2.5,
             ),
             boxShadow: _focused
@@ -296,7 +335,9 @@ class _BannerMediaBarState extends State<BannerMediaBar> {
                         if (v < -300) {
                           _setIndex(_index + 1);
                         } else if (v > 300) {
-                          _setIndex(_index == 0 ? items.length - 1 : _index - 1);
+                          _setIndex(
+                            _index == 0 ? items.length - 1 : _index - 1,
+                          );
                         }
                       }
                     : null,
@@ -385,7 +426,10 @@ class _BannerMediaBarState extends State<BannerMediaBar> {
   }) {
     final theme = Theme.of(context);
     final shadows = <Shadow>[
-      Shadow(blurRadius: 10, color: AppColorScheme.scrim.withValues(alpha: 0.8)),
+      Shadow(
+        blurRadius: 10,
+        color: AppColorScheme.scrim.withValues(alpha: 0.8),
+      ),
     ];
     final meta = <String>[
       if (item.year != null) '${item.year}',
@@ -456,7 +500,6 @@ class _BannerMediaBarState extends State<BannerMediaBar> {
     );
   }
 
-
   String _formatRuntime(Duration d) {
     final h = d.inHours;
     final m = d.inMinutes.remainder(60);
@@ -473,7 +516,10 @@ class _Dots extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final shown = count > 7 ? 7 : count;
-    final start = (active - shown ~/ 2).clamp(0, count - shown < 0 ? 0 : count - shown);
+    final start = (active - shown ~/ 2).clamp(
+      0,
+      count - shown < 0 ? 0 : count - shown,
+    );
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

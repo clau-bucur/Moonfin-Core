@@ -2459,7 +2459,6 @@ class PlaybackManager implements AudioOwnable {
     }
     _lastItemId = itemId;
     _lastPlayedItem = item;
-    _preFetchNextSeasonIfNeeded();
 
     _setBringupState(
       PlaybackBringupState(
@@ -3232,6 +3231,9 @@ class PlaybackManager implements AudioOwnable {
     }
 
     _startProgressTimer();
+    // The current stream owns startup bandwidth. Looking up the next season
+    // can wait until the backend has opened this one successfully.
+    _preFetchNextSeasonIfNeeded();
     _setBringupState(
       PlaybackBringupState(
         phase: PlaybackBringupPhase.ready,

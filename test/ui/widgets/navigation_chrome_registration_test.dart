@@ -18,6 +18,7 @@ import 'package:moonfin/preference/user_preferences.dart';
 import 'package:moonfin/ui/navigation/route_lifecycle_observer.dart';
 import 'package:moonfin/ui/widgets/left_sidebar.dart';
 import 'package:moonfin/ui/widgets/navigation_layout.dart';
+import 'package:moonfin/ui/widgets/overlay_sheet.dart';
 import 'package:moonfin/ui/widgets/top_toolbar.dart';
 import 'package:moonfin/util/focus/input_mode_tracker.dart';
 import 'package:moonfin/util/game_library.dart';
@@ -239,8 +240,9 @@ void main() {
     await GetIt.instance.reset();
   });
 
-  testWidgets('sidebar registers its focus root only while mounted',
-      (tester) async {
+  testWidgets('sidebar registers its focus root only while mounted', (
+    tester,
+  ) async {
     await tester.pumpWidget(_host(const LeftSidebar()));
     expect(NavigationLayout.chromeFocusRoots, hasLength(1));
 
@@ -248,8 +250,9 @@ void main() {
     expect(NavigationLayout.chromeFocusRoots, isEmpty);
   });
 
-  testWidgets('toolbar registers its focus root only while mounted',
-      (tester) async {
+  testWidgets('toolbar registers its focus root only while mounted', (
+    tester,
+  ) async {
     await tester.pumpWidget(_host(const TopToolbar()));
     expect(NavigationLayout.chromeFocusRoots, hasLength(1));
 
@@ -259,10 +262,66 @@ void main() {
 
   final linux = TargetPlatformVariant.only(TargetPlatform.linux);
 
+  for (final key in [
+    LogicalKeyboardKey.arrowDown,
+    LogicalKeyboardKey.escape,
+    LogicalKeyboardKey.goBack,
+  ]) {
+    testWidgets('top navbar returns to the remembered home row with $key', (
+      tester,
+    ) async {
+      final row = FocusNode(debugLabel: 'HomeRow');
+      final content = FocusNode(debugLabel: 'HomeContent');
+      final idleScope = FocusScopeNode(debugLabel: 'IdleScope');
+      addTearDown(row.dispose);
+      addTearDown(content.dispose);
+      addTearDown(idleScope.dispose);
+      var handoffs = 0;
+      NavigationLayout.focusContentFromNavbarNotifier.value = () => handoffs++;
+      addTearDown(
+        () => NavigationLayout.focusContentFromNavbarNotifier.value = null,
+      );
+      await tester.pumpWidget(
+        _host(
+          Stack(
+            children: [
+              Focus(
+                focusNode: content,
+                skipTraversal: true,
+                child: Focus(focusNode: row, child: const SizedBox.expand()),
+              ),
+              FocusScope(node: idleScope, child: const SizedBox()),
+              TopToolbar(activeRoute: '/home', contentFocusNode: content),
+            ],
+          ),
+        ),
+      );
+      row.requestFocus();
+      await tester.pumpAndSettle();
+      // A transient scope focus must not overwrite the last actual home row.
+      idleScope.requestFocus();
+      await tester.pump();
+      NavigationLayout.focusNavbarNotifier.value!();
+      await tester.pumpAndSettle();
+      expect(_focusedLabel(), 'TopToolbarHome');
+
+      // Mirrors the app's hardware Back handler, which precedes focus dispatch.
+      if (key == LogicalKeyboardKey.goBack) {
+        expect(InlineBackInterceptor.handleBack(), isTrue);
+      } else {
+        await tester.sendKeyEvent(key);
+      }
+      await tester.pumpAndSettle();
+      expect(row.hasPrimaryFocus, isTrue);
+      expect(TopToolbar.isFocusedNotifier.value, isFalse);
+      expect(handoffs, 0);
+      await tester.pumpWidget(_host(const SizedBox()));
+      expect(InlineBackInterceptor.handleBack(), isFalse);
+    });
+  }
+
   group('desktop sidebar keyboard navigation', () {
-    setUp(
-      () => PlatformDetection.setInterfaceLayout(InterfaceLayout.desktop),
-    );
+    setUp(() => PlatformDetection.setInterfaceLayout(InterfaceLayout.desktop));
     tearDown(
       () => PlatformDetection.setInterfaceLayout(InterfaceLayout.automatic),
     );
@@ -410,9 +469,7 @@ void main() {
       expect(_railHasFocus(), isTrue);
     }, variant: linux);
 
-    testWidgets('the navbar handoff opens the rail after Back', (
-      tester,
-    ) async {
+    testWidgets('the navbar handoff opens the rail after Back', (tester) async {
       final rail = await _RailHost.pump(tester);
       await rail.openSearchFromRail(tester);
 

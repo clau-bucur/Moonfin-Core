@@ -1001,8 +1001,9 @@ class ItemDetailViewModel extends ChangeNotifier {
       _selectedSubtitleIndex = savedSubIndex == -2 ? null : savedSubIndex;
       final savedAudioIndex = prefs.getItemAudioStreamIndex(itemId);
       _selectedAudioIndex = savedAudioIndex == -2 ? null : savedAudioIndex;
-      // Prepare the page as one layout instead of revealing new sections
-      // and moving focused controls while the user is already navigating.
+      // Keep the main navigation and playback choices together. Optional
+      // ratings, recommendations and extras must not hold the Play button
+      // behind their slowest request.
       _loadingPrimarySections = true;
       try {
         final primary = switch (_item?.type) {
@@ -1012,14 +1013,25 @@ class ItemDetailViewModel extends ChangeNotifier {
           'Playlist' => _loadTracks(),
           _ => Future<void>.value(),
         };
-        await Future.wait([primary, _loadSecondary()]);
+        await Future.wait([
+          primary,
+          _loadProbedMediaSources(),
+          if (const {'Series', 'Season', 'Episode'}.contains(_item?.type))
+            _syncSeriesTrackChoices(),
+        ]);
       } finally {
         _loadingPrimarySections = false;
       }
       if (_isDisposed) return;
       _state = ItemDetailState.ready;
       notifyListeners();
+      // A ready listener can navigate away (for example auto-play). Avoid
+      // starting the optional fan-out for a page already disposed by it.
+      if (!_isDisposed) await _loadSecondary();
     } catch (e) {
+      // Optional sections failing after publication do not make an otherwise
+      // playable title an error page.
+      if (_isDisposed || _state == ItemDetailState.ready) return;
       _error = e;
       _state = ItemDetailState.error;
       notifyListeners();
@@ -1107,7 +1119,6 @@ class ItemDetailViewModel extends ChangeNotifier {
   Future<void> _loadSecondary() async {
     final type = _item?.type;
     final futures = <Future>[];
-    futures.add(_loadProbedMediaSources());
     // Deliberately outside the Future.wait below, so a slow Seerr server never
     // holds up library content that is already here.
     unawaited(_loadSeerrOverlay());
@@ -1116,7 +1127,6 @@ class ItemDetailViewModel extends ChangeNotifier {
       futures.add(_loadPersonAccounts());
     } else if (type == 'Series') {
       futures.add(_loadReviews());
-      futures.add(_syncSeriesTrackChoices());
       futures.add(_loadRatings());
 
       futures.add(_loadSimilar());
@@ -1124,11 +1134,9 @@ class ItemDetailViewModel extends ChangeNotifier {
       futures.add(_loadParentCollection());
       futures.add(_loadUpcomingEpisode());
     } else if (type == 'Season') {
-      futures.add(_syncSeriesTrackChoices());
       futures.add(_loadRatings());
       futures.add(_loadFeatures());
     } else if (type == 'Episode') {
-      futures.add(_syncSeriesTrackChoices());
       futures.add(_loadRatings());
       futures.add(_loadSimilar());
       futures.add(_loadFeatures());

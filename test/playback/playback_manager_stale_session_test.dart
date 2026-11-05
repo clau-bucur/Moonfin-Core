@@ -238,6 +238,40 @@ PlaybackManager _manager(
   ..setPlayerService(service);
 
 void main() {
+  test(
+    'next-season requests wait until the current stream has opened',
+    () async {
+      final gate = Completer<void>();
+      final backend = _TestBackend()..playGate = gate;
+      final manager = _manager(backend, _TestResolver(), _TestService());
+      var nextSeasonRequests = 0;
+      manager.setNextSeasonItemsProvider((item, queue, index) async {
+        nextSeasonRequests++;
+        return [
+          <String, dynamic>{'Id': 'next-season', 'Type': 'Episode'},
+        ];
+      });
+
+      try {
+        final starting = manager.playItems([
+          <String, dynamic>{'Id': 'season-finale', 'Type': 'Episode'},
+        ]);
+        await pumpEventQueue(times: 10);
+        expect(backend.playedUrls, hasLength(1));
+        expect(nextSeasonRequests, 0);
+
+        gate.complete();
+        await starting;
+        await pumpEventQueue(times: 10);
+        expect(nextSeasonRequests, 1);
+        expect(manager.queueService.items, hasLength(2));
+      } finally {
+        if (!gate.isCompleted) gate.complete();
+        manager.dispose();
+      }
+    },
+  );
+
   for (final type in <String>['Movie', 'Episode']) {
     test(
       '$type background stop preserves queue and fresh-resolves position',

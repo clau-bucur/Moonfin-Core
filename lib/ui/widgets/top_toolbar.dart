@@ -241,6 +241,7 @@ class _TopToolbarState extends State<TopToolbar> with RouteAware {
     }
     _clockTimer?.cancel();
     _librariesReloadDebounce?.cancel();
+    InlineBackInterceptor.remove(_returnToHomeContent);
     // Only clear the shared flag if this instance held focus, so a torn-down
     // route's toolbar can't wipe the state of the one the user is on.
     if (_toolbarHadFocus) {
@@ -397,9 +398,7 @@ class _TopToolbarState extends State<TopToolbar> with RouteAware {
 
   void _trackPreviousFocus() {
     final primary = FocusManager.instance.primaryFocus;
-    if (primary == null) return;
-    if (primary.skipTraversal) return;
-    if (_isInsideToolbar(primary)) return;
+    if (!_isUsableOutsideToolbar(primary)) return;
     _previousFocus = primary;
   }
 
@@ -423,13 +422,33 @@ class _TopToolbarState extends State<TopToolbar> with RouteAware {
 
   bool _isUsableOutsideToolbar(FocusNode? node) {
     if (node == null) return false;
+    if (node is FocusScopeNode || identical(node, widget.contentFocusNode)) {
+      return false;
+    }
     if (node.skipTraversal) return false;
     if (_isInsideToolbar(node)) return false;
     return _isLaidOutFocusNode(node);
   }
 
+  bool _returnToHomeContent() {
+    if (!mounted ||
+        !_toolbarScopeNode.hasFocus ||
+        widget.activeRoute != Destinations.home) {
+      return false;
+    }
+    _restoreFocusBelowToolbar();
+    return true;
+  }
+
   void _restoreFocusBelowToolbar() {
     if (NavigationLayout.focusDetailsPlayButton()) return;
+    // Return to the row the user left, including when the media bar and first
+    // rows have been scrolled out of the lazy list.
+    if (widget.activeRoute == Destinations.home &&
+        _isUsableOutsideToolbar(_previousFocus)) {
+      _restoreFocusBelowToolbarFallback();
+      return;
+    }
     final focusContent = NavigationLayout.focusContentFromNavbarNotifier.value;
     if (focusContent != null && widget.activeRoute == Destinations.home) {
       focusContent();
@@ -591,6 +610,9 @@ class _TopToolbarState extends State<TopToolbar> with RouteAware {
   }
 
   bool _isLaidOutFocusNode(FocusNode node) {
+    if (node is FocusScopeNode || identical(node, widget.contentFocusNode)) {
+      return false;
+    }
     if (!node.canRequestFocus) {
       return false;
     }
@@ -673,8 +695,18 @@ class _TopToolbarState extends State<TopToolbar> with RouteAware {
             onFocusChange: (hasFocus) {
               _toolbarHadFocus = hasFocus;
               TopToolbar.isFocusedNotifier.value = hasFocus;
+              if (hasFocus && widget.activeRoute == Destinations.home) {
+                InlineBackInterceptor.push(_returnToHomeContent);
+              } else {
+                InlineBackInterceptor.remove(_returnToHomeContent);
+              }
             },
             onKeyEvent: (_, event) {
+              if (event is KeyDownEvent &&
+                  event.logicalKey.isBackKey &&
+                  _returnToHomeContent()) {
+                return KeyEventResult.handled;
+              }
               if (event is KeyDownEvent &&
                   event.logicalKey == LogicalKeyboardKey.arrowDown) {
                 final primary = FocusManager.instance.primaryFocus;

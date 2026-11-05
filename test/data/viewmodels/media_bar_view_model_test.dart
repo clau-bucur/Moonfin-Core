@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:moonfin/data/models/media_bar_slide_item.dart';
 import 'package:moonfin/data/models/media_bar_state.dart';
 import 'package:moonfin/data/repositories/mdblist_repository.dart';
 import 'package:moonfin/data/repositories/media_bar_repository.dart';
@@ -34,6 +35,7 @@ void main() {
   late UserPreferences prefs;
   late _Repository repository;
   late _Sync sync;
+  late _MdbList mdbList;
   late List<Completer<MediaBarState>> loads;
 
   setUp(() async {
@@ -45,6 +47,7 @@ void main() {
     GetIt.instance.registerSingleton<PluginSyncService>(sync);
     loads = [];
     repository = _Repository();
+    mdbList = _MdbList();
     when(() => repository.loadItems()).thenAnswer((_) {
       final load = Completer<MediaBarState>();
       loads.add(load);
@@ -55,7 +58,88 @@ void main() {
   tearDown(() => GetIt.instance.reset());
 
   MediaBarViewModel create() =>
-      MediaBarViewModel(repository, _MdbList(), prefs, _Client());
+      MediaBarViewModel(repository, mdbList, prefs, _Client());
+
+  const slides = [
+    MediaBarSlideItem(
+      itemId: 'first',
+      serverId: 'server',
+      title: 'First',
+      tmdbId: '1',
+    ),
+    MediaBarSlideItem(
+      itemId: 'second',
+      serverId: 'server',
+      title: 'Second',
+      tmdbId: '2',
+    ),
+  ];
+
+  test(
+    'loading slides waits for a selected slide before fetching ratings',
+    () async {
+      await prefs.set(UserPreferences.mediaBarEnableAdditionalRatings, true);
+      final viewModel = create();
+      addTearDown(viewModel.dispose);
+      final loading = viewModel.load();
+      loads.single.complete(const MediaBarReady(slides));
+      await loading;
+
+      verifyZeroInteractions(mdbList);
+      when(
+        () => mdbList.resolveTmdbId(
+          itemId: 'second',
+          serverId: null,
+          knownTmdbId: '2',
+        ),
+      ).thenAnswer((_) async => '2');
+      final ratings = Completer<Map<String, double>?>();
+      when(() => mdbList.getRatings(tmdbId: '2', mediaType: 'Movie'))
+          .thenAnswer((_) => ratings.future);
+      final selected = viewModel.ensureRatings('second');
+      await pumpEventQueue();
+      await viewModel.ensureRatings('second');
+      ratings.complete({'imdb': 8.5});
+      await selected;
+      await viewModel.ensureRatings('second');
+
+      verify(() => mdbList.getRatings(tmdbId: '2', mediaType: 'Movie'))
+          .called(1);
+      expect(viewModel.ratingsFor('second'), {'imdb': 8.5});
+      expect(viewModel.ratingsFor('first'), isEmpty);
+    },
+  );
+
+  test(
+    'an old selected-slide ratings response cannot update a new load',
+    () async {
+      await prefs.set(UserPreferences.mediaBarEnableAdditionalRatings, true);
+      final viewModel = create();
+      addTearDown(viewModel.dispose);
+      final loading = viewModel.load();
+      loads.single.complete(const MediaBarReady(slides));
+      await loading;
+      when(
+        () => mdbList.resolveTmdbId(
+          itemId: 'first',
+          serverId: null,
+          knownTmdbId: '1',
+        ),
+      ).thenAnswer((_) async => '1');
+      final ratings = Completer<Map<String, double>?>();
+      when(() => mdbList.getRatings(tmdbId: '1', mediaType: 'Movie'))
+          .thenAnswer((_) => ratings.future);
+      final selected = viewModel.ensureRatings('first');
+      await pumpEventQueue();
+      final reload = viewModel.load(force: true);
+      loads.last.complete(MediaBarReady([slides[1]]));
+      await reload;
+      ratings.complete({'imdb': 8.5});
+      await selected;
+
+      expect(viewModel.ratingsFor('first'), isEmpty);
+    },
+  );
 
   test('a source change made during a load runs once that load ends', () async {
     final viewModel = create();
@@ -70,7 +154,10 @@ void main() {
   });
 
   test('picked lists load again once Moonbase answers', () async {
-    await prefs.set(UserPreferences.mediaBarExternalLists, 'imdb_top_250_movies');
+    await prefs.set(
+      UserPreferences.mediaBarExternalLists,
+      'imdb_top_250_movies',
+    );
     final viewModel = create();
     unawaited(viewModel.load());
     loads.first.complete(const MediaBarDisabled());

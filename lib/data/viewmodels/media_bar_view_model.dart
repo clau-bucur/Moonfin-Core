@@ -54,15 +54,16 @@ class MediaBarViewModel extends ChangeNotifier {
     if (!_prefs.get(UserPreferences.mediaBarEnableAdditionalRatings)) return;
     if (_ratings.containsKey(itemId)) return;
     if (!_ratingsInFlight.add(itemId)) return;
+    final generation = _loadGeneration;
     try {
       final item = items.where((i) => i.itemId == itemId).firstOrNull;
       if (item == null) return;
-      await _loadItemRatings(item);
-      if (_ratings.containsKey(itemId)) {
+      await _loadItemRatings(item, generation);
+      if (generation == _loadGeneration && _ratings.containsKey(itemId)) {
         notifyListeners();
       }
     } finally {
-      _ratingsInFlight.remove(itemId);
+      if (generation == _loadGeneration) _ratingsInFlight.remove(itemId);
     }
   }
 
@@ -179,6 +180,8 @@ class MediaBarViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    _loadGeneration++;
+    _reloadAfterLoad = false;
     _prefs.removeListener(_onPrefsChanged);
     _sync?.removeListener(_onPluginChanged);
     super.dispose();
@@ -224,11 +227,9 @@ class MediaBarViewModel extends ChangeNotifier {
         _state = nextState;
       }
 
+      // The visible slide asks for ratings through ensureRatings. Loading all
+      // slides here competes with Home rows and artwork during startup.
       notifyListeners();
-
-      if (_state is MediaBarReady) {
-        _loadRatings((_state as MediaBarReady).items);
-      }
     } finally {
       _isLoading = false;
       if (_reloadAfterLoad) {
@@ -238,33 +239,19 @@ class MediaBarViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> _loadRatings(List<MediaBarSlideItem> items) async {
-    if (!_prefs.get(UserPreferences.mediaBarEnableAdditionalRatings)) return;
-
-    await Future.wait(
-      items.map((item) async {
-        if (item.tmdbId == null) return;
-        await _loadItemRatings(item);
-        if (_ratings.containsKey(item.itemId)) {
-          notifyListeners();
-        }
-      }),
-    );
-  }
-
-  Future<void> _loadItemRatings(MediaBarSlideItem item) async {
+  Future<void> _loadItemRatings(MediaBarSlideItem item, int generation) async {
     try {
       final tmdbId = await _mdbListRepository.resolveTmdbId(
         itemId: item.itemId,
         serverId: null,
         knownTmdbId: item.tmdbId,
       );
-      if (tmdbId == null) return;
+      if (tmdbId == null || generation != _loadGeneration) return;
       final result = await _mdbListRepository.getRatings(
         tmdbId: tmdbId,
         mediaType: item.itemType,
       );
-      if (result != null && result.isNotEmpty) {
+      if (generation == _loadGeneration && result != null) {
         _ratings[item.itemId] = result;
       }
     } catch (_) {}

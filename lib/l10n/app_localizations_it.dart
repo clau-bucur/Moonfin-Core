@@ -19,7 +19,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get animeMarkerFiller => 'Filler';
 
   @override
-  String get animeMarkerMixed => 'Mixed';
+  String get animeMarkerMixed => 'Misto';
 
   @override
   String get animeMarkerAnimeCanon => 'Anime Canon';
@@ -28,13 +28,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get animeMarkerMangaCanon => 'Manga Canon';
 
   @override
-  String get animeMarkerSubbed => 'Subbed';
+  String get animeMarkerSubbed => 'Sottotitolato';
 
   @override
-  String get animeMarkerDubbed => 'Dubbed';
+  String get animeMarkerDubbed => 'Doppiato';
 
   @override
-  String get animeMarkerSubbedAndDubbed => 'Subbed/Dubbed';
+  String get animeMarkerSubbedAndDubbed => 'Sottotitolato/Doppiato';
 
   @override
   String get animeMarkerSubbedShort => 'Sub';
@@ -61,7 +61,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get signIn => 'Accedi';
 
   @override
-  String get signingIn => 'Signing in...';
+  String get signingIn => 'Accesso in corso...';
 
   @override
   String get empty => 'Vuoto';
@@ -99,21 +99,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get timesUpTitle => 'Time\'s up';
 
   @override
-  String get timesUpMessage => 'This account isn\'t available right now.';
+  String get timesUpMessage => 'Questo account non è al momento disponibile.';
 
   @override
   String timesUpResumesToday(String time) {
-    return 'You can use it again today at $time.';
+    return 'Potrai utilizzarlo nuovamente oggi alle $time.';
   }
 
   @override
   String timesUpResumesTomorrow(String time) {
-    return 'You can use it again tomorrow at $time.';
+    return 'Potrai utilizzarlo nuovamente domani alle $time.';
   }
 
   @override
   String timesUpResumesOn(String day, String time) {
-    return 'You can use it again on $day at $time.';
+    return 'Potrai utilizzarlo nuovamente il $day alle $time.';
   }
 
   @override
@@ -130,7 +130,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get loginForbidden =>
-      'This account can\'t sign in right now. It may be outside its allowed hours, locked or disabled. Try again later or ask an administrator.';
+      'Questo account non può effettuare l\'accesso al momento. Potrebbe essere soggetto a restrizioni orarie, bloccato o disabilitato. Riprova più tardi o contatta un amministratore.';
 
   @override
   String quickConnectUnavailable(String detail) {
@@ -263,7 +263,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get spotlightCastCrewStudios => 'Cast, Crew, and Studios';
 
   @override
-  String get spotlightChaptersExtras => 'Chapters and Extras';
+  String get spotlightChaptersExtras => 'Capitoli ed extra';
 
   @override
   String get spotlightFileDetails => 'File Details';
@@ -272,7 +272,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get spotlightSimilarRecommendations => 'Similar and Recommendations';
 
   @override
-  String get spotlightSeasonsEpisodes => 'Seasons and Episodes';
+  String get spotlightSeasonsEpisodes => 'Stagioni ed episodi';
 
   @override
   String get spotlightMoreEpisodes => 'More Episodes';
@@ -281,13 +281,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get spotlightFilmography => 'Filmography';
 
   @override
-  String get spotlightCollectionsCard => 'Collections';
+  String get spotlightCollectionsCard => 'Raccolte';
 
   @override
   String get spotlightPlaylistOrder => 'Playlist Order';
 
   @override
-  String get spotlightMoviesAndShows => 'Movies & Shows';
+  String get spotlightMoviesAndShows => 'Film & Serie TV';
 
   @override
   String get spotlightSimilarSeerr => 'Similar (Seerr)';
@@ -344,8 +344,8 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count chapters',
-      one: '1 chapter',
+      other: '$count capitoli',
+      one: '1 capitolo',
     );
     return '$_temp0';
   }
@@ -355,7 +355,7 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count extras',
+      other: '$count extra',
       one: '1 extra',
     );
     return '$_temp0';
@@ -366,8 +366,8 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count seasons',
-      one: '1 season',
+      other: '$count stagioni',
+      one: '1 stagione',
     );
     return '$_temp0';
   }
@@ -377,8 +377,8 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count episodes',
-      one: '1 episode',
+      other: '$count episodi',
+      one: '1 episodio',
     );
     return '$_temp0';
   }
@@ -388,8 +388,8 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count movies',
-      one: '1 movie',
+      other: '$count film',
+      one: '1 film',
     );
     return '$_temp0';
   }
@@ -399,8 +399,8 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count shows',
-      one: '1 show',
+      other: '$count serie',
+      one: '1 serie',
     );
     return '$_temp0';
   }
@@ -432,7 +432,7 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count albums',
+      other: '$count album',
       one: '1 album',
     );
     return '$_temp0';
@@ -454,8 +454,8 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count titles',
-      one: '1 title',
+      other: '$count titoli',
+      one: '1 titolo',
     );
     return '$_temp0';
   }
@@ -464,7 +464,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get detailScreenStyleNouveau => 'Nouveau';
 
   @override
-  String get detailScreenStyleMinimalist => 'Minimalist';
+  String get detailScreenStyleMinimalist => 'Minimalista';
 
   @override
   String get detailScreenStyleStage => 'Stage';
@@ -2932,7 +2932,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get downloadedItems => 'Elementi Scaricati';
 
   @override
-  String get activeDownloads => 'Active Downloads';
+  String get activeDownloads => 'Download Attivi';
 
   @override
   String savedMediaCount(int count) {
@@ -2973,7 +2973,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get savedMediaGoToDetails => 'Go to details';
 
   @override
-  String get savedMediaDeleteDownload => 'Delete download';
+  String get savedMediaDeleteDownload => 'Elimina download';
 
   @override
   String savedMediaDeleteSeason(String season) {
@@ -3001,13 +3001,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get savedMediaRead => 'Read';
 
   @override
-  String get savedMediaCancelDownload => 'Cancel download';
+  String get savedMediaCancelDownload => 'Annulla download';
 
   @override
   String get sortBySize => 'Size';
 
   @override
-  String get sortByName => 'Name';
+  String get sortByName => 'Nome';
 
   @override
   String get sortByDateAdded => 'Date added';
@@ -4257,7 +4257,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get defaultSubtitleLanguage => 'Lingua Sottotitoli Predefinita';
 
   @override
-  String get subtitleDownloadLanguages => 'Subtitle Download Languages';
+  String get subtitleDownloadLanguages =>
+      'Lingue per il download dei sottotitoli';
 
   @override
   String get subtitleDownloadLanguagesDescription =>
@@ -4300,7 +4301,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String increaseValue(String setting) {
-    return 'Increase $setting';
+    return 'Aumenta $setting';
   }
 
   @override
@@ -12436,10 +12437,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get externalRowSortDefault => 'Default (List Order)';
 
   @override
-  String get externalRowSortName => 'Name';
+  String get externalRowSortName => 'Nome';
 
   @override
-  String get externalRowSortReleaseDate => 'Release Date';
+  String get externalRowSortReleaseDate => 'Data di uscita';
 
   @override
   String get externalRowSortRating => 'Rating';
@@ -12562,7 +12563,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get externalPlayerLiveTvOnlySubtitle =>
-      'Use the external player for Live TV and keep everything else in the built-in player.';
+      'Utilizza il lettore esterno per la TV in diretta e quello integrato per tutti gli altri contenuti.';
 
   @override
   String get automaticQueuing => 'Accodamento Automatico';
@@ -12575,18 +12576,18 @@ class AppLocalizationsIt extends AppLocalizations {
       'Dai priorità alle tracce di sottotitoli SDH/CC nella selezione automatica.';
 
   @override
-  String get preferTextSubtitles => 'Prefer Text Subtitles';
+  String get preferTextSubtitles => 'Preferisci i sottotitoli testuali';
 
   @override
   String get preferTextSubtitlesSubtitle =>
-      'Prioritize text-based subtitles (SRT, VTT) over image-based formats (PGS, VobSub).';
+      'Privilegia i sottotitoli testuali (SRT, VTT) rispetto a quelli grafici (PGS, VobSub).';
 
   @override
-  String get preferExternalSubtitles => 'Prefer External Subtitles';
+  String get preferExternalSubtitles => 'Preferisci i sottotitoli esterni';
 
   @override
   String get preferExternalSubtitlesSubtitle =>
-      'Prioritize external subtitle files over embedded tracks.';
+      'Privilegia i sottotitoli esterni rispetto a quelli inclusi nel video.';
 
   @override
   String get webDiagnostics => 'Diagnostica web';
@@ -15089,7 +15090,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String autoDownloadEnabledFor(String title) {
-    return 'Auto-download enabled for $title';
+    return 'Download automatici abilitati per $title';
   }
 
   @override
@@ -15126,10 +15127,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Episodes already downloaded stay on your device. The new number applies to future downloads.';
 
   @override
-  String get autoDownloadSection => 'Automatic downloads';
+  String get autoDownloadSection => 'Download automatici';
 
   @override
-  String get autoDownloadEnable => 'Enable Automatic Downloads';
+  String get autoDownloadEnable => 'Abilita Download Automatici';
 
   @override
   String get autoDownloadEnableSubtitle =>
@@ -15139,7 +15140,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get autoDownloadKeepUnwatched => 'Keep Unwatched Episodes';
 
   @override
-  String get autoDownloadKeepAll => 'All';
+  String get autoDownloadKeepAll => 'Tutti';
 
   @override
   String get autoDownloadDelete => 'Delete Downloaded Episodes';
@@ -15163,7 +15164,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Never remove this automatically after watching';
 
   @override
-  String get autoDownloadDeleteNever => 'Never';
+  String get autoDownloadDeleteNever => 'Mai';
 
   @override
   String get autoDownloadDeleteImmediately => 'Right after watching';
@@ -15226,7 +15227,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get autoDownloadRemove => 'Stop following';
 
   @override
-  String get autoDownloadStorageFull => 'Not enough storage';
+  String get autoDownloadStorageFull => 'Spazio di archiviazione insufficiente';
 
   @override
   String get autoDownloadWaitingForWifi => 'Waiting for WiFi';
@@ -15321,7 +15322,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get autoDownloadStorageFullTitle =>
-      'Not enough storage for new episodes';
+      'Spazio di archiviazione insufficiente per nuovi episodi';
 
   @override
   String autoDownloadStorageFullBody(int count, String name, String size) {
@@ -15481,7 +15482,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get detailsPage => 'Details Page';
 
   @override
-  String get storageAndDownloads => 'Storage & Downloads';
+  String get storageAndDownloads => 'Archiviazione & Download';
 
   @override
   String get integrations => 'Integrazioni';
@@ -15995,7 +15996,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get playerTransportDocked => 'Docked';
 
   @override
-  String get incompleteRecording => 'Incomplete';
+  String get incompleteRecording => 'Incompleto';
 
   @override
   String incompleteRecordingMinutes(int recorded, int expected) {
@@ -16363,7 +16364,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get readOnTmdb => 'Read on TMDB';
+  String get readOnTmdb => 'Leggi su TMDB';
 
   @override
   String get addServerButtonSubtitle =>

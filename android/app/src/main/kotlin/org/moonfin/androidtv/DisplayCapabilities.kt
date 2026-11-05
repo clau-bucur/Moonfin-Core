@@ -6,6 +6,7 @@ import android.hardware.display.DisplayManager
 import android.os.Build
 import android.view.Display
 import androidx.annotation.RequiresApi
+import androidx.core.view.DisplayCompat
 
 /**
  * Reports what the attached display says about HDR as a set of facts rather
@@ -35,6 +36,8 @@ object DisplayCapabilities {
             "answered" to false,
             "types" to emptyList<String>(),
             "supportedModeCount" to 0,
+            "maxWidth" to 0,
+            "maxHeight" to 0,
             "sinkId" to null,
             "sinkConnection" to null,
             "modeTypes" to emptyList<String>(),
@@ -58,6 +61,17 @@ object DisplayCapabilities {
             .getOrDefault(STATE_UNKNOWN)
         facts["supportedModeCount"] = runCatching { display.supportedModes?.size ?: 0 }
             .getOrDefault(0)
+
+        // Video can use the panel's full resolution even when Android renders
+        // the app UI at 1080p. DisplayCompat also handles TVs whose raw modes
+        // report that UI size instead of the video pipeline's physical size.
+        runCatching {
+            DisplayCompat.getSupportedModes(activity, display)
+                .maxByOrNull { it.physicalWidth.toLong() * it.physicalHeight }
+        }.getOrNull()?.let { mode ->
+            facts["maxWidth"] = mode.physicalWidth
+            facts["maxHeight"] = mode.physicalHeight
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // getHdrCapabilities is deprecated at API 34 in favor of the

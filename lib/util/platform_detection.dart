@@ -96,6 +96,28 @@ class PlatformDetection {
   static bool _supportsDoViProfile5 = false;
   static bool _supportsDoViProfile7 = false;
   static bool _supportsDoViProfile8 = false;
+  static Size? _displayResolution;
+
+  /// The largest native display mode, independent of the app's UI size.
+  static Size? get displayResolution => _displayResolution;
+
+  /// Updated when display detection changes, including a late HDMI handshake.
+  static final _displayCapabilitiesChanged = ValueNotifier<int>(0);
+  static Listenable get displayCapabilitiesChanged =>
+      _displayCapabilitiesChanged;
+
+  static void setDisplayResolution(Size? value) {
+    if (value != null &&
+        (!value.width.isFinite ||
+            !value.height.isFinite ||
+            value.width <= 0 ||
+            value.height <= 0)) {
+      return;
+    }
+    if (_displayResolution == value) return;
+    _displayResolution = value;
+    _displayCapabilitiesChanged.value++;
+  }
 
   /// Whether the display has ever answered the HDR probe. Without this a
   /// panel that reported no HDR is indistinguishable from one that was
@@ -227,6 +249,8 @@ class PlatformDetection {
   static String? get deviceSocModel => _capabilityString('deviceSocModel');
 
   static void setDisplayHdrTypes(Iterable<String>? values) {
+    final wasProbed = _hasDisplayHdrCapabilities;
+    final previous = Set<String>.of(_displayHdrTypes);
     _hasDisplayHdrCapabilities = values != null;
     _displayHdrTypes
       ..clear()
@@ -235,6 +259,10 @@ class PlatformDetection {
             .map((value) => value.trim().toUpperCase())
             .where((value) => value.isNotEmpty),
       );
+    if (wasProbed != _hasDisplayHdrCapabilities ||
+        !setEquals(previous, _displayHdrTypes)) {
+      _displayCapabilitiesChanged.value++;
+    }
   }
 
   static void setMediaCodecCapabilities(Map<String, dynamic>? values) {

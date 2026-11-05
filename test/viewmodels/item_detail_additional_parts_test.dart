@@ -72,18 +72,52 @@ void main() {
     return vm;
   }
 
-  test('details stay loading until secondary content is ready', () async {
-    final extras = Completer<List<Map<String, dynamic>>>();
-    when(() => itemsApi.getSpecialFeatures('movie-1'))
-        .thenAnswer((_) => extras.future);
+  test(
+    'details become playable while optional extras are still loading',
+    () async {
+      final extras = Completer<List<Map<String, dynamic>>>();
+      when(() => itemsApi.getSpecialFeatures('movie-1'))
+          .thenAnswer((_) => extras.future);
+      when(
+        () => itemsApi.getItem(
+          'movie-1',
+          mediaSourceId: any(named: 'mediaSourceId'),
+        ),
+      ).thenAnswer(
+        (_) async => {'Id': 'movie-1', 'Type': 'Movie', 'Name': 'Cold item'},
+      );
+      final tmdb = TmdbRepository(client);
+      final vm = ItemDetailViewModel(
+        itemId: 'movie-1',
+        client: client,
+        mutations: ItemMutationRepository(client),
+        mdbListRepository: MdbListRepository(client, tmdb),
+        tmdbRepository: tmdb,
+      );
+      addTearDown(vm.dispose);
+      final loading = vm.load();
+      await Future<void>.delayed(Duration.zero);
+      verify(() => itemsApi.getSpecialFeatures('movie-1')).called(1);
+      expect(vm.state, ItemDetailState.ready);
+      expect(vm.item?.id, 'movie-1');
+      expect(vm.features, isEmpty);
+      extras.complete([
+        {'Id': 'extra', 'Type': 'Video'},
+      ]);
+      await loading;
+      expect(vm.state, ItemDetailState.ready);
+      expect(vm.features.single.id, 'extra');
+    },
+  );
+
+  test('leaving during the main request skips optional requests', () async {
+    final item = Completer<Map<String, dynamic>>();
     when(
       () => itemsApi.getItem(
         'movie-1',
         mediaSourceId: any(named: 'mediaSourceId'),
       ),
-    ).thenAnswer(
-      (_) async => {'Id': 'movie-1', 'Type': 'Movie', 'Name': 'Cold item'},
-    );
+    ).thenAnswer((_) => item.future);
     final tmdb = TmdbRepository(client);
     final vm = ItemDetailViewModel(
       itemId: 'movie-1',
@@ -92,17 +126,15 @@ void main() {
       mdbListRepository: MdbListRepository(client, tmdb),
       tmdbRepository: tmdb,
     );
-    addTearDown(vm.dispose);
     final loading = vm.load();
-    await Future<void>.delayed(Duration.zero);
-    verify(() => itemsApi.getSpecialFeatures('movie-1')).called(1);
-    expect(vm.state, ItemDetailState.loading);
-    extras.complete([
-      {'Id': 'extra', 'Type': 'Video'},
-    ]);
+    vm.dispose();
+    item.complete({'Id': 'movie-1', 'Type': 'Movie'});
     await loading;
-    expect(vm.state, ItemDetailState.ready);
-    expect(vm.features.single.id, 'extra');
+
+    verifyNever(() => itemsApi.getSpecialFeatures(any()));
+    verifyNever(
+      () => itemsApi.getSimilarItems(any(), limit: any(named: 'limit')),
+    );
   });
 
   test(

@@ -12,21 +12,30 @@ import 'package:moonfin/util/platform_detection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _ViewModel extends ChangeNotifier implements MediaBarViewModel {
-  _ViewModel(this.item);
+  _ViewModel(this.item, {this.loading = false});
 
   final MediaBarSlideItem item;
+  bool loading;
+  final ratingsRequests = <String>[];
 
   @override
-  List<MediaBarSlideItem> get items => [item];
+  List<MediaBarSlideItem> get items => loading ? [] : [item];
 
   @override
-  MediaBarState get state => MediaBarReady([item]);
+  MediaBarState get state =>
+      loading ? const MediaBarLoading() : MediaBarReady([item]);
 
   @override
   Map<String, double> ratingsFor(String itemId) => const {};
 
   @override
-  Future<void> ensureRatings(String itemId) async {}
+  Future<void> ensureRatings(String itemId) async =>
+      ratingsRequests.add(itemId);
+
+  void showReady() {
+    loading = false;
+    notifyListeners();
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -49,7 +58,12 @@ void main() {
     () => PlatformDetection.setInterfaceLayout(InterfaceLayout.automatic),
   );
 
-  Future<void> pumpBar(WidgetTester tester, MediaBarSlideItem item) async {
+  Future<void> pumpBar(
+    WidgetTester tester,
+    MediaBarSlideItem item, {
+    _ViewModel? viewModel,
+    bool externallyPaused = false,
+  }) async {
     tester.view.physicalSize = const Size(1920, 1080);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -59,9 +73,10 @@ void main() {
         supportedLocales: const [Locale('en')],
         home: Scaffold(
           body: BannerMediaBar(
-            viewModel: _ViewModel(item),
+            viewModel: viewModel ?? _ViewModel(item),
             prefs: prefs,
             height: 240,
+            externallyPaused: externallyPaused,
             onOpen: (_) {},
             onPlay: (_) {},
           ),
@@ -82,6 +97,59 @@ void main() {
     backdropUrl: 'http://server/backdrop',
     bannerUrl: 'http://server/banner',
   );
+
+  testWidgets('cold loading requests ratings for the first ready slide', (
+    tester,
+  ) async {
+    final viewModel = _ViewModel(withBanner, loading: true);
+    await pumpBar(tester, withBanner, viewModel: viewModel);
+    expect(viewModel.ratingsRequests, isEmpty);
+
+    viewModel.showReady();
+    await tester.pump();
+    expect(viewModel.ratingsRequests, ['show']);
+  });
+
+  testWidgets('a hidden banner waits to request ratings until it is shown', (
+    tester,
+  ) async {
+    final viewModel = _ViewModel(withBanner, loading: true);
+    await pumpBar(
+      tester,
+      withBanner,
+      viewModel: viewModel,
+      externallyPaused: true,
+    );
+    viewModel.showReady();
+    await tester.pump();
+    expect(viewModel.ratingsRequests, isEmpty);
+
+    await pumpBar(tester, withBanner, viewModel: viewModel);
+    expect(viewModel.ratingsRequests, ['show']);
+  });
+
+  testWidgets('a covered Home defers banner ratings until returning', (
+    tester,
+  ) async {
+    final viewModel = _ViewModel(withBanner, loading: true);
+    await pumpBar(tester, withBanner, viewModel: viewModel);
+    final navigator = Navigator.of(tester.element(find.byType(BannerMediaBar)));
+    navigator.push(
+      MaterialPageRoute<void>(
+        builder: (_) => const Scaffold(body: Text('Details')),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    viewModel.showReady();
+    await tester.pump();
+    expect(viewModel.ratingsRequests, isEmpty);
+
+    navigator.pop();
+    await tester.pumpAndSettle();
+    expect(viewModel.ratingsRequests, ['show']);
+  });
 
   testWidgets('a banner replaces the backdrop and the title on desktop', (
     tester,

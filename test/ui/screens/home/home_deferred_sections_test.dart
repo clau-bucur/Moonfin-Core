@@ -12,6 +12,7 @@ import 'package:moonfin/data/services/plugin_sync_service.dart';
 import 'package:moonfin/data/services/row_data_source.dart';
 import 'package:moonfin/data/viewmodels/media_bar_view_model.dart';
 import 'package:moonfin/preference/home_section_config.dart';
+import 'package:moonfin/preference/preference_constants.dart';
 import 'package:moonfin/preference/seerr_preferences.dart';
 import 'package:moonfin/preference/user_preferences.dart';
 import 'package:moonfin/ui/screens/home/home_view_model.dart';
@@ -154,9 +155,9 @@ void main() {
     final vm = model();
     await vm.load();
 
-    expect(loaded, [for (var n = 0; n < 8; n++) idOf(n)]);
+    expect(loaded, [for (var n = 0; n < 3; n++) idOf(n)]);
     expect(vm.rows, hasLength(sectionCount));
-    expect(vm.rows.skip(8).every((row) => row.isLoading), isTrue);
+    expect(vm.rows.skip(3).every((row) => row.isLoading), isTrue);
     expect(vm.hasDeferredSections, isTrue);
   });
 
@@ -169,10 +170,183 @@ void main() {
     vm.loadSectionsNear(vm.rows.sublist(9, 10));
     await pumpEventQueue();
 
-    expect(loaded, [idOf(8), idOf(9)]);
+    expect(loaded, [idOf(7), idOf(8), idOf(9)]);
     expect(vm.rows[9].isLoading, isFalse);
     expect(vm.rows[10].isLoading, isTrue);
   });
+
+  test(
+    'built-in rows below the first screen also wait for the viewport',
+    () async {
+      await prefs.setHomeSectionsConfig([
+        for (final cfg in HomeSectionConfig.defaults())
+          cfg.copyWith(enabled: false),
+        for (var n = 0; n < 3; n++) collection(n),
+        const HomeSectionConfig(type: HomeSectionType.genres, order: 3),
+      ]);
+      await prefs.set(UserPreferences.displayGenresRows, true);
+      when(
+        () => source.loadGenres(
+          'http://server',
+          sortBy: any(named: 'sortBy'),
+          sortOrder: any(named: 'sortOrder'),
+          includeItemTypes: any(named: 'includeItemTypes'),
+        ),
+      ).thenAnswer(
+        (_) async => populated('genres').copyWith(rowType: HomeRowType.genres),
+      );
+      final vm = model();
+      await vm.load();
+
+      expect(vm.rows.last.id, 'genres');
+      expect(vm.rows.last.isLoading, isTrue);
+      verifyNever(
+        () => source.loadGenres(
+          'http://server',
+          sortBy: any(named: 'sortBy'),
+          sortOrder: any(named: 'sortOrder'),
+          includeItemTypes: any(named: 'includeItemTypes'),
+        ),
+      );
+
+      vm.loadSectionsNear([vm.rows.last]);
+      await pumpEventQueue();
+      expect(vm.rows.last.id, 'genres');
+      expect(vm.rows.last.isLoading, isFalse);
+    },
+  );
+
+  test('repeated viewport changes share three deferred fetch slots', () async {
+    final vm = model();
+    await vm.load();
+    loaded.clear();
+    gate = Completer<void>();
+
+    vm.loadSectionsNear(vm.rows.sublist(3, 7));
+    vm.loadSectionsNear(vm.rows.sublist(7, 11));
+    await pumpEventQueue();
+    expect(loaded, [idOf(3), idOf(4), idOf(5)]);
+
+    gate!.complete();
+    await pumpEventQueue();
+    expect(loaded, [for (var n = 3; n < 11; n++) idOf(n)]);
+    expect(vm.rows.sublist(3, 11).every((row) => !row.isLoading), isTrue);
+  });
+
+  test(
+    'hidden Home retains queued sections without starting requests',
+    () async {
+      final vm = model();
+      await vm.load();
+      loaded.clear();
+      vm.setDeferredSectionsPaused(true);
+      vm.loadSectionsNear(vm.rows.sublist(3, 7));
+      await pumpEventQueue();
+      expect(loaded, isEmpty);
+
+      vm.setDeferredSectionsPaused(false);
+      await pumpEventQueue();
+      expect(loaded, [for (var n = 3; n < 7; n++) idOf(n)]);
+    },
+  );
+
+  test(
+    'hiding Home stops queued requests after in-flight requests finish',
+    () async {
+      final vm = model();
+      await vm.load();
+      loaded.clear();
+      gate = Completer<void>();
+      vm.loadSectionsNear(vm.rows.sublist(3, 10));
+      await pumpEventQueue();
+      vm.setDeferredSectionsPaused(true);
+      gate!.complete();
+      await pumpEventQueue();
+      expect(loaded, [idOf(3), idOf(4), idOf(5)]);
+
+      vm.setDeferredSectionsPaused(false);
+      await pumpEventQueue();
+      expect(loaded, [for (var n = 3; n < 10; n++) idOf(n)]);
+    },
+  );
+
+  test(
+    'a stale deferred response cannot replace a freshly reloaded section',
+    () async {
+      final oldResponse = Completer<HomeRow>();
+      var requests = 0;
+      when(
+        () => source.loadDynamicSection(
+          rowId: idOf(4),
+          section: any(named: 'section'),
+          title: any(named: 'title'),
+          serverId: any(named: 'serverId'),
+          additionalData: any(named: 'additionalData'),
+          pluginSource: any(named: 'pluginSource'),
+          forceRefresh: any(named: 'forceRefresh'),
+        ),
+      ).thenAnswer((_) {
+        requests++;
+        return requests == 1
+            ? oldResponse.future
+            : Future.value(populated(idOf(4)).copyWith(title: 'Fresh'));
+      });
+      final vm = model();
+      await vm.load();
+      vm.loadSectionsNear([vm.rows[4]]);
+      await pumpEventQueue();
+
+      // Reordering makes this same stable section part of the initial screen.
+      await prefs.setHomeSectionsConfig([
+        for (final cfg in HomeSectionConfig.defaults())
+          cfg.copyWith(enabled: false),
+        collection(4).copyWith(order: -1),
+        for (var n = 0; n < sectionCount; n++)
+          if (n != 4) collection(n),
+      ]);
+      await vm.refresh();
+      expect(vm.rows.firstWhere((row) => row.id == idOf(4)).title, 'Fresh');
+
+      oldResponse.complete(populated(idOf(4)).copyWith(title: 'Stale'));
+      await pumpEventQueue();
+      expect(vm.rows.firstWhere((row) => row.id == idOf(4)).title, 'Fresh');
+    },
+  );
+
+  test(
+    'a previously empty deferred row remains reachable after refresh',
+    () async {
+      var empty = true;
+      when(
+        () => source.loadDynamicSection(
+          rowId: idOf(4),
+          section: any(named: 'section'),
+          title: any(named: 'title'),
+          serverId: any(named: 'serverId'),
+          additionalData: any(named: 'additionalData'),
+          pluginSource: any(named: 'pluginSource'),
+          forceRefresh: any(named: 'forceRefresh'),
+        ),
+      ).thenAnswer(
+        (_) async => empty
+            ? populated(idOf(4)).copyWith(items: const [])
+            : populated(idOf(4)),
+      );
+      final vm = model();
+      await vm.load();
+      vm.loadSectionsNear([vm.rows.firstWhere((row) => row.id == idOf(4))]);
+      await pumpEventQueue();
+      expect(vm.rows.any((row) => row.id == idOf(4)), isFalse);
+
+      empty = false;
+      await vm.refresh();
+      final placeholder = vm.rows.firstWhere((row) => row.id == idOf(4));
+      expect(placeholder.isLoading, isTrue);
+      vm.loadSectionsNear([placeholder]);
+      await pumpEventQueue();
+      expect(vm.rows.firstWhere((row) => row.id == idOf(4)).isLoading, isFalse);
+    },
+  );
 
   test('a deferred section missing from the cache stays on screen', () async {
     final vm = model(cached: [for (var n = 0; n < 8; n++) populated(idOf(n))]);

@@ -92,6 +92,7 @@ import '../../../util/game_library.dart';
 import 'home_row_prefetch.dart';
 import 'home_row_shift.dart';
 import 'home_view_model.dart';
+import 'home_startup_cover.dart';
 import '../../widgets/focus/tv_scroll_controller.dart';
 import '../../widgets/seerr/seerr_genre_label.dart';
 import '../../widgets/skeleton/skeleton_home_row.dart';
@@ -172,6 +173,7 @@ class _HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<_HomeShell>
     with WidgetsBindingObserver, RouteAware {
+  static bool _startupHomeRevealed = false;
   final _backgroundService = GetIt.instance<BackgroundService>();
   final _userPrefs = GetIt.instance<UserPreferences>();
   final _themeMusicService = GetIt.instance<ThemeMusicService>();
@@ -342,7 +344,7 @@ class _HomeShellState extends State<_HomeShell>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _viewModel.refresh(preserveExisting: true);
+      if (_isHomeRouteActive()) _viewModel.refresh(preserveExisting: true);
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         (state == AppLifecycleState.inactive &&
@@ -595,68 +597,76 @@ class _HomeShellState extends State<_HomeShell>
         if (didPop) return;
         _requestExit(context);
       },
-      child: Scaffold(
-        backgroundColor: _homeBackground,
-        body: SeasonalPointer(
-          effect: seasonalEffect,
-          enabled:
-              seasonalFollower &&
-              PlatformDetection.isDesktop &&
-              !PlatformDetection.isTV,
-          child: NavigationLayout(
-            activeRoute: Destinations.home,
-            child: QuickReturnWrapper(
-              isAtStart: _isScrolledToTopNotifier,
-              onReturn: () => _contentRowsKey.currentState?.returnToTop(),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (backdropStyle != UserPreferences.homeBackdropOff)
-                    ValueListenableBuilder<String?>(
-                      valueListenable: _backdropUrlNotifier,
-                      builder: (context, url, _) {
-                        return _Backdrop(
-                          url: url,
-                          blurAmount: blurAmount,
-                          useMakdBackdropFx: useMakdBackdropFx,
-                          style: PlatformDetection.useMobileUi
-                              ? UserPreferences.homeBackdropFullScreen
-                              : backdropStyle,
-                        );
-                      },
-                    ),
-                  const _GradientScrim(),
-                  Positioned.fill(
-                    child: _ContentRows(
-                      key: _contentRowsKey,
-                      viewModel: _viewModel,
-                      mediaBarViewModel: _viewModel.mediaBarViewModel,
-                      prefs: _userPrefs,
-                      selectedItemNotifier: _selectedItemNotifier,
-                      onItemSelected: onItemSelected,
-                      isHoverPausedNotifier: _isHoverPausedNotifier,
-                      isScrolledToTopNotifier: _isScrolledToTopNotifier,
-                      onScrolledToTopChanged: (atTop) {
-                        if (atTop != _isScrolledToTopNotifier.value) {
-                          _isScrolledToTopNotifier.value = atTop;
-                        }
-                      },
-                    ),
-                  ),
-                  if (seasonalEffect != UserPreferences.seasonalNone)
+      child: HomeStartupCover(
+        enabled: PlatformDetection.isTV && !_startupHomeRevealed,
+        changes: Listenable.merge([_viewModel, _viewModel.mediaBarViewModel]),
+        contentReady: () => !_viewModel.isLoading &&
+            _viewModel.mediaBarViewModel.state is! MediaBarLoading &&
+            !_viewModel.rows.take(3).any((row) => row.isLoading),
+        onRevealed: () => _startupHomeRevealed = true,
+        child: Scaffold(
+          backgroundColor: _homeBackground,
+          body: SeasonalPointer(
+            effect: seasonalEffect,
+            enabled:
+                seasonalFollower &&
+                PlatformDetection.isDesktop &&
+                !PlatformDetection.isTV,
+            child: NavigationLayout(
+              activeRoute: Destinations.home,
+              child: QuickReturnWrapper(
+                isAtStart: _isScrolledToTopNotifier,
+                onReturn: () => _contentRowsKey.currentState?.returnToTop(),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (backdropStyle != UserPreferences.homeBackdropOff)
+                      ValueListenableBuilder<String?>(
+                        valueListenable: _backdropUrlNotifier,
+                        builder: (context, url, _) {
+                          return _Backdrop(
+                            url: url,
+                            blurAmount: blurAmount,
+                            useMakdBackdropFx: useMakdBackdropFx,
+                            style: PlatformDetection.useMobileUi
+                                ? UserPreferences.homeBackdropFullScreen
+                                : backdropStyle,
+                          );
+                        },
+                      ),
+                    const _GradientScrim(),
                     Positioned.fill(
-                      child: SeasonalEffectsHost(
-                        followFocus: PlatformDetection.isTV && seasonalFollower,
-                        effect: seasonalEffect,
-                        density: _userPrefs.get(
-                          UserPreferences.seasonalDensity,
-                        ),
-                        reducedFrameRate:
-                            _userPrefs.resolveDevicePerformanceTier() ==
-                            DevicePerformanceTier.reduced,
+                      child: _ContentRows(
+                        key: _contentRowsKey,
+                        viewModel: _viewModel,
+                        mediaBarViewModel: _viewModel.mediaBarViewModel,
+                        prefs: _userPrefs,
+                        selectedItemNotifier: _selectedItemNotifier,
+                        onItemSelected: onItemSelected,
+                        isHoverPausedNotifier: _isHoverPausedNotifier,
+                        isScrolledToTopNotifier: _isScrolledToTopNotifier,
+                        onScrolledToTopChanged: (atTop) {
+                          if (atTop != _isScrolledToTopNotifier.value) {
+                            _isScrolledToTopNotifier.value = atTop;
+                          }
+                        },
                       ),
                     ),
-                ],
+                    if (seasonalEffect != UserPreferences.seasonalNone)
+                      Positioned.fill(
+                        child: SeasonalEffectsHost(
+                          followFocus: PlatformDetection.isTV && seasonalFollower,
+                          effect: seasonalEffect,
+                          density: _userPrefs.get(
+                            UserPreferences.seasonalDensity,
+                          ),
+                          reducedFrameRate:
+                              _userPrefs.resolveDevicePerformanceTier() ==
+                              DevicePerformanceTier.reduced,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1078,7 +1088,7 @@ class _ContentRowsState extends State<_ContentRows>
   int _rowPrefetchInFlight = 0;
   bool _isBackgrounded = false;
   static const _rowPrefetchDelay = Duration(milliseconds: 250);
-  static const _rowPrefetchMaxInFlight = 8;
+  static const _rowPrefetchMaxInFlight = 2;
   static const _rowPrefetchCardSpacing = 16.0;
   final ValueNotifier<Map<String, Map<String, double>>>
   _v2AdditionalRatingsNotifier = ValueNotifier({});
@@ -1447,6 +1457,22 @@ class _ContentRowsState extends State<_ContentRows>
     _wasEmpty = empty;
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncDeferredSectionVisibility();
+  }
+
+  void _syncDeferredSectionVisibility() {
+    final paused = _isBackgrounded || !_isHomeRouteActive();
+    widget.viewModel.setDeferredSectionsPaused(paused);
+    if (paused) {
+      _rowPrefetchDebounce?.cancel();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scheduleRowPrefetch());
+    }
+  }
+
   void _onViewModelChanged() {
     _invalidateStaticRowHeightCache();
     _updateOffsets();
@@ -1634,6 +1660,7 @@ class _ContentRowsState extends State<_ContentRows>
             !PlatformDetection.isDesktop &&
             !PlatformDetection.isWeb);
     _isBackgrounded = isBackground;
+    _syncDeferredSectionVisibility();
     if (isBackground) {
       _rowPrefetchDebounce?.cancel();
       _finishSharedPreview(releaseResources: true);
@@ -1646,8 +1673,10 @@ class _ContentRowsState extends State<_ContentRows>
     _lastObservedPath = path;
 
     _mainPlaybackActive = _playbackManager.state.isPlaying;
+    _syncDeferredSectionVisibility();
 
     if (!_isHomeRouteActive()) {
+      _rowPrefetchDebounce?.cancel();
       _finishSharedPreview(releaseResources: true);
       return;
     }
@@ -2561,7 +2590,10 @@ class _ContentRowsState extends State<_ContentRows>
     required bool useSeriesThumbs,
     ImageFetchPriority priority = ImageFetchPriority.normal,
   }) {
-    if (!mounted || PlatformDetection.useMobileUi) return;
+    if (!mounted || PlatformDetection.useMobileUi ||
+        _isBackgrounded || !_isHomeRouteActive()) {
+      return;
+    }
 
     if (_v2FocusPrefetchedUrls.length > 800) {
       _v2FocusPrefetchedUrls.clear();
@@ -2608,6 +2640,7 @@ class _ContentRowsState extends State<_ContentRows>
         v2ImageHeight: v2ImageHeight,
         v2FocusedWidth: v2FocusedWidth,
         useSeriesThumbs: useSeriesThumbs,
+        priority: ImageFetchPriority.low,
       );
     }
   }
@@ -2615,7 +2648,7 @@ class _ContentRowsState extends State<_ContentRows>
   /// Rows this far from the focused one warm their lead image when built.
   /// Every row in the cache extent used to, which at a cold start put about
   /// fifteen landscape decodes in the same batch as the visible posters.
-  static const _v2LeadPrefetchRowDistance = 2;
+  static const _v2LeadPrefetchRowDistance = 1;
 
   void _prefetchV2RowLeadImage({
     required HomeRow row,
@@ -3198,7 +3231,7 @@ class _ContentRowsState extends State<_ContentRows>
   }
 
   void _maybeLoadMoreForRow(String rowId, ScrollController controller) {
-    if (!controller.hasClients) return;
+    if (!controller.hasClients || _isBackgrounded || !_isHomeRouteActive()) return;
     final rowIndex = widget.viewModel.rows.indexWhere((r) => r.id == rowId);
     if (rowIndex < 0) return;
     if (!widget.viewModel.rows[rowIndex].hasMore) return;
@@ -4799,7 +4832,7 @@ class _ContentRowsState extends State<_ContentRows>
                     bottom: neededBottomPadding,
                   ),
                   itemCount: rows.length + headerCount,
-                  scrollCacheExtent: const ScrollCacheExtent.pixels(600.0),
+                  scrollCacheExtent: const ScrollCacheExtent.pixels(250.0),
                   itemBuilder: (context, index) {
                     if (includeMediaBar && index == 0) {
                       return ValueListenableBuilder<bool>(
@@ -6700,7 +6733,7 @@ class _ContentRowsState extends State<_ContentRows>
   }
 
   void _scheduleRowPrefetch() {
-    if (!mounted || _isBackgrounded) return;
+    if (!mounted || _isBackgrounded || !_isHomeRouteActive()) return;
     _loadSectionsNearViewport();
     _rowPrefetchDebounce?.cancel();
     _rowPrefetchDebounce = Timer(_rowPrefetchDelay, _runRowPrefetch);
@@ -6728,7 +6761,7 @@ class _ContentRowsState extends State<_ContentRows>
 
   void _runRowPrefetch() {
     _rowPrefetchDebounce = null;
-    if (!mounted) return;
+    if (!mounted || _isBackgrounded || !_isHomeRouteActive()) return;
     final prefs = widget.prefs;
     final connectivity = GetIt.instance.isRegistered<ConnectivityService>()
         ? GetIt.instance<ConnectivityService>()
@@ -6786,8 +6819,9 @@ class _ContentRowsState extends State<_ContentRows>
       for (final item in row.items.take(target.count)) {
         final image = imageOf(row, item);
         final url = image.url;
-        if (url == null || !_rowPrefetchedUrls.add(url)) continue;
+        if (url == null || _rowPrefetchedUrls.contains(url)) continue;
         if (_rowPrefetchInFlight >= _rowPrefetchMaxInFlight) return;
+        _rowPrefetchedUrls.add(url);
         _rowPrefetchInFlight++;
         unawaited(
           ArtworkDecode.precache(

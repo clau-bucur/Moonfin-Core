@@ -89,14 +89,16 @@ class HomeViewModel extends ChangeNotifier {
   bool _pendingReloadForceRefresh = false;
   bool _pendingReloadNewSectionsOnly = true;
 
-  /// How many sections from the top load with Home. The single row sections
-  /// below them, such as collections, genres and playlists, wait in
-  /// [_deferredSections] until Home scrolls near their row, so a Home with
-  /// hundreds of collections doesn't fetch them all up front.
-  static const _eagerSectionCount = 8;
+  /// Start with a screenful of sections. Rows further down wait until Home
+  /// scrolls near them, leaving bandwidth and server work for visible content.
+  static const _eagerSectionCount = 3;
 
-  /// Sections waiting to load, keyed by the id their row has on Home.
+  /// Sections waiting to load, keyed by their configuration's stable id.
   final Map<String, HomeSectionConfig> _deferredSections = {};
+  final Map<String, HomeSectionConfig> _queuedDeferredSections = {};
+  bool _deferredLoadInFlight = false;
+  bool _deferredSectionsPaused = false;
+  int _loadGeneration = 0;
 
   /// Loads a section the way the last [load] did.
   Future<void> Function(HomeSectionConfig cfg)? _loadDeferredSection;
@@ -378,6 +380,7 @@ class HomeViewModel extends ChangeNotifier {
     }
     newSectionsOnly = newSectionsOnly && _rows.isNotEmpty;
     if (newSectionsOnly) preserveExisting = true;
+    final generation = newSectionsOnly ? _loadGeneration : ++_loadGeneration;
     _isLoading = true;
     if (!newSectionsOnly) {
       _mediaBarViewModel.load(force: forceRefresh);
@@ -538,10 +541,15 @@ class HomeViewModel extends ChangeNotifier {
             .toList();
       } else {
         _deferredSections.clear();
+        _queuedDeferredSections.clear();
         sectionsToLoad = [];
         for (final (index, cfg) in nonResumeEffectiveConfigs.indexed) {
           if (index >= _eagerSectionCount && _isDeferrable(cfg)) {
             _deferredSections[cfg.stableId] = cfg;
+            // A previously empty section still needs a scrollable target so
+            // reaching it can revalidate its contents.
+            final placeholder = _placeholderForConfig(cfg);
+            if (placeholder != null) _emptySectionIds.remove(placeholder.id);
           } else {
             sectionsToLoad.add(cfg);
           }
@@ -570,6 +578,7 @@ class HomeViewModel extends ChangeNotifier {
       }
 
       Future<void> loadConfigItem(HomeSectionConfig cfg) async {
+        if (_disposed || generation != _loadGeneration) return;
         List<HomeRow> sectionRows;
         var failed = false;
         try {
@@ -590,6 +599,7 @@ class HomeViewModel extends ChangeNotifier {
           }
           sectionRows = const <HomeRow>[];
         }
+        if (_disposed || generation != _loadGeneration) return;
         final currentConfigs = _prefs.activeHomeSectionConfigs;
         final isStillActive = currentConfigs.any((c) => c.stableId == cfg.stableId);
         if (!isStillActive) return;
@@ -706,31 +716,82 @@ class HomeViewModel extends ChangeNotifier {
           forceRefresh: nextForceRefresh,
           newSectionsOnly: nextNewSectionsOnly,
         );
+      } else {
+        _startDeferredLoad();
       }
     }
   }
 
   bool get hasDeferredSections => _deferredSections.isNotEmpty;
 
+  /// Keep queued work for the return to Home, without starting more requests
+  /// while another screen or the background owns the connection.
+  void setDeferredSectionsPaused(bool paused) {
+    _deferredSectionsPaused = paused;
+    if (!paused) _startDeferredLoad();
+  }
+
   /// Loads the deferred sections behind [nearRows], the rows on or near the
   /// screen.
   void loadSectionsNear(Iterable<HomeRow> nearRows) {
-    final loadSection = _loadDeferredSection;
-    if (loadSection == null) return;
-    final due = [
-      for (final row in nearRows) ?_deferredSections.remove(row.id),
-    ];
-    if (due.isEmpty) return;
-    unawaited(
-      mapBounded<HomeSectionConfig, void>(due, 3, loadSection)
-          .then((_) => _saveRowCache()),
-    );
+    if (_disposed || _loadDeferredSection == null) return;
+    final deferredConfigs = _deferredSections.values.toList();
+    for (final row in nearRows) {
+      final cfg = sectionConfigForRow(row, deferredConfigs);
+      if (cfg == null || _deferredSections.remove(cfg.stableId) == null) continue;
+      _queuedDeferredSections[cfg.stableId] = cfg;
+    }
+    _startDeferredLoad();
   }
 
-  /// Single row sections, which a layout can hold hundreds of, and whose row
-  /// takes the section's id.
-  static bool _isDeferrable(HomeSectionConfig cfg) =>
-      cfg.isPluginDynamic && (cfg.pluginSection?.isNotEmpty ?? false);
+  void _startDeferredLoad() {
+    if (_disposed || _deferredSectionsPaused || _isLoading ||
+        _queuedDeferredSections.isEmpty || _deferredLoadInFlight) {
+      return;
+    }
+    _deferredLoadInFlight = true;
+    unawaited(_drainDeferredSections());
+  }
+
+  Future<void> _drainDeferredSections() async {
+    try {
+      // Share three slots across scroll notifications. Starting a fresh
+      // bounded batch for every scroll used to multiply the concurrency.
+      await Future.wait(List.generate(3, (_) async {
+        while (!_disposed && !_deferredSectionsPaused && !_isLoading &&
+            _queuedDeferredSections.isNotEmpty) {
+          final cfg = _queuedDeferredSections.values.first;
+          _queuedDeferredSections.remove(cfg.stableId);
+          await _loadDeferredSection?.call(cfg);
+        }
+      }));
+      if (!_disposed) _saveRowCache();
+    } finally {
+      _deferredLoadInFlight = false;
+      _startDeferredLoad();
+    }
+  }
+
+  /// Resume and navigation rows remain available at startup. Other built-in
+  /// sections can use their placeholder as a viewport loading target too.
+  bool _isDeferrable(HomeSectionConfig cfg) {
+    if (cfg.isPluginDynamic) return cfg.pluginSection?.isNotEmpty ?? false;
+    switch (cfg.type) {
+      case HomeSectionType.resume:
+      case HomeSectionType.resumeAudio:
+      case HomeSectionType.nextUp:
+      case HomeSectionType.libraryTilesSmall:
+      case HomeSectionType.libraryButtons:
+      case HomeSectionType.liveTv:
+      case HomeSectionType.activeRecordings:
+      case HomeSectionType.mediaBar:
+      case HomeSectionType.radarrCalendar:
+      case HomeSectionType.sonarrCalendar:
+        return false;
+      default:
+        return _placeholderForConfig(cfg) != null;
+    }
+  }
 
   /// Repaints the watched ticks on the rows already built, without refetching
   /// them. The home screen drives this so the listener lives and dies with the

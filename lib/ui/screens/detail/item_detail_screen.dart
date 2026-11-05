@@ -21,6 +21,7 @@ import 'package:playback_core/playback_core.dart';
 import 'package:server_core/server_core.dart';
 
 import '../../../data/models/aggregated_item.dart';
+import '../../../util/media_source_selection.dart';
 import '../../../util/media_source_summary.dart';
 import '../../../data/repositories/item_mutation_repository.dart';
 import '../../../data/repositories/mdblist_repository.dart';
@@ -310,7 +311,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
   StreamSubscription<String?>? _backgroundSub;
   bool _themeMusicStarted = false;
   bool _seerrRedirectDone = false;
-  String? _selectedMediaSourceId;
+  final _mediaSourceSelection = MediaSourceSelection();
+  String? get _selectedMediaSourceId => _mediaSourceSelection.selectedId;
   bool _showNavbar = true;
   bool _stageReady = false;
   bool _actionsExpanded = false;
@@ -333,6 +335,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    PlatformDetection.displayCapabilitiesChanged.addListener(
+      _onDisplayCapabilitiesChanged,
+    );
     _themeMusicService.registerDetailScreen(this);
     final factory = GetIt.instance<MediaServerClientFactory>();
     final client = widget.serverId != null
@@ -378,6 +383,30 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
     }
     _observedRoute = route;
     routeLifecycleObserver.subscribe(this, route);
+  }
+
+  void _updateMediaSourceSelection() {
+    final item = _viewModel.item;
+    if (item == null) return;
+    _mediaSourceSelection.update(
+      item,
+      displayResolution:
+          PlatformDetection.displayResolution ??
+          WidgetsBinding.instance.platformDispatcher.implicitView?.display.size,
+      displayHdrTypes: PlatformDetection.displayHdrTypesSnapshot,
+    );
+  }
+
+  void _onDisplayCapabilitiesChanged() {
+    if (mounted) setState(_updateMediaSourceSelection);
+  }
+
+  @override
+  void didChangeMetrics() => _onDisplayCapabilitiesChanged();
+
+  void _onSelectedMediaSourceChanged(String? id) {
+    setState(() => _mediaSourceSelection.select(id));
+    _viewModel.load(mediaSourceId: id);
   }
 
   @override
@@ -453,6 +482,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
       _observedRoute = null;
     }
     WidgetsBinding.instance.removeObserver(this);
+    PlatformDetection.displayCapabilitiesChanged.removeListener(
+      _onDisplayCapabilitiesChanged,
+    );
     _themeMusicService.unregisterDetailScreen(this);
     _backgroundSub?.cancel();
     _focusedBackdropDebounce?.cancel();
@@ -489,6 +521,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
       return;
     }
     setState(() {
+      _updateMediaSourceSelection();
       if (_viewModel.state != ItemDetailState.ready) _stageReady = false;
     });
     final item = _viewModel.item;
@@ -512,12 +545,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
 
         if (item.type == 'Playlist' && _viewModel.tracks.isNotEmpty) {
           _onBackdropItemFocused(_viewModel.tracks.first);
-        }
-
-        if (item.mediaSources.isNotEmpty) {
-          _selectedMediaSourceId = item.mediaSources.first['Id']?.toString();
-        } else {
-          _selectedMediaSourceId = null;
         }
       }
       if (!_themeMusicStarted) {
@@ -623,66 +650,22 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
         lastCollapse != null &&
         now.difference(lastCollapse) < const Duration(milliseconds: 350);
 
-    // Albums/playlists hide the chrome on TV/desktop (their split hero owns the
-    // top area); on mobile they need the back arrow like every other screen.
-    final isAlbumOrPlaylist = type == 'MusicAlbum' || type == 'Playlist';
-    final stagePending =
-        _prefs.effectiveDetailScreenStyle == DetailScreenStyle.stage &&
-        StageDetailContent.hasPresentationGate(type) &&
-        !_stageReady;
-    final showNavigationChrome =
-        _viewModel.state == ItemDetailState.ready &&
-        !stagePending &&
-        _showNavbar &&
-        (!isAlbumOrPlaylist || _isCompact(context));
-    // Follows the scroll flag rather than the chrome. Albums and playlists
-    // switch the chrome off at every scroll position on TV and desktop, so
-    // gating on it leaves those pages with no way back at all.
     final showBackButton =
         _viewModel.state != ItemDetailState.ready || _showNavbar;
 
-    Widget body = NavigationLayout(
-      showBackButton: showBackButton,
-      showNavigationChrome: showNavigationChrome,
-      child: _buildBody(context),
+    Widget body = Stack(
+      children: [
+        Positioned.fill(child: _buildBody(context)),
+        if (!PlatformDetection.isTV && showBackButton)
+          Positioned(
+            top: 16,
+            left: 16,
+            child: SafeArea(
+              child: BackButton(onPressed: () => context.popOrHome()),
+            ),
+          ),
+      ],
     );
-
-    if (!PlatformDetection.isTV) {
-      final content = body;
-      body = ValueListenableBuilder<NavbarPosition?>(
-        valueListenable: NavigationLayout.positionNotifier,
-        builder: (context, position, child) {
-          void reveal() {
-            if (!_showNavbar && mounted) setState(() => _showNavbar = true);
-          }
-
-          return Stack(
-            children: [
-              Positioned.fill(child: child!),
-              if (!_showNavbar) ...[
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 90,
-                  child: _NavbarRevealZone(onReveal: reveal),
-                ),
-                if (position == NavbarPosition.left)
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    width: 80,
-                    child: _NavbarRevealZone(onReveal: reveal),
-                  ),
-              ],
-            ],
-          );
-        },
-        child: content,
-      );
-    }
-
     body = PopScope(canPop: !wasCollapsedRecently, child: body);
     return RequestInitialFocus(
       targetNode: node,
@@ -733,10 +716,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
       backdropUrl: _backdropUrl,
       selectedMediaSourceId: _selectedMediaSourceId,
       initialFocusNode: _ensureInitialFocusNode(),
-      onSelectedMediaSourceChanged: (id) {
-        setState(() => _selectedMediaSourceId = id);
-        _viewModel.load(mediaSourceId: id);
-      },
+      onSelectedMediaSourceChanged: _onSelectedMediaSourceChanged,
       onBackdropItemFocused: _onBackdropItemFocused,
       autoPlay: widget.autoPlay,
       onPlayFromChapter: (position) => unawaited(
@@ -762,10 +742,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
       backdropUrl: _backdropUrl,
       selectedMediaSourceId: _selectedMediaSourceId,
       initialFocusNode: _ensureInitialFocusNode(),
-      onSelectedMediaSourceChanged: (id) {
-        setState(() => _selectedMediaSourceId = id);
-        _viewModel.load(mediaSourceId: id);
-      },
+      onSelectedMediaSourceChanged: _onSelectedMediaSourceChanged,
       onBackdropItemFocused: _onBackdropItemFocused,
       autoPlay: widget.autoPlay,
       onPlayFromChapter: (position) => unawaited(
@@ -838,10 +815,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
           backdropUrl: _backdropUrl,
           selectedMediaSourceId: _selectedMediaSourceId,
           initialFocusNode: _ensureInitialFocusNode(),
-          onSelectedMediaSourceChanged: (id) {
-            setState(() => _selectedMediaSourceId = id);
-            _viewModel.load(mediaSourceId: id);
-          },
+          onSelectedMediaSourceChanged: _onSelectedMediaSourceChanged,
           onBackdropItemFocused: _onBackdropItemFocused,
           autoPlay: widget.autoPlay,
         ),
@@ -863,10 +837,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
                 backdropUrl: _backdropUrl,
                 selectedMediaSourceId: _selectedMediaSourceId,
                 initialFocusNode: _ensureInitialFocusNode(),
-                onSelectedMediaSourceChanged: (id) {
-                  setState(() => _selectedMediaSourceId = id);
-                  _viewModel.load(mediaSourceId: id);
-                },
+                onSelectedMediaSourceChanged: _onSelectedMediaSourceChanged,
                 onBackdropItemFocused: _onBackdropItemFocused,
                 autoPlay: widget.autoPlay,
                 onPlayFromChapter: (position) => unawaited(
@@ -888,10 +859,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
           backdropUrl: _backdropUrl,
           selectedMediaSourceId: _selectedMediaSourceId,
           initialFocusNode: _ensureInitialFocusNode(),
-          onSelectedMediaSourceChanged: (id) {
-            setState(() => _selectedMediaSourceId = id);
-            _viewModel.load(mediaSourceId: id);
-          },
+          onSelectedMediaSourceChanged: _onSelectedMediaSourceChanged,
           autoPlay: widget.autoPlay,
           actionsExpanded: _actionsExpanded,
           onActionsExpandedChanged: (val) =>
@@ -907,10 +875,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
           backdropUrl: _backdropUrl,
           selectedMediaSourceId: _selectedMediaSourceId,
           initialFocusNode: _ensureInitialFocusNode(),
-          onSelectedMediaSourceChanged: (id) {
-            setState(() => _selectedMediaSourceId = id);
-            _viewModel.load(mediaSourceId: id);
-          },
+          onSelectedMediaSourceChanged: _onSelectedMediaSourceChanged,
           autoPlay: widget.autoPlay,
           actionsExpanded: _actionsExpanded,
           onActionsExpandedChanged: (val) =>
@@ -16813,20 +16778,3 @@ class _PersonDisplaySettingsDialogState
 }
 
 typedef PersonDisplaySettingsDialog = _PersonDisplaySettingsDialog;
-
-/// An invisible edge strip that brings the hidden navbar back when the
-/// pointer reaches it. Mouse only, so it stays out of the way on touch.
-class _NavbarRevealZone extends StatelessWidget {
-  const _NavbarRevealZone({required this.onReveal});
-
-  final VoidCallback onReveal;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      opaque: false,
-      onEnter: (_) => onReveal(),
-      onHover: (_) => onReveal(),
-    );
-  }
-}

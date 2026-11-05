@@ -34,6 +34,9 @@ import '../navigation/app_router.dart';
 import '../navigation/destinations.dart';
 import '../screensaver/screensaver_controller.dart';
 import '../../util/language_matching.dart';
+import '../../util/artwork_prefetch_queue.dart';
+import '../../util/device_performance.dart';
+import '../../util/image_fetch_priority.dart' show artworkFetchHeaders;
 import '../../util/overlay_color_palette.dart';
 import '../../util/overview_text.dart';
 import '../../util/platform_detection.dart';
@@ -159,6 +162,8 @@ class _MediaBarState extends State<MediaBar>
   int _currentIndex = 0;
 
   bool _readyHooksAppliedForCurrentLoad = false;
+  final _artworkPrefetch = ArtworkPrefetchQueue();
+  bool _appInForeground = true;
 
   DateTime? _keyDownTime;
   DateTime? _lastFocusReceivedAt;
@@ -278,6 +283,11 @@ class _MediaBarState extends State<MediaBar>
     _screensaverController.visible.addListener(_onScreensaverVisibleChanged);
     WidgetsBinding.instance.addObserver(this);
     _audioArbiter.register(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _prefetchAround(widget.viewModel.items, _currentIndex);
+      _ensureCurrentSlideRatings();
+    });
     // The home list recycles this widget past its cache extent, and by then
     // the view model is already loaded so it never notifies again. Without
     // this the bar would come back with no trailer.
@@ -303,7 +313,11 @@ class _MediaBarState extends State<MediaBar>
   // not keep sounding behind the overlay.
   void _onScreensaverVisibleChanged() {
     if (_screensaverController.visible.value) {
+      _artworkPrefetch.cancel();
       _cancelTrailerPreview();
+    } else {
+      _prefetchAround(widget.viewModel.items, _currentIndex);
+      _ensureCurrentSlideRatings();
     }
   }
 
@@ -335,6 +349,7 @@ class _MediaBarState extends State<MediaBar>
 
   @override
   void deactivate() {
+    _artworkPrefetch.cancel();
     // Stop playback if the widget is recycled before the async dispose() runs.
     _cancelTrailerPreview(rebuild: false);
     super.deactivate();
@@ -342,6 +357,7 @@ class _MediaBarState extends State<MediaBar>
 
   @override
   void dispose() {
+    _artworkPrefetch.cancel();
     _isTrailerPlayingValue = false;
     _publishTrailerImmersive(false);
     _audioArbiter.unregister(this);
@@ -377,6 +393,7 @@ class _MediaBarState extends State<MediaBar>
   void _onPlayerRouteChanged() {
     if (!mounted) return;
     if (PlayerRouteObserver.instance.isPlayerActive.value) {
+      _artworkPrefetch.cancel();
       _cancelTrailerPreview(rebuild: false);
       unawaited(_disposeTrailerPlayer());
     }
@@ -457,7 +474,11 @@ class _MediaBarState extends State<MediaBar>
     if (_mainPlaybackActive == active) return;
     _mainPlaybackActive = active;
     if (active) {
+      _artworkPrefetch.cancel();
       _cancelTrailerPreview();
+    } else {
+      _prefetchAround(widget.viewModel.items, _currentIndex);
+      _ensureCurrentSlideRatings();
     }
     // Re-evaluate the persistent Media3 view's mount condition.
     if (mounted) setState(() {});
@@ -477,9 +498,12 @@ class _MediaBarState extends State<MediaBar>
     super.didUpdateWidget(oldWidget);
     if (widget.externallyPaused != oldWidget.externallyPaused) {
       if (widget.externallyPaused) {
+        _artworkPrefetch.cancel();
         _autoAdvanceTimer?.cancel();
         _cancelTrailerPreview();
       } else {
+        _prefetchAround(widget.viewModel.items, _currentIndex);
+        _ensureCurrentSlideRatings();
         _startAutoAdvance();
         final items = widget.viewModel.items;
         if (_isHomeRouteActive && _currentIndex < items.length) {
@@ -507,9 +531,14 @@ class _MediaBarState extends State<MediaBar>
             !PlatformDetection.isWeb);
 
     if (isBackground) {
+      _appInForeground = false;
+      _artworkPrefetch.cancel();
       _cancelTrailerPreview();
       _autoAdvanceTimer?.cancel();
     } else if (state == AppLifecycleState.resumed) {
+      _appInForeground = true;
+      _prefetchAround(widget.viewModel.items, _currentIndex);
+      _ensureCurrentSlideRatings();
       _startAutoAdvance();
       // Backgrounding cancelled the trailer, so bring it back rather than
       // leaving a frozen slide behind.
@@ -524,17 +553,15 @@ class _MediaBarState extends State<MediaBar>
     setState(() {});
     final state = widget.viewModel.state;
     if (state is MediaBarLoading) {
+      _artworkPrefetch.cancel();
       _readyHooksAppliedForCurrentLoad = false;
     }
 
     if (state is MediaBarReady && !_readyHooksAppliedForCurrentLoad) {
       _readyHooksAppliedForCurrentLoad = true;
       _prefetchAround(state.items, _currentIndex);
-      _prefetchAllInBackground(state.items, _currentIndex);
-      if (_isGalleryMode()) {
-        _prefetchGalleryWindow(state.items, _currentIndex);
-      }
     }
+    if (state is MediaBarReady) _ensureCurrentSlideRatings();
     if (state is MediaBarReady && _failedTrailerAt.isNotEmpty) {
       final knownItemIds = state.items.map((item) => item.itemId).toSet();
       _failedTrailerAt.removeWhere((id, _) => !knownItemIds.contains(id));
@@ -621,83 +648,11 @@ class _MediaBarState extends State<MediaBar>
     return mode == UserPreferences.mediaBarModeAya;
   }
 
-  void _prefetchAllInBackground(
-    List<MediaBarSlideItem> items,
-    int centerIndex,
-  ) {
-    if (!mounted || items.isEmpty) return;
-    final dpr = MediaQuery.devicePixelRatioOf(context);
-
-    // Calculate dimensions matching layout constraints exactly to maximize memory cache hits.
-    final isMobile = PlatformDetection.useMobileUi;
-    final contentHeight = widget.height - (isMobile ? 108.0 : 0.0);
-    final activeBookHeight = contentHeight * 0.84;
-    final activeBookWidth = activeBookHeight * 0.72;
-    final posterCacheW = (activeBookWidth * 0.88 * dpr).round().clamp(150, 400);
-    final backdropCacheW = MediaBar.backdropDecodeWidth(context);
-    final logoCacheW = MediaBar.logoDecodeWidth(context);
-
-    final warmIndices = <int>{
-      centerIndex,
-      if (centerIndex + 1 < items.length) centerIndex + 1,
-      if (centerIndex + 2 < items.length) centerIndex + 2,
-      if (centerIndex + 3 < items.length) centerIndex + 3,
-      if (centerIndex - 1 >= 0) centerIndex - 1,
-      if (centerIndex - 2 >= 0) centerIndex - 2,
-    };
-
-    final isBookshelf = _isBookshelfMode();
-
-    final windowStart = (centerIndex - 2).clamp(0, items.length);
-    final windowEnd = (centerIndex + 11).clamp(0, items.length);
-
-    Future<void>(() async {
-      // Allow active and adjacent images to load first without network contention
-      await Future<void>.delayed(const Duration(milliseconds: 1500));
-      for (var i = windowStart; i < windowEnd; i++) {
-        if (warmIndices.contains(i)) continue;
-
-        final item = items[i];
-        if (!mounted) return;
-
-        // Add a brief delay between items to prevent clogging the network queue
-        await Future<void>.delayed(const Duration(milliseconds: 200));
-        if (!mounted) return;
-
-        try {
-          if (isBookshelf) {
-            if (item.posterUrl != null) {
-              await precacheImage(
-                ArtworkDecode.provider(item.posterUrl!, width: posterCacheW),
-                context,
-              );
-            }
-          } else {
-            if (item.backdropUrl != null) {
-              await precacheImage(
-                ArtworkDecode.provider(
-                  item.backdropUrl!,
-                  width: backdropCacheW,
-                ),
-                context,
-              );
-              if (!mounted) return;
-            }
-            if (item.logoUrl != null) {
-              await precacheImage(
-                ArtworkDecode.provider(item.logoUrl!, width: logoCacheW),
-                context,
-              );
-            }
-          }
-        } catch (_) {}
-      }
-    });
-  }
-
   void _onPrefsChanged() {
     if (!mounted) return;
     setState(() {});
+    _prefetchAround(widget.viewModel.items, _currentIndex);
+    _ensureCurrentSlideRatings();
 
     if (_isMakdMobileMode() || _isAyaMobileMode()) {
       _cancelTrailerPreview();
@@ -751,6 +706,7 @@ class _MediaBarState extends State<MediaBar>
 
     _isHomeRouteActive = isHome;
     if (!_isHomeRouteActive) {
+      _artworkPrefetch.cancel();
       _autoAdvanceTimer?.cancel();
       _cancelTrailerPreview();
       _lastSyncedMakdBackdropUrl = null;
@@ -763,6 +719,8 @@ class _MediaBarState extends State<MediaBar>
 
     _startAutoAdvance();
     final items = widget.viewModel.items;
+    _prefetchAround(items, _currentIndex);
+    _ensureCurrentSlideRatings();
     if (_currentIndex < items.length) {
       _scheduleTrailerPreview(items[_currentIndex]);
     }
@@ -854,22 +812,46 @@ class _MediaBarState extends State<MediaBar>
     _cancelTrailerPreview(retainYouTubePlayer: true);
     final items = widget.viewModel.items;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!mounted || _currentIndex != index) return;
       _prefetchAround(items, index);
-      if (_isGalleryMode()) {
-        _prefetchGalleryWindow(items, index);
-      }
+      _ensureCurrentSlideRatings();
       if (index < items.length) {
         _scheduleTrailerPreview(items[index]);
       }
     });
   }
 
-  void _prefetchAround(List<MediaBarSlideItem> items, int centerIndex) {
-    if (!mounted || items.isEmpty) return;
-    final dpr = MediaQuery.devicePixelRatioOf(context);
+  bool get _isVisibleOnHome =>
+      mounted &&
+      _appInForeground &&
+      _isHomeRouteCurrent() &&
+      !widget.externallyPaused &&
+      !_mainPlaybackActive &&
+      !PlayerRouteObserver.instance.isPlayerActive.value &&
+      !_screensaverController.visible.value;
 
-    // Calculate dimensions matching layout constraints exactly to maximize memory cache hits.
+  void _ensureCurrentSlideRatings() {
+    if (!_isVisibleOnHome || _isBookshelfMode()) return;
+    if (UserPreferences.normalizeMediaBarMode(
+          widget.prefs.get(UserPreferences.mediaBarMode),
+        ) ==
+        UserPreferences.mediaBarModeAya) {
+      return;
+    }
+    final item = widget.viewModel.items.elementAtOrNull(_currentIndex);
+    if (item != null) unawaited(widget.viewModel.ensureRatings(item.itemId));
+  }
+
+  void _prefetchAround(List<MediaBarSlideItem> items, int centerIndex) {
+    if (!_isVisibleOnHome ||
+        items.isEmpty ||
+        _isGalleryMode() ||
+        widget.prefs.resolveDevicePerformanceTier() ==
+            DevicePerformanceTier.reduced) {
+      _artworkPrefetch.cancel();
+      return;
+    }
+    final dpr = MediaQuery.devicePixelRatioOf(context);
     final isMobile = PlatformDetection.useMobileUi;
     final contentHeight = widget.height - (isMobile ? 108.0 : 0.0);
     final activeBookHeight = contentHeight * 0.84;
@@ -877,44 +859,37 @@ class _MediaBarState extends State<MediaBar>
     final posterCacheW = (activeBookWidth * 0.88 * dpr).round().clamp(150, 400);
     final backdropCacheW = MediaBar.backdropDecodeWidth(context);
     final logoCacheW = MediaBar.logoDecodeWidth(context);
-
     final isBookshelf = _isBookshelfMode();
+    final requests = <Future<void> Function()>[];
 
-    // Prefetch close items (next 2 slides and previous 2 slides)
-    final indicesToPrefetch = [
-      centerIndex + 1,
-      centerIndex + 2,
-      centerIndex - 1,
-      centerIndex - 2,
-    ];
-    for (final idx in indicesToPrefetch) {
-      if (idx >= 0 && idx < items.length) {
-        final item = items[idx];
+    void add(String? url, int width) {
+      if (url == null || url.isEmpty) return;
+      requests.add(() async {
+        if (!_isVisibleOnHome) return;
+        await precacheImage(
+          ArtworkDecode.provider(
+            url,
+            width: width,
+            headers: artworkFetchHeaders(url, ImageFetchPriority.low),
+          ),
+          context,
+        );
+      });
+    }
 
-        if (isBookshelf) {
-          if (item.posterUrl != null) {
-            precacheImage(
-              ArtworkDecode.provider(item.posterUrl!, width: posterCacheW),
-              context,
-            );
-          }
-        } else {
-          if (item.backdropUrl != null) {
-            precacheImage(
-              ArtworkDecode.provider(item.backdropUrl!, width: backdropCacheW),
-              context,
-            );
-          }
-
-          if (item.logoUrl != null) {
-            precacheImage(
-              ArtworkDecode.provider(item.logoUrl!, width: logoCacheW),
-              context,
-            );
-          }
-        }
+    // Only the immediately adjacent slides. Gallery already mounts its visible
+    // page, so its own images load on demand with no next-page prefetch.
+    for (final idx in [centerIndex + 1, centerIndex - 1]) {
+      if (idx < 0 || idx >= items.length) continue;
+      final item = items[idx];
+      if (isBookshelf) {
+        add(item.posterUrl, posterCacheW);
+      } else {
+        add(item.backdropUrl, backdropCacheW);
+        add(item.logoUrl, logoCacheW);
       }
     }
+    _artworkPrefetch.replace(requests);
   }
 
   void _setPaused(bool paused) {
@@ -2516,7 +2491,8 @@ class _MediaBarState extends State<MediaBar>
     }
 
     final activeItem = items[clampedIndex];
-    if (widget.viewModel.bookshelfDetailFor(activeItem.itemId) == null) {
+    if (_isVisibleOnHome &&
+        widget.viewModel.bookshelfDetailFor(activeItem.itemId) == null) {
       unawaited(widget.viewModel.ensureBookshelfDetail(activeItem.itemId));
     }
 
@@ -2589,11 +2565,12 @@ class _MediaBarState extends State<MediaBar>
     final useCoverflow =
         PlatformDetection.useMobileUi &&
         MediaQuery.of(context).orientation == Orientation.portrait;
-    if (!useCoverflow &&
+    if (_isVisibleOnHome &&
+        !useCoverflow &&
         widget.viewModel.galleryDetailFor(activeItem.itemId) == null) {
       unawaited(widget.viewModel.ensureGalleryDetail(activeItem.itemId));
     }
-    unawaited(widget.viewModel.ensureRatings(activeItem.itemId));
+    _ensureCurrentSlideRatings();
 
     final activeRatingsMap = widget.viewModel.ratingsFor(activeItem.itemId);
     final hasRatings =
@@ -2817,7 +2794,7 @@ class _MediaBarState extends State<MediaBar>
     // Keep the booted WebView across the slide change so the next YouTube
     // trailer starts fast.
     _cancelTrailerPreview(retainYouTubePlayer: true);
-    _prefetchGalleryWindow(items, index);
+    _ensureCurrentSlideRatings();
     _scheduleTrailerPreview(items[index]);
   }
 
@@ -2835,24 +2812,6 @@ class _MediaBarState extends State<MediaBar>
         setState(() => _galleryLoadingOverlay = false);
       }
     });
-  }
-
-  void _prefetchGalleryWindow(List<MediaBarSlideItem> items, int centerIndex) {
-    if (!mounted || items.isEmpty) return;
-    final pageSize = GalleryLayout.pageSize;
-    final start = (centerIndex ~/ pageSize) * pageSize;
-    final end = (start + pageSize * 2).clamp(0, items.length);
-    for (var i = start; i < end; i++) {
-      final url = items[i].backdropUrl;
-      if (url == null) continue;
-      precacheImage(
-        ResizeImage(
-          offlineAwareImageProvider(url),
-          width: GalleryLayout.kBackdropDecodeWidth,
-        ),
-        context,
-      );
-    }
   }
 
   KeyEventResult _handleKeyEvent(

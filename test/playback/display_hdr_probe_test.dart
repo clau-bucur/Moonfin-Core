@@ -68,6 +68,7 @@ void main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
     PlatformDetection.setTvMode(true);
     PlatformDetection.setDisplayHdrTypes(null);
+    PlatformDetection.setDisplayResolution(null);
     SharedPreferences.setMockInitialValues(<String, Object>{});
     DisplayHdrProbe.resetForTesting();
   });
@@ -75,6 +76,7 @@ void main() {
   tearDown(() {
     debugDefaultTargetPlatformOverride = null;
     PlatformDetection.setDisplayHdrTypes(null);
+    PlatformDetection.setDisplayResolution(null);
     DisplayHdrProbe.resetForTesting();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_platform, null);
@@ -143,6 +145,55 @@ void main() {
   });
 
   group('apply', () {
+    test('publishes the native maximum mode independently of the UI size', () {
+      DisplayHdrProbe.apply(
+        DisplayHdrSnapshot.fromMap({
+          ..._attachedDolbyVision(),
+          'maxWidth': 3840,
+          'maxHeight': 2160,
+        }),
+      );
+      expect(PlatformDetection.displayResolution, const Size(3840, 2160));
+
+      DisplayHdrProbe.apply(
+        DisplayHdrSnapshot.fromMap({
+          ..._sleepingChain(),
+          'maxWidth': 1920,
+          'maxHeight': 1080,
+        }),
+      );
+      expect(PlatformDetection.displayResolution, const Size(3840, 2160));
+
+      DisplayHdrProbe.apply(
+        DisplayHdrSnapshot.fromMap({
+          ..._attachedSdr(),
+          'maxWidth': 1920,
+          'maxHeight': 1080,
+        }),
+      );
+      expect(PlatformDetection.displayResolution, const Size(1920, 1080));
+    });
+
+    test('an old native reply cannot erase the detected resolution', () {
+      PlatformDetection.setDisplayResolution(const Size(3840, 2160));
+      DisplayHdrProbe.apply(DisplayHdrSnapshot.fromMap(_attachedSdr()));
+      expect(PlatformDetection.displayResolution, const Size(3840, 2160));
+    });
+
+    test('native modes can answer resolution when the HDR probe cannot', () {
+      DisplayHdrProbe.apply(
+        DisplayHdrSnapshot.fromMap({
+          ..._sleepingChain(),
+          'answered': false,
+          'supportedModeCount': 6,
+          'maxWidth': 3840,
+          'maxHeight': 2160,
+        }),
+      );
+      expect(PlatformDetection.displayResolution, const Size(3840, 2160));
+      expect(PlatformDetection.hasDisplayHdrCapabilities, isFalse);
+    });
+
     test('a sleeping chain never clobbers what was already detected', () async {
       PlatformDetection.setDisplayHdrTypes(const ['DOLBY_VISION', 'HDR10']);
       DisplayHdrProbe.apply(DisplayHdrSnapshot.fromMap(_sleepingChain()));

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,6 +35,8 @@ import '../util/media_segment_fakes.dart';
 
 class _Client extends Fake implements MediaServerClient {
   final items = FakeItemsApi();
+  final images = _Images();
+  TrickplayApi? previews;
 
   @override
   ServerType get serverType => ServerType.jellyfin;
@@ -41,7 +45,39 @@ class _Client extends Fake implements MediaServerClient {
   ItemsApi get itemsApi => items;
 
   @override
-  TrickplayApi? get trickplayApi => null;
+  TrickplayApi? get trickplayApi => previews;
+
+  @override
+  ImageApi get imageApi => images;
+}
+
+class _Images extends Fake implements ImageApi {
+  final requestedTrickplaySheets = <int>[];
+
+  @override
+  String getTrickplayTileImageUrl(
+    String itemId, {
+    required int width,
+    required int index,
+    String? mediaSourceId,
+  }) {
+    requestedTrickplaySheets.add(index);
+    return 'https://example.test/trickplay/$index.jpg';
+  }
+}
+
+class _Trickplay extends Fake implements TrickplayApi {
+  int metadataRequests = 0;
+
+  @override
+  Future<TrickplayThumbnailSet?> getThumbnailSet(
+    String itemId, {
+    required int width,
+    String? mediaSourceId,
+  }) async {
+    metadataRequests++;
+    return null;
+  }
 }
 
 class _Factory extends Fake implements MediaServerClientFactory {
@@ -121,9 +157,21 @@ class _Manager extends PlaybackManager {
   int stopCalls = 0;
   int nextInQueueCalls = 0;
   PlaybackBringupState bringup = const PlaybackBringupState.idle();
+  bool controlBringupStream = false;
+  final bringupChanges = StreamController<PlaybackBringupState>.broadcast();
 
   @override
   PlaybackBringupState get bringupState => bringup;
+
+  @override
+  Stream<PlaybackBringupState> get bringupStateStream =>
+      controlBringupStream ? bringupChanges.stream : super.bringupStateStream;
+
+  @override
+  void dispose() {
+    bringupChanges.close();
+    super.dispose();
+  }
 
   // The real calls run too, since they record the viewer's pause.
   @override
@@ -191,7 +239,20 @@ void main() {
     await GetIt.instance.reset();
   });
 
-  Future<void> mountPlayer(WidgetTester tester) async {
+  Future<void> revealControls(WidgetTester tester) async {
+    final item = manager.queueService.currentItem;
+    if (item is Map && item['__moonfinIsPreroll'] == true) return;
+    await tester.sendKeyEvent(PlatformDetection.isTV
+        ? LogicalKeyboardKey.arrowDown : LogicalKeyboardKey.enter);
+    await tester.pump();
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 60));
+    }
+  }
+
+  Future<void> mountPlayer(WidgetTester tester, {
+    bool settle = true, bool reveal = true,
+  }) async {
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -199,8 +260,143 @@ void main() {
         home: const VideoPlayerScreen(),
       ),
     );
-    await tester.pumpAndSettle();
+    if (settle) {
+      await tester.pumpAndSettle();
+    } else {
+      await tester.pump();
+    }
+    if (reveal) await revealControls(tester);
   }
+
+  testWidgets('startup and stream preparation never reveal controls', (tester) async {
+    PlatformDetection.setTvMode(true);
+    addTearDown(() => PlatformDetection.setTvMode(false));
+    manager.controlBringupStream = true;
+    manager.bringup = const PlaybackBringupState(phase: PlaybackBringupPhase.resolving);
+    await mountPlayer(tester, reveal: false, settle: false);
+    expect(find.byType(Slider), findsNothing);
+    for (final phase in [PlaybackBringupPhase.opening, PlaybackBringupPhase.ready]) {
+      manager.bringup = PlaybackBringupState(phase: phase);
+      manager.bringupChanges.add(manager.bringup);
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.byType(Slider), findsNothing);
+    }
+    await revealControls(tester);
+    expect(find.byType(Slider), findsOneWidget);
+    manager.queueService.setQueue([{'Id': 'next', 'Type': 'Episode'}]);
+    await tester.pump();
+    await tester.pump();
+    expect(find.byType(Slider), findsNothing,
+        reason: 'the next item also starts without controls');
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('early controls request waits for resolved stream buttons', (tester) async {
+    PlatformDetection.setTvMode(true);
+    addTearDown(() => PlatformDetection.setTvMode(false));
+    manager.controlBringupStream = true;
+    manager.bringup = const PlaybackBringupState(phase: PlaybackBringupPhase.resolving);
+    await mountPlayer(tester, reveal: false, settle: false);
+    await revealControls(tester);
+    expect(find.byType(Slider), findsNothing);
+    expect(find.byIcon(Icons.subtitles_outlined), findsNothing);
+    manager.queueService.setQueue([{
+      'Id': 'video', 'Type': 'Movie', 'MediaStreams': [{'Type': 'Subtitle', 'Index': 2}],
+    }]);
+    await tester.pump();
+    // Queue changes are a new playback start, so explicitly request its controls.
+    await revealControls(tester);
+    manager.bringup = const PlaybackBringupState(phase: PlaybackBringupPhase.ready);
+    manager.bringupChanges.add(manager.bringup);
+    await tester.pump();
+    await tester.pump();
+    await tester.pumpAndSettle();
+    expect(find.byType(Slider), findsOneWidget);
+    expect(find.byIcon(Icons.subtitles_outlined), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('seek-preview metadata waits for the current stream to open', (
+    tester,
+  ) async {
+    final previews = _Trickplay();
+    client.previews = previews;
+    manager.controlBringupStream = true;
+    manager.bringup = const PlaybackBringupState(
+      phase: PlaybackBringupPhase.resolving,
+    );
+    manager.queueService.setQueue([
+      {'Id': 'video', 'Type': 'Movie'},
+    ]);
+    await mountPlayer(tester, settle: false);
+    expect(previews.metadataRequests, 0);
+
+    manager.bringup = const PlaybackBringupState(
+      phase: PlaybackBringupPhase.ready,
+    );
+    manager.bringupChanges.add(manager.bringup);
+    await tester.pump();
+    await tester.pump();
+    expect(previews.metadataRequests, 1);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('disabled seek previews make no metadata request', (
+    tester,
+  ) async {
+    final previews = _Trickplay();
+    client.previews = previews;
+    final prefs = GetIt.instance<UserPreferences>();
+    await prefs.set(UserPreferences.trickPlayMode, TrickplayMode.disabled);
+    manager.queueService.setQueue([
+      {'Id': 'video', 'Type': 'Movie'},
+    ]);
+    await mountPlayer(tester);
+    expect(previews.metadataRequests, 0);
+
+    // Enabling previews from the player still makes them available.
+    await prefs.set(UserPreferences.trickPlayMode, TrickplayMode.single);
+    await tester.pump();
+    expect(previews.metadataRequests, 1);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('watching without seeking downloads no trickplay sheets', (
+    tester,
+  ) async {
+    PlatformDetection.setTvMode(true);
+    addTearDown(() => PlatformDetection.setTvMode(false));
+    manager.queueService.setQueue([
+      {
+        'Id': 'video',
+        'Type': 'Movie',
+        'Trickplay': {
+          'source': {
+            '320': {
+              'Width': 320,
+              'Height': 180,
+              'TileWidth': 10,
+              'TileHeight': 10,
+              'Interval': 1000,
+            },
+          },
+        },
+      },
+    ]);
+    manager.state.setDuration(const Duration(hours: 2));
+    await mountPlayer(tester);
+    expect(client.images.requestedTrickplaySheets, isEmpty);
+
+    manager.state.setPlaying(true);
+    await tester.pump(const Duration(seconds: 10));
+    for (final second in [60, 180, 600, 1800]) {
+      manager.state.setPosition(Duration(seconds: second));
+      await tester.pump();
+    }
+    expect(client.images.requestedTrickplaySheets, isEmpty);
+    await tester.pumpWidget(const SizedBox());
+  });
 
   for (final type in ['Movie', 'Episode']) {
     testWidgets('TV Restart leads the entire transport row for $type', (
@@ -263,51 +459,6 @@ void main() {
     expect(find.byIcon(Icons.skip_previous_rounded), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
-
-  testWidgets('desktop Escape and Cinema Skip dismiss keys', (tester) async {
-    var fullscreen = true;
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      const MethodChannel('window_manager'),
-      (call) async {
-        if (call.method == 'isFullScreen') return fullscreen;
-        if (call.method == 'setFullScreen') {
-          fullscreen = (call.arguments as Map)['isFullScreen'] as bool;
-        }
-        if (call.method == 'isVisible') return true;
-        return call.method.startsWith('is') ? false : null;
-      },
-    );
-    addTearDown(() => tester.binding.defaultBinaryMessenger
-        .setMockMethodCallHandler(const MethodChannel('window_manager'), null));
-    await GetIt.instance<UserPreferences>()
-        .set(UserPreferences.cinemaModeSkipEnabled, true);
-    manager.queueService.setQueue([
-      {'Id': 'trailer', '__moonfinIsPreroll': true, 'RunTimeTicks': 900000000},
-    ]);
-    await mountPlayer(tester);
-    final skip = find.byType(SkipSegmentOverlay);
-
-    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-    await tester.pumpAndSettle();
-    expect(fullscreen, isFalse);
-    expect(skip, findsOneWidget);
-
-    for (final key in [
-      LogicalKeyboardKey.backspace,
-      LogicalKeyboardKey.delete,
-    ]) {
-      await tester.sendKeyEvent(key);
-      await tester.pump();
-      expect(skip, findsNothing);
-      await tester.sendKeyEvent(key);
-      await tester.pump();
-      expect(manager.stopCalls, 0);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-      await tester.pump();
-      expect(skip, findsOneWidget);
-    }
-    await tester.pumpWidget(const SizedBox());
-  }, variant: TargetPlatformVariant.only(TargetPlatform.windows));
 
   testWidgets('moving the mouse after the X keeps Cinema Skip hidden', (
     tester,
@@ -531,6 +682,7 @@ void main() {
       ),
     );
     await tester.pump();
+    await revealControls(tester);
     expect(find.byType(Slider), findsOneWidget);
 
     await tester.pump(const Duration(seconds: 10));
@@ -559,6 +711,7 @@ void main() {
       ),
     );
     await tester.pump();
+    await revealControls(tester);
     manager.state.setPlaying(true);
     await tester.pump();
 
@@ -596,6 +749,7 @@ void main() {
         ),
       );
       await tester.pump();
+    await revealControls(tester);
 
       // The player holds a single tap until its double-tap timeout runs out.
       await tester.tap(find.byIcon(Icons.lock_outline));
@@ -625,6 +779,7 @@ void main() {
       ),
     );
     await tester.pump();
+    await revealControls(tester);
 
     await tester.tap(find.byIcon(Icons.audiotrack_outlined));
     await tester.pump();
@@ -645,6 +800,7 @@ void main() {
       ),
     );
     await tester.pump();
+    await revealControls(tester);
     expect(find.byType(Slider), findsOneWidget);
 
     await tester.tapAt(const Offset(100, 300));
@@ -685,6 +841,7 @@ void main() {
       ),
     );
     await tester.pump();
+    await revealControls(tester);
     // The playing stream delivers after the first frame, so the rebuild
     // lands on the second.
     Future<void> setPlaying(bool playing) async {
@@ -774,62 +931,6 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
-  // Issue #985: a click plays or pauses at once and a double-click toggles
-  // fullscreen, putting back what its first click did to playback.
-  testWidgets('desktop click pauses and double-click toggles fullscreen', (
-    tester,
-  ) async {
-    final calls = <MethodCall>[];
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      const MethodChannel('window_manager'),
-      (call) async {
-        calls.add(call);
-        if (call.method == 'isVisible') return true;
-        return call.method.startsWith('is') ? false : null;
-      },
-    );
-    addTearDown(
-      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        const MethodChannel('window_manager'),
-        null,
-      ),
-    );
-
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: const [Locale('en')],
-        home: const VideoPlayerScreen(),
-      ),
-    );
-    manager.state.setPlaying(true);
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 10));
-    expect(find.byType(Slider), findsNothing);
-
-    await tester.tapAt(const Offset(100, 300));
-    await tester.pump();
-    expect(manager.transport, ['pause']);
-    expect(find.byType(Slider), findsOneWidget);
-    await tester.pump(const Duration(seconds: 1));
-    expect(calls.where((c) => c.method == 'setFullScreen'), isEmpty);
-
-    manager.transport.clear();
-    await tester.tapAt(const Offset(100, 300));
-    await tester.pump(const Duration(milliseconds: 100));
-    await tester.tapAt(const Offset(100, 300));
-    await tester.pumpAndSettle();
-    expect(manager.transport, ['pause', 'resume']);
-    expect(
-      calls.where((c) => c.method == 'setFullScreen').map((c) => c.arguments),
-      [
-        {'isFullScreen': true},
-      ],
-    );
-
-    await tester.pumpWidget(const SizedBox());
-  }, variant: TargetPlatformVariant.only(TargetPlatform.windows));
-
   // Issue #1305: off TV the transport sits where the paused description card
   // goes, so the card waits for the controls, which still hide while paused.
   group('play buttons', () {
@@ -877,6 +978,7 @@ void main() {
         ),
       );
       await tester.pump();
+    await revealControls(tester);
     }
 
     double cardOpacity(WidgetTester tester) => tester

@@ -7,8 +7,21 @@ param(
 $ErrorActionPreference = 'Stop'
 $previousSuffix = $env:MOONFIN_TEST_ID_SUFFIX
 $previousName = $env:MOONFIN_TEST_APP_NAME
+$previousTemp = $env:TEMP
+$previousTmp = $env:TMP
+$previousJavaOptions = $env:JAVA_TOOL_OPTIONS
 Push-Location $PSScriptRoot
 try {
+    # Java's Windows socket implementation can fail under long sandbox TEMP
+    # paths. Keep both native and JVM temporary socket paths short and writable.
+    $buildTemp = Join-Path $PSScriptRoot '.dart_tool/tmp'
+    New-Item -ItemType Directory -Path $buildTemp -Force | Out-Null
+    $env:TEMP = $buildTemp
+    $env:TMP = $buildTemp
+    $env:JAVA_TOOL_OPTIONS = (
+        $previousJavaOptions +
+        (' "-Djava.io.tmpdir={0}" "-Djdk.net.unixdomain.tmpdir={0}"' -f $buildTemp)
+    ).Trim()
     # An isolated id is the default so this never replaces the regular app.
     $env:MOONFIN_TEST_ID_SUFFIX = $ApplicationIdSuffix
     $env:MOONFIN_TEST_APP_NAME = 'Moonfin Video Experiment'
@@ -35,4 +48,7 @@ try {
     Pop-Location
     $env:MOONFIN_TEST_ID_SUFFIX = $previousSuffix
     $env:MOONFIN_TEST_APP_NAME = $previousName
+    $env:TEMP = $previousTemp
+    $env:TMP = $previousTmp
+    $env:JAVA_TOOL_OPTIONS = $previousJavaOptions
 }

@@ -36,6 +36,8 @@ class DisplayHdrSnapshot {
     this.state = 'unknown',
     this.answered = false,
     this.supportedModeCount = 0,
+    this.maxWidth = 0,
+    this.maxHeight = 0,
     this.sinkId,
     this.sinkConnection,
     this.modeTypes = const <String>[],
@@ -64,6 +66,8 @@ class DisplayHdrSnapshot {
       state: raw['state']?.toString() ?? 'unknown',
       answered: raw['answered'] == true,
       supportedModeCount: (raw['supportedModeCount'] as num?)?.toInt() ?? 0,
+      maxWidth: (raw['maxWidth'] as num?)?.toInt() ?? 0,
+      maxHeight: (raw['maxHeight'] as num?)?.toInt() ?? 0,
       sinkId: raw['sinkId']?.toString(),
       sinkConnection: raw['sinkConnection']?.toString(),
       modeTypes: (raw['modeTypes'] as List<dynamic>? ?? const <dynamic>[])
@@ -81,6 +85,8 @@ class DisplayHdrSnapshot {
   final String state;
   final bool answered;
   final int supportedModeCount;
+  final int maxWidth;
+  final int maxHeight;
   final String? sinkId;
   final String? sinkConnection;
 
@@ -116,7 +122,7 @@ class DisplayHdrSnapshot {
       'trigger=$trigger verdict=${verdict.name} types=$types '
       'present=$present valid=$valid state=$state answered=$answered '
       'sink=${sinkId ?? 'none'}/${sinkConnection ?? 'unknown'} '
-      'modes=$supportedModeCount modeTypes=$modeTypes '
+      'modes=$supportedModeCount max=${maxWidth}x$maxHeight modeTypes=$modeTypes '
       'displays=$displayCount sdk=$sdkInt';
 }
 
@@ -209,6 +215,20 @@ class DisplayHdrProbe {
     if (snapshot == null) {
       _log('display probe: no result, keeping the last detection');
       return;
+    }
+    // Several native modes identify a usable panel even on OEMs that cannot
+    // answer the HDR/EDID query. A lone placeholder mode does not.
+    if (snapshot.present &&
+        snapshot.valid &&
+        snapshot.state == 'on' &&
+        (snapshot.sinkEnumerated ||
+            snapshot.supportedModeCount > 1 ||
+            snapshot.types.isNotEmpty) &&
+        snapshot.maxWidth > 0 &&
+        snapshot.maxHeight > 0) {
+      PlatformDetection.setDisplayResolution(
+        Size(snapshot.maxWidth.toDouble(), snapshot.maxHeight.toDouble()),
+      );
     }
     switch (snapshot.verdict) {
       case DisplayHdrVerdict.reportsHdr:
