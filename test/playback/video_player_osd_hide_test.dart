@@ -700,6 +700,66 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
+  for (final back in ['remote', 'system']) {
+    testWidgets('$back Back has a 750ms grace period after controls auto-hide',
+        (tester) async {
+      PlatformDetection.setTvMode(true);
+      addTearDown(() => PlatformDetection.setTvMode(false));
+      await GetIt.instance<UserPreferences>().set(
+          UserPreferences.playbackEnginePreference, PlaybackEnginePreference.mpv);
+      final router = GoRouter(initialLocation: '/details', routes: [
+        GoRoute(path: '/details', builder: (_, _) => const SizedBox()),
+        GoRoute(path: '/play', builder: (_, _) => const VideoPlayerScreen()),
+      ]);
+      addTearDown(router.dispose);
+      manager.state.setPlaying(true);
+      await tester.pumpWidget(MaterialApp.router(
+        routerConfig: router,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: const [Locale('en')],
+      ));
+      router.push('/play');
+      await tester.pumpAndSettle();
+      await revealControls(tester);
+      expect(find.byType(Slider), findsOneWidget);
+
+      // Stop at the actual auto-hide frame so the grace period starts here.
+      for (var i = 0; i < 60 && find.byType(Slider).evaluate().isNotEmpty; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      expect(find.byType(Slider), findsNothing);
+
+      Future<void> pressBack() async {
+        if (back == 'system') {
+          await tester.binding.handlePopRoute();
+        } else {
+          await tester.sendKeyEvent(LogicalKeyboardKey.goBack,
+              physicalKey: PhysicalKeyboardKey.escape);
+        }
+        await tester.pump();
+      }
+
+      await pressBack();
+      expect(manager.stopCalls, 0);
+      await tester.pump(const Duration(milliseconds: 500));
+      await pressBack();
+      expect(manager.stopCalls, 0);
+      expect(manager.state.isPlaying, isTrue);
+      expect(find.byType(Slider), findsNothing);
+
+      await tester.pump(const Duration(milliseconds: 300));
+      await pressBack();
+      await tester.runAsync(() async {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      });
+      await tester.pumpAndSettle();
+      expect(manager.stopCalls, 1,
+          reason: 'ignored Back presses do not extend the grace period');
+      expect(router.state.uri.path, '/details');
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
+
   testWidgets('controls stay up while a dialog covers the player', (
     tester,
   ) async {

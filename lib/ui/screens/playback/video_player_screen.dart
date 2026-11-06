@@ -284,6 +284,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   bool _controlsVisible = false;
   Timer? _hideTimer;
+  Timer? _autoHideBackGraceTimer;
   bool _displayPlaying = false;
   Timer? _displayPlayingDebounce;
   Timer? _endsAtTicker;
@@ -1060,6 +1061,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _cinemaSkip.removeListener(_onCinemaSkipChanged);
     _cinemaSkip.dispose();
     _displayPlayingDebounce?.cancel();
+    _autoHideBackGraceTimer?.cancel();
     _endsAtTicker?.cancel();
     _volumeOverlayTimer?.cancel();
     _brightnessOverlayTimer?.cancel();
@@ -1370,6 +1372,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   bool _isBackNavigationSuppressed() {
+    if (_autoHideBackGraceTimer?.isActive ?? false) return true;
     final until = _suppressBackNavigationUntil;
     if (until == null) return false;
     return DateTime.now().isBefore(until);
@@ -2889,6 +2892,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       }
       final playing = _state.isPlaying;
       if (!playing && !_hasPausedDescriptionCard) return;
+      if (!_controlsVisible) return;
+      // Back can arrive just after this timer wins the race to dismiss the
+      // controls. Give that press time to land without leaving playback.
+      _autoHideBackGraceTimer?.cancel();
+      _autoHideBackGraceTimer = Timer(
+        const Duration(milliseconds: 750),
+        () {},
+      );
       setState(() {
         _controlsVisible = false;
         if (playing &&
