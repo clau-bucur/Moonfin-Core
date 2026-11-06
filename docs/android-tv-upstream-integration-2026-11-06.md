@@ -81,3 +81,41 @@ reported as full-suite passes.
 This is selected regression coverage rather than a full inherited application
 suite pass. No measured startup/frame-rate gain or receiver resume-audio fix
 is claimed from these changes.
+
+## Release build
+
+`build-android-tv-video.ps1` passed using the pinned Flutter 3.47.2 SDK, with
+code revision `aafa0425bea8700dfc3eb591d06ef150097c83fd`.
+
+- Package/label: `org.moonfin.androidtv.videoexperiment`, Moonfin Video Experiment.
+- Version: `3.0.0`, build `2000023`.
+- APK size: 67,575,179 bytes.
+- SHA-256: `3d9cdf76f9d43cbc07d20c35a1f09c2ba9e97cb3b8c88cb4c5882e571333d78f`.
+- Signing certificate SHA-256:
+  `3af2f489977eec2dd8d1382d655e79e8f2b68ebf806275e87a9f859bf9ee3f82`,
+  matching the prior Shield installation.
+- Delivery APK and size/provenance JSON are under
+  `artifacts/upstream-sync-2026-11-06/release-android-arm64` in the regular TV
+  checkout. The earlier Shield APK was backed up and its checksum verified.
+
+`aapt` verified the package, label and Leanback launcher. Flutter's AOT target
+is ARM64; the inherited support libraries still include ARM64, ARMv7 and x86_64.
+
+## Shield deployment
+
+Installed the release on `shield.gme:5555` with `adb install -r`, preserving
+application data. The installed APK's SHA-256 matches the release above.
+The original first-install timestamp remains `2026-11-02 18:27:32`; the update
+timestamp is `2026-11-06 14:08:34` (device local time).
+
+The Shield was asleep during the first launch request. After waking it,
+MainActivity was resumed in the foreground and the Home screen rendered with
+populated library rows and a focused card. The application remained running,
+and its process log contained no fatal exception, fatal signal or unhandled
+exception entries. The initial launch wait included device sleep and is not a
+startup-performance measurement.
+
+The previous APK backup, deployment JSON, process logs and awake screenshot
+are in `artifacts/upstream-sync-2026-11-06` in the regular TV checkout. This was
+an installation and Home-screen smoke check; media playback, HDR and receiver
+passthrough were not exercised.
