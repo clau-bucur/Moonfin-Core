@@ -14,6 +14,7 @@ import '../../auth/store/authentication_store.dart';
 import '../../auth/store/credential_store.dart';
 import '../../data/repositories/anime_marker_repository.dart';
 import '../../data/repositories/calendar_repository.dart';
+import '../../data/repositories/poster_badge_repository.dart';
 import '../../data/repositories/mdblist_repository.dart';
 import '../../data/repositories/multi_server_repository.dart';
 import '../../data/repositories/media_bar_repository.dart';
@@ -45,6 +46,7 @@ import '../../data/services/retro_artwork/retro_artwork_activity_gate.dart';
 import '../../data/services/retro_artwork/retro_artwork_cache.dart';
 import '../../data/services/retro_artwork/retro_artwork_disk_cache.dart';
 import '../../data/services/custom_external_lists_service.dart';
+import '../../data/services/item_membership_service.dart';
 import '../../data/services/row_data_source.dart';
 import '../../data/services/socket_handler.dart';
 import '../../data/services/user_data_sync.dart';
@@ -81,8 +83,10 @@ void resetUserScopedSingletons() {
   unregister<MdbListRepository>();
   unregister<CalendarRepository>();
   unregister<AnimeMarkerRepository>();
+  unregister<PosterBadgeRepository>();
   unregister<RowDataSource>();
   RowDataSource.clearRecommendationCache();
+  ItemMembershipService.instance.clearCache();
   unregister<ItemMutationRepository>();
   unregister<SearchRepository>();
   unregister<UserViewsRepository>();
@@ -282,6 +286,10 @@ void _registerUserScopedSingletons() {
   );
   _getIt.registerLazySingleton(
     () => AnimeMarkerRepository(_getIt<MediaServerClient>()),
+    dispose: (repository) => repository.dispose(),
+  );
+  _getIt.registerLazySingleton(
+    () => PosterBadgeRepository(_getIt<MediaServerClient>()),
     dispose: (repository) => repository.dispose(),
   );
   _getIt.registerLazySingleton(

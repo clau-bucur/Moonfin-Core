@@ -338,7 +338,7 @@
   "@detailScreenStyle": {
     "description": "Label for the media detail screen layout style setting"
   },
-  "detailScreenStyleSubtitle": "Classic is the original centered moonfin layout. Modern is a responsive cinematic layout. Spotlight is a hero-first layout with pop-up content cards. Nouveau is a full-screen layout with sections stacked down the page. Minimalist is artwork, one play button and the episodes. Stage leads with the poster, with play under it and the details beside it. Premiere centers the title over a backdrop that fills the screen, with every section down the page under it. Quick Look opens a drawer over the screen you were on, with the full page a press away. Frost floats the title in a glass window over a blurred copy of its art, with its parts in tabs under the buttons.",
+  "detailScreenStyleSubtitle": "How a movie or show looks when you open it.",
   "@detailScreenStyleSubtitle": {
     "description": "Explanation under the detail screen style setting"
   },
@@ -4289,6 +4289,14 @@
   "@watchedIndicators": {
     "description": "Setting for watched indicator display"
   },
+  "showPosterLabels": "Poster Labels",
+  "@showPosterLabels": {
+    "description": "Setting that shows or hides the labels the server admin adds to posters"
+  },
+  "showPosterLabelsSubtitle": "Show the labels on posters, such as 4K or HDR.",
+  "@showPosterLabelsSubtitle": {
+    "description": "Subtitle of the Poster Labels setting"
+  },
   "always": "Always",
   "@always": {
     "description": "Option: always"
@@ -7885,6 +7893,18 @@
   "@seerrSeriesContinuing": {
     "description": "Banner in the Seerr request dialog for a continuing series whose aired seasons are all in the library"
   },
+  "seerrSeriesMatchDescription": "We couldn't match this series automatically. Pick the right one below.",
+  "@seerrSeriesMatchDescription": {
+    "description": "Shown above Sonarr's matches in the Seerr request dialog when the series has no TVDB id, so the user has to pick which series to request"
+  },
+  "seerrSeriesNoMatch": "We couldn't find a match for this series, so it can't be requested.",
+  "@seerrSeriesNoMatch": {
+    "description": "Shown in the Seerr request dialog when the series has no TVDB id and Sonarr found no series to match it with"
+  },
+  "seerrSeriesMatchFailed": "Sonarr couldn't find a match for this series, or couldn't be reached. Try again, or check the series on Seerr.",
+  "@seerrSeriesMatchFailed": {
+    "description": "Shown in the Seerr request dialog above a Retry button when looking up Sonarr's matches for a series with no TVDB id fails. Seerr reports a series Sonarr doesn't know and an unreachable Sonarr the same way, so the text covers both"
+  },
   "advancedOptions": "Advanced Options",
   "@advancedOptions": {
     "description": "Expansion tile for advanced request options"
@@ -10580,6 +10600,22 @@
   "playlistCreateNew": "Create New Playlist",
   "playlistNoneFound": "No playlists found",
   "addToPlaylist": "Add to Playlist",
+  "removeFromPlaylist": "Remove from Playlist",
+  "@removeFromPlaylist": {
+    "description": "Context menu action to remove an item from a playlist"
+  },
+  "removeFromPlaylistConfirm": "Remove {item} from {playlist}?",
+  "@removeFromPlaylistConfirm": {
+    "description": "Confirmation shown before removing an item from a playlist",
+    "placeholders": {
+      "item": {"type": "String"},
+      "playlist": {"type": "String"}
+    }
+  },
+  "removeFromPlaylistFailed": "Failed to remove from playlist",
+  "@removeFromPlaylistFailed": {
+    "description": "Error shown when removing an item from a playlist fails"
+  },
 
   "lyricsNotAvailable": "No lyrics available",
   "upNext": "Up Next",
@@ -13813,6 +13849,75 @@
   "setupCurrent": "Current",
   "@setupCurrent": {
     "description": "Tag beside the option that is chosen right now in a setup wizard list"
+  },
+  "setupMoonbaseTitle": "Add Moonbase to your server",
+  "@setupMoonbaseTitle": {
+    "description": "Row on the last setup wizard step that opens the Moonbase server plugin dialog"
+  },
+  "setupMoonbaseHint": "A free server plugin that unlocks more of Moonfin",
+  "@setupMoonbaseHint": {
+    "description": "Line under the Moonbase row on the last setup wizard step"
+  },
+  "setupMoonbaseIntro": "Moonbase is free and runs on your server. With it, Moonfin gets:",
+  "@setupMoonbaseIntro": {
+    "description": "First line of the Moonbase dialog, followed by a list of features"
+  },
+  "setupMoonbaseAskAdmin": "Only a server admin can install it. Send them this link.",
+  "@setupMoonbaseAskAdmin": {
+    "description": "Moonbase dialog line for users who aren't a server admin, above a QR code or link to the install steps"
+  },
+  "setupMoonbaseManualSteps": "It takes a few steps on your server to install. They're all at this link.",
+  "@setupMoonbaseManualSteps": {
+    "description": "Moonbase dialog line for admins of servers the app can't install it on, above a QR code or link to the install steps"
+  },
+  "setupMoonbaseInstalling": "Installing Moonbase...",
+  "@setupMoonbaseInstalling": {
+    "description": "Shown in the Moonbase dialog while the plugin installs"
+  },
+  "setupMoonbaseInstalled": "Moonbase is installed. It turns on when the server restarts, which stops anything playing right now.",
+  "@setupMoonbaseInstalled": {
+    "description": "Shown in the Moonbase dialog after the plugin installed, above a Restart Server button"
+  },
+  "setupMoonbaseRestarting": "The server is restarting. Moonbase turns on once it's back.",
+  "@setupMoonbaseRestarting": {
+    "description": "Shown while the server restarts after Moonbase was installed"
+  },
+  "moonbaseFeatureSync": "Settings synced across your devices",
+  "@moonbaseFeatureSync": {
+    "description": "Moonbase dialog feature"
+  },
+  "moonbaseFeatureRatings": "Extra ratings and TMDB reviews",
+  "@moonbaseFeatureRatings": {
+    "description": "Moonbase dialog feature"
+  },
+  "moonbaseFeatureRows": "Custom rows from your favorite lists",
+  "@moonbaseFeatureRows": {
+    "description": "Moonbase dialog feature, rows built from Letterboxd, IMDb, TMDB and MDBList lists"
+  },
+  "moonbaseFeatureGames": "Retro games with synced saves",
+  "@moonbaseFeatureGames": {
+    "description": "Moonbase dialog feature"
+  },
+  "moonbaseFeatureCalendar": "A calendar of what's coming up",
+  "@moonbaseFeatureCalendar": {
+    "description": "Moonbase dialog feature, upcoming episodes and movies"
+  },
+  "moonbaseFeatureCollections": "Your own order for each collection",
+  "@moonbaseFeatureCollections": {
+    "description": "Moonbase dialog feature"
+  },
+  "moonbaseFeatureMessages": "Messages from your server admin",
+  "@moonbaseFeatureMessages": {
+    "description": "Moonbase dialog feature"
+  },
+  "setupMoonbaseInstallFailed": "Moonbase couldn't be installed. {error}",
+  "@setupMoonbaseInstallFailed": {
+    "description": "Shown in the Moonbase dialog when installing or restarting failed",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "setupTvHint": "Up and down to preview · OK to choose · Back twice to skip",
   "@setupTvHint": {

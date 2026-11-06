@@ -596,7 +596,7 @@ class MainActivity : AudioServiceActivity() {
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (gameInputRouter.onKeyEvent(event)) return true
         if (gameInputRouter.blocksNavigation(event)) return true
-        return super.dispatchKeyEvent(event)
+        return super.dispatchKeyEvent(ModifierScanCodePolicy.forFlutter(event))
     }
 
     override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {

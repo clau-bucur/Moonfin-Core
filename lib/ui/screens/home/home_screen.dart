@@ -152,6 +152,20 @@ class HomeScreen extends StatelessWidget {
       _ContentRowsState._homeRowImageTypeForRow(row, prefs);
 
   @visibleForTesting
+  static String? resolveRowImageUrl(
+    AggregatedItem item,
+    ImageApi imageApi,
+    ImageType imageType,
+  ) => _ContentRowsState._resolveRowImageUrl(
+    item,
+    imageApi,
+    200,
+    imageType,
+    false,
+    1,
+  );
+
+  @visibleForTesting
   static bool showsCalendarSeeAll(HomeRow row, UserPreferences prefs) =>
       _ContentRowsState._showsCalendarSeeAll(row, prefs);
 
@@ -5569,10 +5583,16 @@ class _ContentRowsState extends State<_ContentRows>
           if (row.rowType == HomeRowType.libraryTiles) {
             _navigateToLibrary(context, item);
           } else if (row.rowType == HomeRowType.genres && row.id == 'genres') {
-            context.push(Destinations.genre(item.name, genreId: item.id));
+            context.push(Destinations.genre(
+              item.name,
+              genreId: item.id,
+              serverId: item.serverId,
+            ));
           } else if (row.rowType == HomeRowType.studios &&
               row.id == 'studios') {
-            context.push(Destinations.studio(item.name));
+            context.push(
+              Destinations.studio(item.name, serverId: item.serverId),
+            );
           } else if (item.serverId == 'seerr') {
             _navigateToSeerrItem(context, item);
           } else {
@@ -5716,7 +5736,16 @@ class _ContentRowsState extends State<_ContentRows>
                       } else if (row.rowType == HomeRowType.genres &&
                           row.id == 'genres') {
                         context.push(
-                          Destinations.genre(item.name, genreId: item.id),
+                          Destinations.genre(
+                            item.name,
+                            genreId: item.id,
+                            serverId: item.serverId,
+                          ),
+                        );
+                      } else if (row.rowType == HomeRowType.studios &&
+                          row.id == 'studios') {
+                        context.push(
+                          Destinations.studio(item.name, serverId: item.serverId),
                         );
                       } else if (item.serverId == 'seerr') {
                         _navigateToSeerrItem(context, item);
@@ -5827,6 +5856,10 @@ class _ContentRowsState extends State<_ContentRows>
                     final isSeerrGenreCard =
                         _isSeerrFilterRow(row) && item.type == 'Genre';
                     final card = MediaCard(
+                      posterBadgeItemId:
+                          isSeerrGenreCard || isWatchingNow || item.serverId == 'seerr'
+                          ? null
+                          : item.id,
                       showLabel: !isWatchingNow,
                       animeMarkerItemId: (isWatchingNow || isSeerrGenreCard) ? null : item.id,
                       recordingItemId: (isWatchingNow || isSeerrGenreCard) ? null : item.id,
@@ -7163,7 +7196,15 @@ class _ContentRowsState extends State<_ContentRows>
       }
     }
 
+    final studioLogo = item.rawData[studioLogoUrlKey];
+    if (studioLogo is String) return studioLogo;
+
     if (item.type == 'Studio' || item.type == 'Network') {
+      final maxW = artworkRequestWidth(
+        height * (imageType == ImageType.banner ? kBannerAspectRatio : 16 / 9),
+        requestScale,
+        ArtworkShape.landscape,
+      );
       final primaryUrl = _resolvePrimaryImageUrl(
         item,
         imageApi,
@@ -7172,13 +7213,21 @@ class _ContentRowsState extends State<_ContentRows>
           requestScale,
           ArtworkShape.poster,
         ),
-        maxWidth: artworkRequestWidth(
-          height * 16 / 9,
-          requestScale,
-          ArtworkShape.landscape,
-        ),
+        maxWidth: maxW,
       );
       if (primaryUrl != null) return primaryUrl;
+      // Jellyfin studios usually have only a Thumb, so a poster row would
+      // otherwise have nothing to show. Thumb and banner rows reach it below.
+      if (imageType == ImageType.poster) {
+        final thumbTag = _tagForType(item, 'Thumb');
+        if (thumbTag != null) {
+          return imageApi.getThumbImageUrl(
+            item.id,
+            maxWidth: maxW,
+            tag: thumbTag,
+          );
+        }
+      }
     }
 
     if (item.serverId == 'seerr') {

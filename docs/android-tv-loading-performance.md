@@ -53,11 +53,12 @@ deployed to the Shield.
 
 ### Remaining request work
 
-- Auto bitrate's cold-cache measurement can request 500 KB, 1 MB and 3 MB before
-  stream resolution. Successful measurements last 15 minutes; failed probes
-  currently fall back without caching that failure. A short failure cooldown
-  or measurement started while browsing could reduce repeated delays. This
-  needs a separate policy change with slow-link and bitrate-selection checks.
+- Auto bitrate now uses a per-server saved measurement for normal stream
+  negotiation, measuring only when transcoding is necessary or a live stream
+  requires a measurement before opening. Direct play skips the speed probe.
+  Successful measurements last 15 minutes; failed probes still fall back
+  without caching that failure. A short failure cooldown remains a possible
+  follow-up with slow-link and bitrate-selection checks.
 - Modern series details request every episode to supply season counts and
   fallback playback targets. Requesting only the selected season could reduce
   large-series responses, but requires preserving counts and next-episode
