@@ -27,3 +27,23 @@ Validation before the release build: 31 route/profile/preference/search/Home
 cases, two toolbar/sidebar visibility cases and 57 authentication, permissions,
 request/status and Home-settings cases passed (90 total). Full static analysis
 passed with zero errors and the same 11 existing warnings.
+
+## MiBedroom release and deployment
+
+Built and installed source `3e07c9e18dff516ee048392c5e13db092511fcf6` as the
+main `org.moonfin.androidtv` app for 32-bit ARM. The release is 69,454,043 bytes,
+SHA-256 `61e3b9771f216bf2d8608bc082d5a322215814ed665ba20b384dc2c3566b1f16`.
+Its signing certificate matches the existing local main installation.
+
+Used `adb install -r` on `mitvbedroom.gme:5555`, preserving app data. The
+first-install timestamp remains `2026-11-11 23:01:15`; the update timestamp is
+`2026-11-11 23:45:11` (device local time). The on-device checksum matches the
+release, the app remains running, and startup logs contain no fatal entries.
+
+Visual checks confirmed the existing signed-in Home library, the restored
+Seerr top-navigation entry, and discovery populated with existing Recent
+Requests. Screenshots and logs are in the evidence directory. The separate
+Requests route is covered by automated tests; an on-device attempt to open
+it did not establish that page's result. A later navigation check briefly
+resumed Fargo; playback was exited and the detail drawer dismissed. No Seerr
+requests were submitted during verification.
