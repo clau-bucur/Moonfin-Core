@@ -54,7 +54,7 @@ enum OsdButton {
   };
 
   IconData get icon => switch (this) {
-    OsdButton.restart => Icons.replay_rounded,
+    OsdButton.restart => Icons.restart_alt,
     OsdButton.syncPlay => Icons.groups_rounded,
     OsdButton.favorite => Icons.favorite_border,
     OsdButton.speed => Icons.speed_rounded,
@@ -134,12 +134,20 @@ IconData osdZoomIcon(ZoomMode mode) => switch (mode) {
 
 enum OsdTransportButton { previous, seekBack, playPause, seekForward, next }
 
-typedef OsdTransportBuilder =
-    Widget Function(OsdTransportButton button, double iconSize, double extent);
+typedef OsdTransportBuilder = Widget Function(
+  OsdTransportButton button,
+  double iconSize,
+  double extent,
+);
 
 /// The transport in the middle of the picture, with play centered and the
 /// seeks and skips spreading out from it.
-Widget osdCenterTransport(double scale, OsdTransportBuilder build) {
+Widget osdCenterTransport(
+  double scale,
+  OsdTransportBuilder build, {
+  bool showPrevious = true,
+  bool showNext = true,
+}) {
   Widget side(Alignment alignment, List<Widget> buttons) => Expanded(
     child: Align(
       alignment: alignment,
@@ -150,13 +158,14 @@ Widget osdCenterTransport(double scale, OsdTransportBuilder build) {
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       side(Alignment.centerRight, [
-        build(OsdTransportButton.previous, 40 * scale, 72 * scale),
+        if (showPrevious)
+          build(OsdTransportButton.previous, 40 * scale, 72 * scale),
         build(OsdTransportButton.seekBack, 46 * scale, 78 * scale),
       ]),
       build(OsdTransportButton.playPause, 64 * scale, 92 * scale),
       side(Alignment.centerLeft, [
         build(OsdTransportButton.seekForward, 46 * scale, 78 * scale),
-        build(OsdTransportButton.next, 40 * scale, 72 * scale),
+        if (showNext) build(OsdTransportButton.next, 40 * scale, 72 * scale),
       ]),
     ],
   );
@@ -169,6 +178,8 @@ Widget osdDockedTransport({
   required double scale,
   required OsdTransportBuilder build,
   Widget? leading,
+  bool showPrevious = true,
+  bool showNext = true,
 }) {
   final size = osdRowButtonSize(landscape: landscape);
   Widget button(OsdTransportButton button) =>
@@ -180,15 +191,19 @@ Widget osdDockedTransport({
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         if (leading != null) ...[leading, const SizedBox(width: 4)],
-        button(OsdTransportButton.previous),
-        const SizedBox(width: 4),
+        if (showPrevious) ...[
+          button(OsdTransportButton.previous),
+          const SizedBox(width: 4),
+        ],
         button(OsdTransportButton.seekBack),
         const SizedBox(width: 8),
         button(OsdTransportButton.playPause),
         const SizedBox(width: 8),
         button(OsdTransportButton.seekForward),
-        const SizedBox(width: 4),
-        button(OsdTransportButton.next),
+        if (showNext) ...[
+          const SizedBox(width: 4),
+          button(OsdTransportButton.next),
+        ],
       ],
     ),
   );

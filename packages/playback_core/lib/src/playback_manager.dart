@@ -4404,6 +4404,20 @@ class PlaybackManager implements AudioOwnable {
       await seekTo(Duration.zero);
       return;
     }
+    await _retreatQueue();
+  }
+
+  /// Goes to the previous item regardless of chapters or playback position.
+  Future<void> previousInQueue() async {
+    if (await _maybeIntercept(TransportAction.previous)) return;
+    if (!queueService.hasPrevious) {
+      await seekTo(Duration.zero);
+      return;
+    }
+    await _retreatQueue();
+  }
+
+  Future<void> _retreatQueue() async {
     _beginNewPlaybackSource('the viewer moved to the previous item');
     _mediaSourceId = null;
     await _stopAndReportCurrent(skipQueueChange: true);

@@ -26,6 +26,11 @@ class MediaSegmentService {
   /// everyone land there again: an endless loop of group seeks. Skipping a
   /// segment once, until a real rewind to its start, cannot loop.
   final Set<MediaSegment> _autoSkipped = <MediaSegment>{};
+  final Set<MediaSegment> _replayedSegments = <MediaSegment>{};
+
+  /// An explicit Play Segment action keeps this segment playable for this item,
+  /// including when the seek lands at or slightly before its start.
+  void allowReplay(MediaSegment segment) => _replayedSegments.add(segment);
 
   List<MediaSegment> get segments => _segments;
   MediaSegment? get activeSegment => _activeSegment;
@@ -38,6 +43,7 @@ class MediaSegmentService {
     _segments = [];
     _activeSegment = null;
     _autoSkipped.clear();
+    _replayedSegments.clear();
     if (!isSupported) return;
 
     try {
@@ -52,6 +58,7 @@ class MediaSegmentService {
     _segments = [];
     _activeSegment = null;
     _autoSkipped.clear();
+    _replayedSegments.clear();
   }
 
   Map<MediaSegmentType, MediaSegmentAction> get actionMap =>
@@ -66,6 +73,7 @@ class MediaSegmentService {
 
     for (final segment in _segments) {
       if (position >= segment.start && position < segment.end) {
+        if (_replayedSegments.contains(segment)) return SegmentCheckResult.none;
         final action = actionMap[segment.type] ?? MediaSegmentAction.nothing;
         // Seeks travel as whole milliseconds; a truncated end would still be
         // inside the segment.

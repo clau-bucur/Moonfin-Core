@@ -17232,4 +17232,17 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get showNextAirDateSubtitle =>
       'When the next episode isn\'t in your library yet, the end of episode card says when it airs';
+
+  @override
+  String segmentSkipped(String segment) {
+    return '$segment skipped';
+  }
+
+  @override
+  String playSegment(String segment) {
+    return 'Play $segment';
+  }
+
+  @override
+  String get autoplayCanceled => 'Canceled';
 }

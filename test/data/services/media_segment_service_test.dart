@@ -31,6 +31,26 @@ void main() {
   );
 
   group('MediaSegmentService auto-skip', () {
+    test(
+      'Play Intro allows replay from its exact start until item reload',
+      () async {
+        final svc = await service([intro]);
+        final skipped = svc.checkPosition(const Duration(seconds: 5));
+        expect(skipped.shouldSkip, isTrue);
+        svc.allowReplay(skipped.segment!);
+        svc.checkPosition(const Duration(seconds: 120));
+        expect(svc.checkPosition(const Duration(seconds: 5)).isNone, isTrue);
+        expect(svc.checkPosition(const Duration(seconds: 40)).isNone, isTrue);
+        svc.checkPosition(const Duration(seconds: 2));
+        expect(svc.checkPosition(const Duration(seconds: 6)).isNone, isTrue);
+        await svc.loadSegments('ep1');
+        expect(
+          svc.checkPosition(const Duration(seconds: 5)).shouldSkip,
+          isTrue,
+        );
+      },
+    );
+
     test('skips to the first whole millisecond past the segment', () async {
       final svc = await service([intro]);
       final result = svc.checkPosition(const Duration(seconds: 5));

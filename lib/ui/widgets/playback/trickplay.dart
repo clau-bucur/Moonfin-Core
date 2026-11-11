@@ -2,6 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:moonfin_design/moonfin_design.dart';
 
 import '../../../preference/preference_constants.dart';
+import '../../../data/models/trickplay_preview_layout.dart';
+
+/// Shared placement for seek and chapter previews above the playback controls.
+class TrickplayPreviewArea extends StatelessWidget {
+  const TrickplayPreviewArea({
+    super.key,
+    required this.plan,
+    required this.trackWidth,
+    required this.allowOverflow,
+    required this.child,
+  });
+
+  final TrickplayPreviewPlan plan;
+  final double trackWidth;
+  final bool allowOverflow;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final positioned = Transform.translate(
+      offset: Offset(plan.leftOffset, 0),
+      child: child,
+    );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.spaceSm),
+      child: Transform.translate(
+        offset: Offset(0, -plan.verticalTravel),
+        child: SizedBox(
+          width: trackWidth > 0 ? trackWidth : null,
+          height: plan.tileHeight,
+          child: allowOverflow
+              ? OverflowBox(
+                  minWidth: 0,
+                  maxWidth: double.infinity,
+                  alignment: Alignment.topLeft,
+                  child: positioned,
+                )
+              : Align(alignment: Alignment.topLeft, child: positioned),
+        ),
+      ),
+    );
+  }
+}
 
 BoxFit zoomModeToBoxFit(ZoomMode mode) => switch (mode) {
   ZoomMode.fit => BoxFit.contain,
@@ -51,7 +94,11 @@ class Trickplay extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        for (var slotIndex = -leftCount; slotIndex <= rightCount; slotIndex++) ...[
+        for (
+          var slotIndex = -leftCount;
+          slotIndex <= rightCount;
+          slotIndex++
+        ) ...[
           if (slotIndex > -leftCount) SizedBox(width: slotSpacing),
           _TrickplayTileChrome(
             key: ValueKey(slotIndex),

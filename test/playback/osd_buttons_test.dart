@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:moonfin/preference/user_preferences.dart';
@@ -22,6 +23,45 @@ void main() {
   });
 
   tearDown(() => PlatformDetection.setTvMode(false));
+
+  for (final docked in [false, true]) {
+    testWidgets(
+      'transport omits unavailable episode navigation (docked=$docked)',
+      (tester) async {
+        Widget button(OsdTransportButton button, double size, double extent) =>
+            SizedBox(width: extent, height: extent, child: Text(button.name));
+        Widget transport(bool previous, bool next) => docked
+            ? osdDockedTransport(
+                landscape: true,
+                scale: 1,
+                build: button,
+                showPrevious: previous,
+                showNext: next,
+              )
+            : osdCenterTransport(
+                1,
+                button,
+                showPrevious: previous,
+                showNext: next,
+              );
+
+        await tester.pumpWidget(
+          MaterialApp(home: Scaffold(body: transport(false, false))),
+        );
+        expect(find.text('previous'), findsNothing);
+        expect(find.text('next'), findsNothing);
+        expect(find.text('playPause'), findsOneWidget);
+        expect(find.text('seekBack'), findsOneWidget);
+        expect(find.text('seekForward'), findsOneWidget);
+
+        await tester.pumpWidget(
+          MaterialApp(home: Scaffold(body: transport(true, true))),
+        );
+        expect(find.text('previous'), findsOneWidget);
+        expect(find.text('next'), findsOneWidget);
+      },
+    );
+  }
 
   test('offers every button a TV can draw and no others', () async {
     expect(visibleOsdButtonIds(prefs), [
@@ -64,7 +104,7 @@ void main() {
       expect(visibleOsdButtonIds(prefs), [
         // Never placed and declared before anything that was, so they stay put.
         OsdButton.restart.id,
-      OsdButton.syncPlay.id,
+        OsdButton.syncPlay.id,
         OsdButton.chapters.id,
         OsdButton.episodes.id,
         OsdButton.info.id,

@@ -42,6 +42,7 @@ import '../../navigation/home_refresh_bus.dart';
 import '../../navigation/app_router.dart';
 import '../../navigation/playback_launcher.dart';
 import 'detail_buttons.dart';
+import 'detail_autoplay_gate.dart';
 import '../../../data/models/upcoming_episode_info.dart';
 import '../../../preference/detail_metadata_layout.dart';
 import '../../../preference/detail_section_layout.dart';
@@ -702,9 +703,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
         _viewModel.state != ItemDetailState.ready || _showNavbar;
 
     if (widget.quickLook) {
-      return RequestInitialFocus(
-        targetNode: node,
-        child: QuickLookFrame(child: _buildBody(context)),
+      return _guardAutoPlay(
+        RequestInitialFocus(
+          targetNode: node,
+          child: QuickLookFrame(child: _buildBody(context)),
+        ),
       );
     }
 
@@ -722,11 +725,23 @@ class _ItemDetailScreenState extends State<ItemDetailScreen>
       ],
     );
     body = PopScope(canPop: !wasCollapsedRecently, child: body);
-    return RequestInitialFocus(
-      targetNode: node,
-      child: Scaffold(backgroundColor: Colors.black, body: body),
+    return _guardAutoPlay(
+      RequestInitialFocus(
+        targetNode: node,
+        child: Scaffold(backgroundColor: Colors.black, body: body),
+      ),
     );
   }
+
+  Widget _guardAutoPlay(Widget child) => DetailAutoplayGate(
+    autoPlay: widget.autoPlay,
+    failed:
+        _viewModel.state == ItemDetailState.error ||
+        _viewModel.state == ItemDetailState.blocked,
+    loading: DetailScreenSkeleton(style: _style, prefs: _prefs),
+    onRevealed: _recoverFocusAfterSectionChange,
+    child: child,
+  );
 
   Future<void> _playFromChapter(
     BuildContext context,
@@ -6457,7 +6472,12 @@ class DetailActionButtonsState extends State<DetailActionButtons> {
 
       final isPhoto = item.type == 'Photo';
       final ws = watchStateOf(item);
-      _play(context, item, resume: !isPhoto && ws.hasProgress);
+      unawaited(
+        DetailAutoplayGate.run(
+          context,
+          () => _play(context, item, resume: !isPhoto && ws.hasProgress),
+        ),
+      );
     });
   }
 

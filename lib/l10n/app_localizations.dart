@@ -29756,6 +29756,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'When the next episode isn\'t in your library yet, the end of episode card says when it airs'**
   String get showNextAirDateSubtitle;
+
+  /// Confirmation after automatically skipping a playback segment
+  ///
+  /// In en, this message translates to:
+  /// **'{segment} skipped'**
+  String segmentSkipped(String segment);
+
+  /// Replay an automatically skipped playback segment
+  ///
+  /// In en, this message translates to:
+  /// **'Play {segment}'**
+  String playSegment(String segment);
+
+  /// Next episode autoplay countdown canceled after focus leaves Play next
+  ///
+  /// In en, this message translates to:
+  /// **'Canceled'**
+  String get autoplayCanceled;
 }
 
 class _AppLocalizationsDelegate

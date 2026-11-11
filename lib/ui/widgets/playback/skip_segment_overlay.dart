@@ -14,13 +14,16 @@ import '../../../util/platform_detection.dart';
 import '../adaptive/adaptive_glass.dart';
 import '../anime_marker_badge.dart';
 import '../focus/focus_theme.dart';
+import 'next_up_overlay.dart';
 
 class SkipSegmentOverlay extends StatefulWidget {
   final MediaSegment segment;
   final VoidCallback onSkip;
   final VoidCallback onDismiss;
   final String? actionLabel;
+  final bool wasAutoSkipped;
   final FocusNode? focusNode;
+  final FocusNode? dismissFocusNode;
   final Stream<Duration>? positionStream;
 
   /// Current playback position at build time, so a freshly created widget
@@ -45,7 +48,9 @@ class SkipSegmentOverlay extends StatefulWidget {
     required this.onSkip,
     required this.onDismiss,
     this.actionLabel,
+    this.wasAutoSkipped = false,
     this.focusNode,
+    this.dismissFocusNode,
     this.positionStream,
     this.initialPosition,
     this.nextItem,
@@ -114,20 +119,41 @@ class _SkipSegmentOverlayState extends State<SkipSegmentOverlay> {
     final l10n = AppLocalizations.of(context);
 
     final prefs = GetIt.instance<UserPreferences>();
-    final mediaSegmentCountdown = prefs.get(UserPreferences.mediaSegmentCountdown);
-    final showProgressBar = mediaSegmentCountdown == MediaSegmentCountdown.progressBar ||
+    if (widget.wasAutoSkipped) {
+      return NextUpOverlay.skippedSegment(
+        key: ValueKey('skipped-${widget.segment.itemId}-${widget.segment.id}'),
+        segment: widget.segment,
+        timeoutMs: prefs.get(UserPreferences.nextUpTimeout),
+        onPlay: widget.onSkip,
+        onDismiss: widget.onDismiss,
+        focusNode: widget.focusNode,
+        dismissFocusNode: widget.dismissFocusNode,
+        bottomInset: widget.bottomInset,
+        rightInset: widget.rightInset,
+      );
+    }
+    final mediaSegmentCountdown = prefs.get(
+      UserPreferences.mediaSegmentCountdown,
+    );
+    final showProgressBar =
+        mediaSegmentCountdown == MediaSegmentCountdown.progressBar ||
         mediaSegmentCountdown == MediaSegmentCountdown.both;
-    final showTimer = mediaSegmentCountdown == MediaSegmentCountdown.timer ||
+    final showTimer =
+        mediaSegmentCountdown == MediaSegmentCountdown.timer ||
         mediaSegmentCountdown == MediaSegmentCountdown.both;
 
     final segmentDuration = widget.segment.duration;
     final elapsed = _currentPosition - widget.segment.start;
     final progress = segmentDuration.inMilliseconds > 0
-        ? (1.0 - (elapsed.inMilliseconds / segmentDuration.inMilliseconds)).clamp(0.0, 1.0)
+        ? (1.0 - (elapsed.inMilliseconds / segmentDuration.inMilliseconds))
+              .clamp(0.0, 1.0)
         : 0.0;
 
     final remaining = widget.segment.end - _currentPosition;
-    final remainingSec = remaining.inSeconds.clamp(0, segmentDuration.inSeconds);
+    final remainingSec = remaining.inSeconds.clamp(
+      0,
+      segmentDuration.inSeconds,
+    );
 
     final int minutes = remainingSec ~/ 60;
     final int seconds = remainingSec % 60;

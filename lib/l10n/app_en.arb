@@ -16363,5 +16363,19 @@
   "showNextAirDateSubtitle": "When the next episode isn't in your library yet, the end of episode card says when it airs",
   "@showNextAirDateSubtitle": {
     "description": "Subtitle of the Next air date at the end setting"
+  },
+  "segmentSkipped": "{segment} skipped",
+  "@segmentSkipped": {
+    "description": "Confirmation after automatically skipping a playback segment",
+    "placeholders": {"segment": {"type": "String"}}
+  },
+  "playSegment": "Play {segment}",
+  "@playSegment": {
+    "description": "Replay an automatically skipped playback segment",
+    "placeholders": {"segment": {"type": "String"}}
+  },
+  "autoplayCanceled": "Canceled",
+  "@autoplayCanceled": {
+    "description": "Next episode autoplay countdown canceled after focus leaves Play next"
   }
 }

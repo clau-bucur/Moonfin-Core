@@ -60,6 +60,37 @@ void main() {
 
   final closeChip = find.byIcon(Icons.close_rounded);
 
+  testWidgets('auto-skipped segment offers replay with the Next Up countdown', (
+    tester,
+  ) async {
+    var replayed = 0;
+    final focus = FocusNode();
+    addTearDown(focus.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Stack(
+          children: [
+            SkipSegmentOverlay(
+              segment: segment,
+              wasAutoSkipped: true,
+              focusNode: focus,
+              onSkip: () => replayed++,
+              onDismiss: () {},
+            ),
+          ],
+        ),
+      ),
+    );
+    expect(find.text('Intro skipped'), findsOneWidget);
+    expect(find.text('Play Intro'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text(':07'), findsOneWidget);
+    await tester.tap(find.text('Play Intro'));
+    expect(replayed, 1);
+  });
+
   testWidgets('off TV the close chip dismisses without skipping', (
     tester,
   ) async {

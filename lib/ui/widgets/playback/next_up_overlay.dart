@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:moonfin_design/moonfin_design.dart';
 
 import '../../../data/models/aggregated_item.dart';
+import '../../../data/models/media_segment.dart';
 import '../../../data/models/calendar_entry.dart';
 import '../../../data/models/upcoming_episode_info.dart';
 import '../../../data/repositories/calendar_repository.dart';
@@ -29,6 +30,9 @@ class NextUpOverlay extends StatefulWidget {
   final FocusNode? focusNode;
   final FocusNode? dismissFocusNode;
   final bool isMinimal;
+  final MediaSegment? segment;
+  final double bottomInset;
+  final double rightInset;
 
   /// When the next episode airs, for the card shown when the library has no
   /// next episode yet.
@@ -49,7 +53,10 @@ class NextUpOverlay extends StatefulWidget {
     this.focusNode,
     this.dismissFocusNode,
     this.isMinimal = false,
-  }) : airDate = null,
+  }) : segment = null,
+       bottomInset = 120,
+       rightInset = 24,
+       airDate = null,
        airDateTitle = null,
        reminder = null;
 
@@ -66,9 +73,33 @@ class NextUpOverlay extends StatefulWidget {
     this.focusNode,
     this.dismissFocusNode,
     this.isMinimal = false,
-  }) : nextItem = null,
+  }) : segment = null,
+       bottomInset = 120,
+       rightInset = 24,
+       nextItem = null,
        imageUrl = null,
        onPlayNext = null;
+
+  /// The same compact card and button countdown, offering an undo after an
+  /// automatic skip. Expiry dismisses the offer; it never replays by itself.
+  const NextUpOverlay.skippedSegment({
+    super.key,
+    required MediaSegment this.segment,
+    required this.timeoutMs,
+    required VoidCallback onPlay,
+    required this.onDismiss,
+    this.focusNode,
+    this.dismissFocusNode,
+    this.bottomInset = 120,
+    this.rightInset = 24,
+  }) : isMinimal = true,
+       nextItem = null,
+       imageUrl = null,
+       onPlayNext = onPlay,
+       onTimeout = onDismiss,
+       airDate = null,
+       airDateTitle = null,
+       reminder = null;
 
   @override
   State<NextUpOverlay> createState() => _NextUpOverlayState();
@@ -79,6 +110,7 @@ class _NextUpOverlayState extends State<NextUpOverlay>
   late AnimationController _countdownController;
   Timer? _timer;
   bool _playFocused = false;
+  bool _autoplayCanceled = false;
   bool _dismissFocused = false;
   bool _reminderSet = false;
   bool _reminderBusy = false;
@@ -107,6 +139,23 @@ class _NextUpOverlayState extends State<NextUpOverlay>
     _timer?.cancel();
     _countdownController.dispose();
     super.dispose();
+  }
+
+  void _onPlayFocusChanged(bool focused) {
+    if (_playFocused == focused) return;
+    setState(() {
+      // Initial focus is assigned after the card mounts. Only leaving the
+      // button cancels autoplay, and returning keeps it canceled.
+      if (_playFocused &&
+          !focused &&
+          widget.onPlayNext != null &&
+          widget.timeoutMs > 0) {
+        _autoplayCanceled = true;
+        _timer?.cancel();
+        _countdownController.stop();
+      }
+      _playFocused = focused;
+    });
   }
 
   Future<void> _readReminder(CalendarEntry reminder) async {
@@ -150,12 +199,14 @@ class _NextUpOverlayState extends State<NextUpOverlay>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final item = widget.nextItem;
+    final segment = widget.segment;
+    final hasPlayAction = widget.onPlayNext != null;
     final airDate = widget.airDate;
     final tvFocusMode =
         widget.focusNode != null || widget.dismissFocusNode != null;
     final epInfo = airDate != null
         ? 'S${airDate.seasonNumber}:E${airDate.episodeNumber}'
-        : item!.indexNumber != null
+        : item != null && item.indexNumber != null
         ? 'S${item.parentIndexNumber ?? '?'}:E${item.indexNumber}'
         : null;
 
@@ -172,12 +223,16 @@ class _NextUpOverlayState extends State<NextUpOverlay>
 
     final bool hasThumb = widget.imageUrl != null && !widget.isMinimal;
 
-    final countdownText = (showTimer && widget.timeoutMs > 0)
+    final countdownText = ((hasPlayAction || showTimer) && widget.timeoutMs > 0)
         ? AnimatedBuilder(
             animation: _countdownController,
             builder: (context, _) {
-              final remainingMs =
-                  widget.timeoutMs * (1.0 - _countdownController.value);
+              final elapsedMs =
+                  _countdownController.lastElapsedDuration?.inMilliseconds ?? 0;
+              final remainingMs = (widget.timeoutMs - elapsedMs).clamp(
+                0,
+                widget.timeoutMs,
+              );
               final remainingSeconds = (remainingMs / 1000).ceil();
               final int minutes = remainingSeconds ~/ 60;
               final int secs = remainingSeconds % 60;
@@ -185,7 +240,11 @@ class _NextUpOverlayState extends State<NextUpOverlay>
                   ? '$minutes:${secs.toString().padLeft(2, '0')}'
                   : ':${secs.toString().padLeft(2, '0')}';
               return Text(
-                l10n.endsIn(timerText),
+                _autoplayCanceled
+                    ? l10n.autoplayCanceled
+                    : hasPlayAction
+                    ? timerText
+                    : l10n.endsIn(timerText),
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: widget.isMinimal ? 11 : 12,
@@ -198,7 +257,9 @@ class _NextUpOverlayState extends State<NextUpOverlay>
         : null;
 
     final eyebrow = Text(
-      l10n.upNext,
+      segment != null
+          ? l10n.segmentSkipped(segment.type.displayName)
+          : l10n.upNext,
       style: TextStyle(
         color: Colors.white.withValues(alpha: 0.85),
         fontSize: widget.isMinimal ? 11 : 12,
@@ -242,7 +303,7 @@ class _NextUpOverlayState extends State<NextUpOverlay>
 
     final headerRow = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [eyebrow, ?countdownText],
+      children: [eyebrow, if (!hasPlayAction) ?countdownText],
     );
 
     final titleBlock = Column(
@@ -272,8 +333,8 @@ class _NextUpOverlayState extends State<NextUpOverlay>
       ],
     );
 
-    final hasPrimary = item != null || widget.reminder != null;
-    final primaryAction = item != null ? widget.onPlayNext! : _toggleReminder;
+    final hasPrimary = hasPlayAction || widget.reminder != null;
+    final primaryAction = hasPlayAction ? widget.onPlayNext! : _toggleReminder;
     // A lone close button takes the primary node, which is the one the player
     // focuses when the card comes up.
     final closeFocusNode = hasPrimary
@@ -288,8 +349,8 @@ class _NextUpOverlayState extends State<NextUpOverlay>
         cardBorder.width > 0;
 
     return Positioned(
-      right: 24,
-      bottom: 120,
+      right: widget.rightInset,
+      bottom: widget.bottomInset,
       child: Container(
         width: widget.isMinimal ? 300 : 340,
         // The solid glass tier is a plain DecoratedBox that doesn't clip, so
@@ -380,8 +441,10 @@ class _NextUpOverlayState extends State<NextUpOverlay>
                       children: [
                         if (!hasThumb) ...[
                           headerRow,
-                          SizedBox(height: widget.isMinimal ? 6 : 8),
-                          titleBlock,
+                          if (segment == null) ...[
+                            SizedBox(height: widget.isMinimal ? 6 : 8),
+                            titleBlock,
+                          ],
                           SizedBox(height: widget.isMinimal ? 10 : 14),
                         ],
                         Row(
@@ -391,11 +454,7 @@ class _NextUpOverlayState extends State<NextUpOverlay>
                               Expanded(
                                 child: Focus(
                                   focusNode: widget.focusNode,
-                                  onFocusChange: (focused) {
-                                    if (_playFocused != focused) {
-                                      setState(() => _playFocused = focused);
-                                    }
-                                  },
+                                  onFocusChange: _onPlayFocusChanged,
                                   onKeyEvent: (_, event) {
                                     if (event is KeyDownEvent &&
                                         (event.logicalKey ==
@@ -434,37 +493,51 @@ class _NextUpOverlayState extends State<NextUpOverlay>
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         if (showProgressBar &&
                                             widget.timeoutMs > 0 &&
-                                            item != null)
+                                            hasPlayAction &&
+                                            !_autoplayCanceled)
                                           AnimatedBuilder(
                                             animation: _countdownController,
                                             builder: (context, _) =>
                                                 _PlayButtonRing(
                                                   progress:
                                                       1.0 -
-                                                      _countdownController.value,
+                                                      _countdownController
+                                                          .value,
                                                 ),
                                           )
                                         else
                                           Icon(
-                                            item != null
+                                            hasPlayAction
                                                 ? Icons.play_arrow_rounded
                                                 : _reminderSet
-                                                ? Icons.notifications_active_rounded
-                                                : Icons.notifications_none_rounded,
+                                                ? Icons
+                                                      .notifications_active_rounded
+                                                : Icons
+                                                      .notifications_none_rounded,
                                             size: 20,
                                           ),
                                         const SizedBox(width: 9),
                                         Text(
-                                          item != null
+                                          segment != null
+                                              ? l10n.playSegment(
+                                                  segment.type.displayName,
+                                                )
+                                              : item != null
                                               ? l10n.playNext
                                               : _reminderSet
                                               ? l10n.calendarReminderSet
                                               : l10n.calendarRemindMe,
                                         ),
+                                        if (hasPlayAction &&
+                                            countdownText != null) ...[
+                                          const SizedBox(width: 8),
+                                          Flexible(child: countdownText),
+                                        ],
                                       ],
                                     ),
                                   ),

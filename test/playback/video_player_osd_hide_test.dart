@@ -29,6 +29,7 @@ import 'package:moonfin/preference/user_preferences.dart';
 import 'package:moonfin/ui/screens/playback/video_player_screen.dart';
 import 'package:moonfin/ui/screensaver/screensaver_controller.dart';
 import 'package:moonfin/ui/widgets/playback/skip_segment_overlay.dart';
+import 'package:moonfin/ui/widgets/playback/seek_icons.dart';
 import 'package:moonfin/util/platform_detection.dart';
 
 import '../util/media_segment_fakes.dart';
@@ -412,20 +413,26 @@ void main() {
         ),
       ]);
       await mountPlayer(tester);
-      final restart = find.byIcon(Icons.replay_rounded);
-      final previous = find.byIcon(Icons.skip_previous_rounded);
+      final restart = find.byIcon(Icons.restart_alt);
+      final seekBack = find.byIcon(
+        seekBackIcon(
+          GetIt.instance<UserPreferences>().get(UserPreferences.skipBackLength),
+        ),
+      );
       expect(restart, findsOneWidget);
+      expect(find.byIcon(Icons.skip_previous_rounded), findsNothing);
+      expect(find.byIcon(Icons.skip_next_rounded), findsNothing);
       expect(
         tester.getCenter(restart).dx,
-        lessThan(tester.getCenter(previous).dx),
+        lessThan(tester.getCenter(seekBack).dx),
       );
-      expect(tester.getCenter(restart).dy, tester.getCenter(previous).dy);
+      expect(tester.getCenter(restart).dy, tester.getCenter(seekBack).dy);
 
-      // Enter the row at Play/Pause, then walk left through Seek and Previous.
+      // A single item has Restart and Seek before Play/Pause.
       Focus.of(tester.element(find.byIcon(Icons.play_arrow_rounded)))
           .requestFocus();
       await tester.pump();
-      for (var i = 0; i < 3; i++) {
+      for (var i = 0; i < 2; i++) {
         await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
         await tester.pump();
       }
@@ -455,8 +462,15 @@ void main() {
       ),
     ]);
     await mountPlayer(tester);
-    expect(find.byIcon(Icons.replay_rounded), findsNothing);
-    expect(find.byIcon(Icons.skip_previous_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.restart_alt), findsNothing);
+    expect(find.byIcon(Icons.skip_previous_rounded), findsNothing);
+    final seekBack = find.byIcon(
+      seekBackIcon(
+        GetIt.instance<UserPreferences>().get(UserPreferences.skipBackLength),
+      ),
+    );
+    expect(seekBack, findsOneWidget);
+    expect(Focus.of(tester.element(seekBack)).hasPrimaryFocus, isTrue);
     await tester.pumpWidget(const SizedBox());
   });
 
