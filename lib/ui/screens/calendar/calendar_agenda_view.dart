@@ -5,6 +5,7 @@ import 'package:moonfin_design/moonfin_design.dart';
 
 import '../../../data/models/calendar_entry.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../util/date_format_util.dart';
 import '../../../util/platform_detection.dart';
 import '../../navigation/destinations.dart';
 import '../../widgets/bottom_nav/bottom_navbar.dart';
@@ -337,7 +338,7 @@ class _DayHeader extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          if (name != DateFormat.MMMEd(l10n.localeName).format(day)) ...[
+          if (name != formatShortDayName(day, locale: l10n.localeName)) ...[
             const SizedBox(width: 8),
             Text(
               date,
@@ -381,7 +382,7 @@ class CalendarAgendaRow extends StatelessWidget {
     final c = controller;
     final e = entry;
     final spoilers = c.hidesSpoilers(e);
-    final color = calendarColor(e, c.now);
+    final color = calendarColor(context, e, c.now);
     final tags = calendarTags(context, e, c.now);
     final subtitle = calendarSubtitle(l10n, e, hideSpoilers: spoilers);
     final thumbWidth = compact ? 88.0 : (mobile ? 112.0 : 128.0);
@@ -583,7 +584,7 @@ class _Preview extends StatelessWidget {
                 Text(
                   kicker.toUpperCase(),
                   style: TextStyle(
-                    color: calendarColor(e, c.now),
+                    color: calendarColor(context, e, c.now),
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.8,

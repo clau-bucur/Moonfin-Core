@@ -33,7 +33,6 @@ class _AboutCategoryScreen extends StatelessWidget {
                 title: Text(l10n.version),
                 subtitle: Text(appVersion),
                 trailing: const SizedBox.shrink(),
-                onTap: () {},
               ),
               if (AppDistribution.supportsInAppUpdates)
                 const _CheckForUpdatesTile(),

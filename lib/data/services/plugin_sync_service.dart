@@ -9,6 +9,7 @@ import 'package:get_it/get_it.dart';
 import 'package:moonfin_design/moonfin_design.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:server_core/server_core.dart';
+import 'package:server_plex/server_plex.dart' show plexItemToJellyfin;
 import 'package:server_silo/server_silo.dart';
 
 import '../../auth/services/silo_token_storage.dart';
@@ -133,6 +134,12 @@ class PluginSyncService extends ChangeNotifier {
   int get calendarDaysAhead => _calendarDaysAhead;
   bool _calendarReminders = false;
   bool get calendarRemindersAvailable => _pluginAvailable && _calendarReminders;
+
+  /// Whether the plugin can read a title's Radarr/Sonarr queue, which says why
+  /// a download is stuck. Older plugins, and ones without Seerr set up, leave
+  /// it out.
+  bool _arrQueueAvailable = false;
+  bool get arrQueueAvailable => _pluginAvailable && _arrQueueAvailable;
 
   /// Whether the server will take an uploaded diagnostic report. An older
   /// plugin, or none at all, leaves it false.
@@ -274,6 +281,7 @@ class PluginSyncService extends ChangeNotifier {
     _calendarDaysBack = 14;
     _calendarDaysAhead = 90;
     _calendarReminders = false;
+    _arrQueueAvailable = false;
     _clientLogSupported = false;
     if (!keepIncompleteRecordings) _incompleteRecordings?.setSupported(false);
     _activeThemeCacheServerId = null;
@@ -321,11 +329,7 @@ class PluginSyncService extends ChangeNotifier {
     // home rows, no Seerr proxy, no plugin push enrollment. The messages flag
     // is cleared too, since only a ping would otherwise reset it after a
     // session on a server that had the plugin.
-    final features = FeatureDetector(
-      serverType: client.serverType,
-      serverVersion: '',
-    );
-    if (!features.supportsMoonfinPlugin) {
+    if (!client.features.supportsMoonfinPlugin) {
       _stopSettingsStream();
       _messages?.setSupported(false);
       _setPluginSeerrEnabled(client, false);
@@ -390,6 +394,7 @@ class PluginSyncService extends ChangeNotifier {
       _calendarDaysBack = _readCount(pingResult, 'calendarDaysBack') ?? 14;
       _calendarDaysAhead = _readCount(pingResult, 'calendarDaysAhead') ?? 90;
       _calendarReminders = _readBool(pingResult, 'calendarReminders') ?? false;
+      _arrQueueAvailable = _readBool(pingResult, 'arrQueueAvailable') ?? false;
       // Older plugins leave this out, which reads as false and hides the button.
       _messages?.setSupported(
         _readBool(pingResult, 'messagesSupported') ?? false,
@@ -734,10 +739,10 @@ class PluginSyncService extends ChangeNotifier {
   /// on its own.
   Future<void> _startSettingsStream(MediaServerClient client) async {
     // Emby servers have no SSE endpoint, so plugin events arrive over the
-    // session websocket instead. Moonbase for Silo and Plex can't stream, so
-    // settings arrive at sign-in and on a manual sync. Don't loop on 501
-    // reconnects here.
-    if (client.serverType != ServerType.jellyfin) return;
+    // session websocket instead. Moonbase for Silo can't stream, so settings
+    // arrive at sign-in and on a manual sync. Don't loop on 501 reconnects
+    // here.
+    if (!client.features.supportsPluginSettingsStream) return;
 
     if (!_pluginAvailable || !_prefs.get(UserPreferences.pluginSyncEnabled)) {
       return;
@@ -946,6 +951,9 @@ class PluginSyncService extends ChangeNotifier {
   }
 
   Future<void> pushNotificationPrefs(MediaServerClient client) async {
+    // Cleared once the server has them, so a change that never got there goes
+    // up at the next sign-in instead of being replaced by the server's copy.
+    await _seerrPrefs.setNotificationPrefsUnsynced(true);
     if (!_pluginAvailable || !serverHasMoonfinPlugin(client)) {
       debugPrint('PluginSync: skip pushNotificationPrefs, plugin unavailable');
       return;
@@ -971,6 +979,36 @@ class PluginSyncService extends ChangeNotifier {
           headers: {...headers, 'Content-Type': 'application/json'},
         ),
       );
+      await _seerrPrefs.setNotificationPrefsUnsynced(false);
+    } catch (_) {}
+  }
+
+  /// Takes the notification choices the server keeps for this user, so a new
+  /// install shows them instead of pushing its defaults over them.
+  Future<void> syncNotificationPrefs(MediaServerClient client) async {
+    if (_seerrPrefs.notificationPrefsUnsynced) {
+      return pushNotificationPrefs(client);
+    }
+    if (!_pluginAvailable || !serverHasMoonfinPlugin(client)) return;
+
+    try {
+      final ep = await moonbaseEndpoint(client, _dio);
+      if (ep == null) return;
+      final response = await _dio.get(
+        '${ep.base}/Moonfin/Notifications/Prefs',
+        options: Options(headers: ep.headers),
+      );
+      final data = response.data;
+      if (data is! Map<String, dynamic>) return;
+      for (final (key, save) in <(String, Future<void> Function(bool))>[
+        ('notifyOnNewRequests', _seerrPrefs.setNotifyOnNewRequests),
+        ('notifyOnLibraryAdded', _seerrPrefs.setNotifyOnLibraryAdded),
+        ('notifyOnIssues', _seerrPrefs.setNotifyOnIssues),
+        ('notifyOnNewMedia', _seerrPrefs.setNotifyOnNewMedia),
+      ]) {
+        final value = _readBool(data, key);
+        if (value != null) await save(value);
+      }
     } catch (_) {}
   }
 
@@ -983,7 +1021,7 @@ class PluginSyncService extends ChangeNotifier {
     required String platform,
     required String deviceId,
   }) async {
-    if (!_pluginAvailable || !serverHasMoonfinPlugin(client)) {
+    if (!_pluginAvailable || !client.features.supportsPushNotifications) {
       debugPrint('PluginSync: skip registerPushDevice, plugin unavailable');
       return false;
     }
@@ -1017,7 +1055,9 @@ class PluginSyncService extends ChangeNotifier {
     MediaServerClient client, {
     required String deviceId,
   }) async {
-    if (!_pluginAvailable || !serverHasMoonfinPlugin(client)) return;
+    if (!_pluginAvailable || !client.features.supportsPushNotifications) {
+      return;
+    }
 
     try {
       final ep = await moonbaseEndpoint(client, _dio);
@@ -1337,8 +1377,18 @@ class PluginSyncService extends ChangeNotifier {
         },
         options: Options(headers: headers),
       );
-      if (response.data is Map<String, dynamic>) {
-        return response.data as Map<String, dynamic>;
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        if (client.serverType != ServerType.plex) return data;
+        // Moonbase for Plex answers with Plex's own metadata.
+        return {
+          ...data,
+          'Items': [
+            for (final raw
+                in (data['Items'] as List? ?? const []).whereType<Map>())
+              plexItemToJellyfin(raw.cast<String, dynamic>()),
+          ],
+        };
       }
     } catch (e) {
       debugPrint('[PluginSyncService] fetchSimilarItems failed: $e');
@@ -1373,10 +1423,11 @@ class PluginSyncService extends ChangeNotifier {
 
   /// The seasonal Home row Moonbase built for this user. [country] is the
   /// viewer's two letter code, ZZ for "other", or null to let the server fall
-  /// back to its own.
+  /// back to its own. [allYear] asks for a row outside the holiday dates too.
   Future<Map<String, dynamic>?> fetchSeasonalRow(
     MediaServerClient client, {
     String? country,
+    bool allYear = false,
   }) async {
     final ep = await moonbaseEndpoint(client, _dio);
     if (ep == null) return null;
@@ -1385,11 +1436,21 @@ class PluginSyncService extends ChangeNotifier {
     try {
       final response = await _dio.get(
         '${ep.base}/Moonfin/Seasonal/Row',
-        queryParameters: {'country': ?country},
+        queryParameters: {'country': ?country, if (allYear) 'allYear': true},
         options: Options(headers: headers),
       );
-      if (response.data is Map<String, dynamic>) {
-        return response.data as Map<String, dynamic>;
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        if (client.serverType != ServerType.plex) return data;
+        // Moonbase for Plex answers with Plex's own metadata.
+        return {
+          ...data,
+          'items': [
+            for (final raw
+                in (data['items'] as List? ?? const []).whereType<Map>())
+              plexItemToJellyfin(raw.cast<String, dynamic>()),
+          ],
+        };
       }
     } catch (e) {
       debugPrint('[PluginSyncService] fetchSeasonalRow failed: $e');

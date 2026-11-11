@@ -1,6 +1,8 @@
 {
   "pressBackAgainToExit": "Press back again to exit",
-  "@pressBackAgainToExit": {"description": "Toast shown after pressing Back at the app root"},
+  "@pressBackAgainToExit": {
+    "description": "Toast shown after pressing Back at the app root"
+  },
   "@@locale": "en",
   "appTitle": "Moonfin",
   "@appTitle": {
@@ -1221,7 +1223,7 @@
   "@scrollDirectionHorizontal": {
     "description": "Library scroll direction option: horizontal grid for ultrawide displays"
   },
-  "libraryGenresTitle": "{name} \u2014 Genres",
+  "libraryGenresTitle": "{name} — Genres",
   "@libraryGenresTitle": {
     "description": "Header title showing library name with genres suffix",
     "placeholders": {
@@ -1755,7 +1757,6 @@
     "description": "Placeholder text for an empty item list screen"
   },
   "failedToLoad": "Failed to load",
-
   "@failedToLoad": {
     "description": "Error message when item detail fails to load"
   },
@@ -1851,10 +1852,6 @@
   "noBiographyAvailable": "No biography available for this author.",
   "@noBiographyAvailable": {
     "description": "Placeholder when no biography text is available"
-  },
-  "noBooksFound": "No Books Found",
-  "@noBooksFound": {
-    "description": "Title shown when a books library has no items"
   },
   "unableToLoadAuthorDetails": "Unable to load author details right now.",
   "@unableToLoadAuthorDetails": {
@@ -2218,7 +2215,7 @@
     "description": "Subtitle for the download subtitles option"
   },
   "downloadSubtitles": "Download Subtitles",
-  "searchingSubtitles": "Searching for subtitles\u2026",
+  "searchingSubtitles": "Searching for subtitles…",
   "@searchingSubtitles": {
     "description": "Shown while a remote subtitle search is running"
   },
@@ -2226,7 +2223,7 @@
   "@fetchingSubtitles": {
     "description": "Playback status shown while the selected subtitle file is loading"
   },
-  "downloadingSubtitle": "Downloading subtitle\u2026",
+  "downloadingSubtitle": "Downloading subtitle…",
   "@downloadingSubtitle": {
     "description": "Shown while a chosen subtitle is downloaded and the server is picking it up"
   },
@@ -3412,7 +3409,6 @@
   "@readerNotReady": {
     "description": "Error when reader has not finished initializing"
   },
-
   "seriesRecordings": "Series Recordings",
   "@seriesRecordings": {
     "description": "Live TV series recordings label"
@@ -3770,7 +3766,6 @@
   "@failedToCancelSeriesRecording": {
     "description": "Error when cancelling a series recording fails"
   },
-
   "searchThisLibrary": "Search this library...",
   "@searchThisLibrary": {
     "description": "Search hint when scoped to a specific library"
@@ -3801,7 +3796,6 @@
   "@seerr": {
     "description": "Seerr brand name"
   },
-
   "seerrAccountType": "Seerr Account Type",
   "@seerrAccountType": {
     "description": "Header for selecting Seerr authentication account type"
@@ -3814,7 +3808,6 @@
   "@localAccount": {
     "description": "Auth option label for Seerr sign in using local Seerr credentials"
   },
-
   "savedMedia": "Downloads",
   "@savedMedia": {
     "description": "Header title for saved/downloaded media screen"
@@ -4171,7 +4164,6 @@
       }
     }
   },
-
   "settings": "Settings",
   "@settings": {
     "description": "Settings screen title"
@@ -5175,9 +5167,15 @@
   "@upcomingEpisodeNext": {
     "description": "Formatted badge text for an upcoming episode release date",
     "placeholders": {
-      "date": {"type": "String"},
-      "season": {"type": "int"},
-      "episode": {"type": "int"}
+      "date": {
+        "type": "String"
+      },
+      "season": {
+        "type": "int"
+      },
+      "episode": {
+        "type": "int"
+      }
     }
   },
   "upcomingEpisodeToday": "Today",
@@ -5216,8 +5214,12 @@
   "@calendarReleaseIn": {
     "description": "Release date under a movie in the Radarr calendar row, e.g. 'In 2 days (Oct 29)'",
     "placeholders": {
-      "days": {"type": "int"},
-      "date": {"type": "String"}
+      "days": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "calendarReleaseCinema": "Cinema",
@@ -5292,7 +5294,7 @@
   "@buttonOrderHint": {
     "description": "Explains how to reorder the buttons in a row"
   },
-  "buttonShownInSyncPlayGroup": "Only shows while you're in a SyncPlay group",
+  "buttonShownInSyncPlayGroup": "Only shows while you're in a watch party",
   "@buttonShownInSyncPlayGroup": {
     "description": "Hint under the SyncPlay and Watch with group buttons in the button settings, which only appear once the user has joined a group"
   },
@@ -6437,21 +6439,27 @@
   "@bookSeriesCount": {
     "description": "How many series a book library holds",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "bookInProgressCount": "{count} in progress",
   "@bookInProgressCount": {
     "description": "How many books or audiobooks are started but not finished",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "bookBrowseAllTitles": "{count, plural, =1{Browse 1 title} other{Browse all {count} titles}}",
   "@bookBrowseAllTitles": {
     "description": "Link from the book library to the full title grid",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "searchBooks": "Search books",
@@ -6853,7 +6861,9 @@
   "@daysValue": {
     "description": "A number of days",
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "fullScreenRows": "Expanded Rows",
@@ -8248,7 +8258,6 @@
   "@episodesLabel": {
     "description": "Stat label for number of episodes"
   },
-
   "access": "Access",
   "add": "Add",
   "address": "Address",
@@ -8301,7 +8310,6 @@
   "unmute": "Unmute",
   "mute": "Mute",
   "branding": "Branding",
-
   "adminDrawerDashboard": "Dashboard",
   "adminDrawerAnalytics": "Analytics",
   "adminDrawerSettings": "Settings",
@@ -8325,7 +8333,6 @@
   "adminDrawerPlugins": "Plugins",
   "adminDrawerRepositories": "Repositories",
   "adminDrawerLiveTv": "Live TV",
-
   "adminExitTooltip": "Exit Admin",
   "adminPremiereNoteLiveTv": "Live TV needs Emby Premiere. Without it the server doesn't import channels or record anything.",
   "adminPremiereNoteBackups": "Backup & Restore needs Emby Premiere once its trial ends.",
@@ -8343,7 +8350,13 @@
   "adminGeneralAutoRestart": "Restart automatically to apply updates",
   "adminGeneralAutoRestartHelp": "The server only restarts while no users are active.",
   "adminTaskTriggerSystemEvent": "After a system event ({event})",
-  "@adminTaskTriggerSystemEvent": {"placeholders": {"event": {"type": "String"}}},
+  "@adminTaskTriggerSystemEvent": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
   "adminPluginNeedsPremiere": "Needs Emby Premiere after a 14-day free trial",
   "adminEmbyBackupsHelp": "Emby backs up through its Backup & Restore plugin.",
   "adminEmbyBackupsNoPlugin": "The Backup & Restore plugin isn't installed. Install it from the plugin catalog to back up this server.",
@@ -8351,9 +8364,21 @@
   "adminEmbyFullBackup": "Full backup",
   "adminEmbyLightBackups": "Database backups",
   "adminEmbyBackupServerVersion": "Emby {version}",
-  "@adminEmbyBackupServerVersion": {"placeholders": {"version": {"type": "String"}}},
+  "@adminEmbyBackupServerVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "adminEmbyRestoreConfirm": "Restore {name}? It replaces this server's libraries, settings, users and passwords, and the server shuts down when it's done. You may need to start it again yourself.",
-  "@adminEmbyRestoreConfirm": {"placeholders": {"name": {"type": "String"}}},
+  "@adminEmbyRestoreConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "adminEmbyRestoreServerId": "Restore the server ID",
   "adminEmbyRestoreServerIdHelp": "Turn this off when you restore the same backup onto more than one server.",
   "adminEmbyRestoreShuttingDown": "The restore is done and the server is shutting down. Start it again if it doesn't restart by itself.",
@@ -8385,7 +8410,13 @@
   "adminLibImportCollections": "Import collections from metadata downloaders",
   "adminLibThumbnailInterval": "Preview thumbnail interval",
   "adminLibThumbnailEverySeconds": "Every {count} seconds",
-  "@adminLibThumbnailEverySeconds": {"placeholders": {"count": {"type": "int"}}},
+  "@adminLibThumbnailEverySeconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "adminLibThumbnailAtChapters": "At chapter markers",
   "adminLibSaveThumbnailsWithMedia": "Save preview thumbnails into media folders",
   "adminLibrarySectionMarkers": "Intro markers",
@@ -8430,13 +8461,25 @@
   "adminSyncJobsEmpty": "No jobs",
   "adminSyncJobCancel": "Cancel job",
   "adminSyncJobCancelConfirm": "Cancel {name} and remove it from the list?",
-  "@adminSyncJobCancelConfirm": {"placeholders": {"name": {"type": "String"}}},
+  "@adminSyncJobCancelConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "adminSyncJobConverting": "Converting",
   "adminSyncJobReady": "Ready to transfer",
   "adminSyncJobTransferring": "Transferring",
   "adminSyncJobCompletedWithError": "Completed with errors",
   "adminSyncJobItemCount": "{count, plural, =1{1 item} other{{count} items}}",
-  "@adminSyncJobItemCount": {"placeholders": {"count": {"type": "int"}}},
+  "@adminSyncJobItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "adminDrawerDatabase": "Database",
   "adminPageDescDatabase": "Cache size and upkeep",
   "adminDatabaseWarning": "These are advanced options. Leave them at their defaults unless you have a reason to change them.",
@@ -8507,7 +8550,13 @@
   "embyPremiereEnterKey": "Enter key",
   "adminPremiereNote": "Needs Emby Premiere. The server keeps this setting but won't use it until Premiere is active.",
   "adminExternalIdLabel": "{name} Id",
-  "@adminExternalIdLabel": {"placeholders": {"name": {"type": "String"}}},
+  "@adminExternalIdLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "adminExternalIdTypePerson": "Person",
   "adminExternalIdTypeArtist": "Artist",
   "adminExternalIdTypeAlbumArtist": "Album Artist",
@@ -8518,7 +8567,13 @@
   "adminLibMetadataChangeHelp": "Changes to metadata settings apply to new content. To update existing content, refresh it from its detail page or refresh the library.",
   "adminLibFetcherSettings": "Fetcher settings",
   "adminLibImageOptionsTitle": "Image options for {type}",
-  "@adminLibImageOptionsTitle": {"placeholders": {"type": {"type": "String"}}},
+  "@adminLibImageOptionsTitle": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
   "adminLibFetchImages": "Fetch images",
   "adminLibMaxBackdrops": "Maximum number of backdrops per item",
   "adminLibMinBackdropWidth": "Minimum backdrop download width",
@@ -8555,7 +8610,13 @@
   "adminMetadataNameOrIdRequired": "Enter a name or an external ID.",
   "adminLibMetadataReaders": "Metadata readers",
   "adminLibSimilarProvidersFor": "Similar item providers: {type}",
-  "@adminLibSimilarProvidersFor": {"placeholders": {"type": {"type": "String"}}},
+  "@adminLibSimilarProvidersFor": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
   "adminLibMediaSegmentProviders": "Media segment providers",
   "adminLibEnableLibrary": "Enable the library",
   "adminLibEnableLibraryHelp": "Disabling the library hides it from all user views.",
@@ -8569,7 +8630,13 @@
   "adminLibraryFolderRequired": "Add at least one folder to this library.",
   "adminRenameLibraryWarning": "Renaming a library loses all of its metadata. Proceed with caution.",
   "adminDeleteLibraryConfirm": "Remove the library \"{name}\"? Files on disk are not deleted.",
-  "@adminDeleteLibraryConfirm": {"placeholders": {"name": {"type": "String"}}},
+  "@adminDeleteLibraryConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "adminDeleteLibraryLocations": "These media locations will be removed from the library:",
   "adminRefreshMode": "Refresh mode",
   "adminRefreshModeScan": "Scan for new and updated files",
@@ -8577,7 +8644,16 @@
   "adminReplaceTrickplayImages": "Replace existing trickplay images",
   "adminRefreshDialogHelp": "Metadata is refreshed based on the settings and internet services enabled in the dashboard.",
   "adminActivityCount": "{shown} of {total}",
-  "@adminActivityCount": {"placeholders": {"shown": {"type": "String"}, "total": {"type": "String"}}},
+  "@adminActivityCount": {
+    "placeholders": {
+      "shown": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
   "adminLiveTvTabSources": "Tuners and guide",
   "adminLiveTvTabRecordings": "Recordings",
   "adminLiveTvAddTuner": "Add tuner device",
@@ -8598,7 +8674,13 @@
   "adminLiveTvNoTunerChannels": "No tuner channels found",
   "adminLiveTvXmltvPathHelp": "A path or URL to an XMLTV file. The server reads it and checks it for updates. You are responsible for creating and updating the file.",
   "adminLiveTvSdCreateAccount": "Create an account at {url}",
-  "@adminLiveTvSdCreateAccount": {"placeholders": {"url": {"type": "String"}}},
+  "@adminLiveTvSdCreateAccount": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
   "adminLiveTvSdSignIn": "Sign in",
   "adminLiveTvSdLineup": "Lineup",
   "adminLiveTvSdSelectLineup": "Select a lineup. If none are listed, check your username, password and postal code.",
@@ -8614,7 +8696,13 @@
   "adminLiveTvSectionDefaultRecording": "Default recording settings",
   "adminLiveTvSectionMetadata": "Recording metadata",
   "adminUserLastActivity": "Last activity {time}",
-  "@adminUserLastActivity": {"placeholders": {"time": {"type": "String"}}},
+  "@adminUserLastActivity": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "adminCurrentPassword": "Current password",
   "adminChannelAccess": "Channel access",
   "adminDeviceAccess": "Device access",
@@ -8636,22 +8724,61 @@
   "adminLogLevelNone": "None",
   "adminActivityAllUsers": "All users",
   "adminTaskLastRan": "Last ran {time}, taking {duration}.",
-  "@adminTaskLastRan": {"placeholders": {"time": {"type": "String"}, "duration": {"type": "String"}}},
+  "@adminTaskLastRan": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "adminTaskResultFailed": "Failed",
   "adminTaskResultCancelled": "Cancelled",
   "adminTaskResultAborted": "Aborted by server shutdown",
   "adminDurationSecondsShort": "{seconds}s",
-  "@adminDurationSecondsShort": {"placeholders": {"seconds": {"type": "String"}}},
+  "@adminDurationSecondsShort": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
   "adminDeleteTaskTrigger": "Delete task trigger",
   "adminDeleteTaskTriggerConfirm": "Are you sure you want to delete this task trigger?",
   "adminTaskTriggerEveryMinutes": "Every {minutes} minutes",
-  "@adminTaskTriggerEveryMinutes": {"placeholders": {"minutes": {"type": "String"}}},
+  "@adminTaskTriggerEveryMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
   "adminTaskTriggerEveryHours": "Every {hours} hours",
-  "@adminTaskTriggerEveryHours": {"placeholders": {"hours": {"type": "String"}}},
+  "@adminTaskTriggerEveryHours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
   "adminTaskMinutesValue": "{minutes} minutes",
-  "@adminTaskMinutesValue": {"placeholders": {"minutes": {"type": "String"}}},
+  "@adminTaskMinutesValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
   "adminTaskHoursValue": "{hours} hours",
-  "@adminTaskHoursValue": {"placeholders": {"hours": {"type": "String"}}},
+  "@adminTaskHoursValue": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
   "adminTimeLimitHours": "Time limit (hours)",
   "adminTranscodingDecodingFor": "Enable hardware decoding for",
   "adminTranscodingThreadCountHelp": "The most threads a transcode can use. Fewer threads lower CPU use but may be too slow for smooth playback.",
@@ -8762,7 +8889,6 @@
   "adminLeaveTitle": "Discard unsaved changes?",
   "adminLeaveMessage": "The changes on this page haven't been saved yet.",
   "adminKeepEditing": "Keep editing",
-
   "adminDashboardLoadFailed": "Failed to load dashboard",
   "adminMediaOverview": "Media Overview",
   "adminMediaTotalsError": "Could not load server media totals.",
@@ -8770,22 +8896,27 @@
   "adminPluginUpdatesAvailable": "Plugin updates available: {count}",
   "@adminPluginUpdatesAvailable": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "adminPluginsRequiringRestart": "Plugins requiring restart: {count}",
   "@adminPluginsRequiringRestart": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "adminFailedScheduledTasks": "Failed scheduled tasks: {count}",
   "@adminFailedScheduledTasks": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "analyticsMediaDistribution": "Media Distribution",
   "analyticsVideoCodecs": "Video Codecs",
   "analyticsAudioCodecs": "Audio Codecs",
@@ -8796,7 +8927,6 @@
   "analyticsRuntimeBuckets": "Runtime Buckets",
   "analyticsFileFormats": "File Formats",
   "analyticsNoData": "No Data Available.",
-
   "adminServerInfo": "Server Info",
   "adminRestartPending": "Restart Pending",
   "adminServerPaths": "Server Paths",
@@ -8807,22 +8937,24 @@
   "errorGeneric": "Error: {error}",
   "@errorGeneric": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminServerRebootInProgress": "Server reboot in progress",
   "adminServerRebootMessage": "Server reboot in progress, please restart Moonfin",
-
   "adminActiveSessions": "Active Sessions",
   "adminSessionsLoadFailed": "Failed to load sessions",
   "adminNoActiveSessions": "No active sessions",
   "adminRecentActivity": "Recent Activity",
   "adminNoRecentActivity": "No recent activity",
-
   "adminCommandFailed": "Command failed: {error}",
   "@adminCommandFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminSendMessage": "Send Message",
@@ -8832,7 +8964,7 @@
   "sessionRewind": "Rewind",
   "sessionForward": "Forward",
   "sessionNext": "Next",
-  "sessionVolumeDown": "Vol \u2013",
+  "sessionVolumeDown": "Vol –",
   "sessionVolumeUp": "Vol +",
   "uhd4k": "4K",
   "nowPlaying": "Now Playing",
@@ -8842,25 +8974,27 @@
   "audioCodec": "Audio Codec",
   "hwAccel": "HW Accel",
   "completion": "Completion",
-
   "adminClearDates": "Clear dates",
   "adminActivitySeverityAll": "All severities",
   "adminActivityDateRange": "Date range",
   "adminActivityLoadFailed": "Failed to load activity log: {error}",
   "@adminActivityLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminNoActivityEntries": "No activity entries",
-
   "adminEditDeviceName": "Edit Device Name",
   "adminCustomName": "Custom Name",
   "adminDeviceNameUpdated": "Device name updated",
   "adminDeviceUpdateFailed": "Failed to update device: {error}",
   "@adminDeviceUpdateFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminDeleteDevice": "Delete Device",
@@ -8894,14 +9028,15 @@
   },
   "@adminDeviceDeleteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminDevicesLoadFailed": "Failed to load devices",
   "adminSearchDevices": "Search devices",
   "adminThisDevice": "This Device",
   "adminEditName": "Edit Name",
-
   "adminLibrariesLoadFailed": "Failed to load libraries",
   "adminNoLibraries": "No libraries configured",
   "adminScanAllLibraries": "Scan All Libraries",
@@ -8909,55 +9044,69 @@
   "adminScanFailed": "Failed to start scan: {error}",
   "@adminScanFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
-
   "adminRenameLibrary": "Rename Library",
   "adminNewName": "New name",
   "adminLibraryRenamed": "Library renamed to \"{name}\"",
   "@adminLibraryRenamed": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminRenameFailed": "Failed to rename: {error}",
   "@adminRenameFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminDeleteLibrary": "Delete Library",
   "adminLibraryDeleted": "Library \"{name}\" deleted",
   "@adminLibraryDeleted": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminLibraryDeleteFailed": "Failed to delete library: {error}",
   "@adminLibraryDeleteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
-
   "adminAddPathFailed": "Failed to add path: {error}",
   "@adminAddPathFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminRemovePath": "Remove Path",
   "adminRemovePathConfirm": "Remove \"{path}\" from this library?",
   "@adminRemovePathConfirm": {
     "placeholders": {
-      "path": {"type": "String"}
+      "path": {
+        "type": "String"
+      }
     }
   },
   "adminRemovePathFailed": "Failed to remove path: {error}",
   "@adminRemovePathFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminLibraryLoadFailed": "Failed to load library",
@@ -9060,77 +9209,91 @@
   "adminLibLufsScan": "Enable LUFS scan for audio normalization",
   "adminLibPreferNonstandardArtist": "Prefer non-standard artists tag",
   "adminLibAutoAddToCollection": "Automatically add movies to collections",
-
   "adminLibraryNameRequired": "Library name is required",
   "adminLibraryCreateFailed": "Failed to create library: {error}",
   "@adminLibraryCreateFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminLibraryName": "Library Name",
   "adminSelectedPaths": "Selected Paths:",
   "adminCreateLibrary": "Create Library",
   "paths": "Paths:",
-
   "adminDisableUser": "Disable User",
   "adminEnableUser": "Enable User",
   "adminDisableUserConfirm": "Disable {name}? They will not be able to sign in.",
   "@adminDisableUserConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminEnableUserConfirm": "Enable {name}? They will be able to sign in again.",
   "@adminEnableUserConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminUserDisabled": "User \"{name}\" disabled",
   "@adminUserDisabled": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminUserEnabled": "User \"{name}\" enabled",
   "@adminUserEnabled": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminUserPolicyUpdateFailed": "Failed to update user policy: {error}",
   "@adminUserPolicyUpdateFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminUsersLoadFailed": "Failed to load users",
   "adminSearchUsers": "Search users",
   "adminEditUser": "Edit User",
   "adminAddUser": "Add User",
-
   "adminUserCreateFailed": "Failed to create user: {error}",
   "@adminUserCreateFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminCreateUser": "Create User",
   "adminPasswordOptional": "Password (optional)",
-
   "adminUsernameRequired": "Username cannot be empty",
   "adminSaveFailed": "Failed to save: {error}",
   "@adminSaveFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminPasswordsMismatch": "Passwords do not match",
   "adminFailed": "Failed: {error}",
   "@adminFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminUserLoadFailed": "Failed to load user",
@@ -9219,26 +9382,30 @@
       }
     }
   },
-
   "adminDeleteUserConfirm": "Are you sure you want to delete {name}?",
   "@adminDeleteUserConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminUserDeleted": "User \"{name}\" deleted",
   "@adminUserDeleted": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminUserDeleteFailed": "Failed to delete user: {error}",
   "@adminUserDeleteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
-
   "adminCreateApiKey": "Create API Key",
   "adminAppName": "App name",
   "adminApiKeyCreated": "API Key Created",
@@ -9247,7 +9414,9 @@
   "adminApiKeyCreateFailed": "Failed to create key: {error}",
   "@adminApiKeyCreateFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminKeyTokenMissing": "Key token missing from server response",
@@ -9255,14 +9424,18 @@
   "adminRevokeKeyConfirm": "Revoke key for {name}?",
   "@adminRevokeKeyConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminApiKeyRevoked": "API key revoked",
   "adminApiKeyRevokeFailed": "Failed to revoke key: {error}",
   "@adminApiKeyRevokeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminApiKeysLoadFailed": "Failed to load API keys",
@@ -9281,7 +9454,6 @@
       }
     }
   },
-
   "adminBackupOptionsTitle": "Create Backup",
   "adminBackupDatabase": "Database",
   "adminBackupDatabaseAlways": "Always included",
@@ -9293,20 +9465,26 @@
   "adminBackupCreateFailed": "Failed to create backup: {error}",
   "@adminBackupCreateFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminBackupPathMissing": "Backup path missing in server response",
   "adminBackupManifest": "Manifest: {name}",
   "@adminBackupManifest": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminManifestLoadFailed": "Failed to load manifest: {error}",
   "@adminManifestLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminConfirmRestore": "Confirm Restore",
@@ -9314,7 +9492,9 @@
   "adminRestoreFailed": "Failed to restore backup: {error}",
   "@adminRestoreFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminBackupsLoadFailed": "Failed to load backups",
@@ -9322,37 +9502,42 @@
   "adminNoBackups": "No backups found",
   "adminViewDetails": "View Details",
   "restore": "Restore",
-
   "adminLogsLoadFailed": "Failed to load server logs",
   "adminNoLogFiles": "No log files found",
-
   "adminLogCopied": "Log copied to clipboard",
   "adminSaveLogFile": "Save log file",
   "adminSavedTo": "Saved to {path}",
   "@adminSavedTo": {
     "placeholders": {
-      "path": {"type": "String"}
+      "path": {
+        "type": "String"
+      }
     }
   },
   "adminFileSaveFailed": "Failed to save file: {error}",
   "@adminFileSaveFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminLogFileLoadFailed": "Failed to load {fileName}",
   "@adminLogFileLoadFailed": {
     "placeholders": {
-      "fileName": {"type": "String"}
+      "fileName": {
+        "type": "String"
+      }
     }
   },
   "adminSearchInLog": "Search in log",
   "adminNoMatchingLines": "No matching lines",
-
   "adminTasksLoadFailed": "Failed to load tasks: {error}",
   "@adminTasksLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminNoScheduledTasks": "No scheduled tasks found",
@@ -9360,33 +9545,42 @@
   "adminTaskStartFailed": "Failed to start task: {error}",
   "@adminTaskStartFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminTaskStopFailed": "Failed to stop task: {error}",
   "@adminTaskStopFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
-
   "adminTaskLoadFailed": "Failed to load task: {error}",
   "@adminTaskLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminRunNow": "Run Now",
   "adminTriggerRemoveFailed": "Failed to remove trigger: {error}",
   "@adminTriggerRemoveFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminTriggerAddFailed": "Failed to add trigger: {error}",
   "@adminTriggerAddFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminLastExecution": "Last Execution",
@@ -9398,47 +9592,60 @@
   "adminHours": "{hours} hour(s)",
   "@adminHours": {
     "placeholders": {
-      "hours": {"type": "String"}
+      "hours": {
+        "type": "String"
+      }
     }
   },
   "adminDayOfWeek": "Day of week",
-
   "adminSearchPlugins": "Search plugins...",
   "adminPluginToggleFailed": "Failed to toggle plugin: {error}",
   "@adminPluginToggleFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminUninstallPlugin": "Uninstall Plugin",
   "adminUninstallPluginConfirm": "Are you sure you want to uninstall \"{name}\"?",
   "@adminUninstallPluginConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminPluginUninstallFailed": "Failed to uninstall plugin: {error}",
   "@adminPluginUninstallFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminPackageInstallFailed": "Failed to install package: {error}",
   "@adminPackageInstallFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminPluginUpdateFailed": "Failed to install update: {error}",
   "@adminPluginUpdateFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminPluginsLoadFailed": "Failed to load plugins: {error}",
   "@adminPluginsLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminNoPluginsMatchSearch": "No plugins match your search",
@@ -9446,97 +9653,119 @@
   "adminInstallUpdate": "Install update (v{version})",
   "@adminInstallUpdate": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "adminCatalogLoadFailed": "Failed to load catalog: {error}",
   "@adminCatalogLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminNoPackagesMatchSearch": "No packages match your search",
   "adminNoPackagesAvailable": "No packages available",
-
   "adminExperimentalIntegration": "Experimental Integration",
   "adminExperimentalWarning": "Plugin settings integration is still experimental. Some settings pages may not render correctly.",
   "continueAction": "Continue",
   "adminPluginRemoveAfterRestart": "\"{name}\" will be removed after server restart",
   "@adminPluginRemoveAfterRestart": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminUninstallFailed": "Failed to uninstall: {error}",
   "@adminUninstallFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminPluginUpdating": "Updating \"{name}\" to v{version}...",
   "@adminPluginUpdating": {
     "placeholders": {
-      "name": {"type": "String"},
-      "version": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
     }
   },
   "adminPluginLoadFailed": "Failed to load plugin: {error}",
   "@adminPluginLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminPluginNotFound": "Plugin not found",
   "adminPluginVersion": "Version {version}",
   "@adminPluginVersion": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "adminEnablePlugin": "Enable Plugin",
   "adminPluginSettingsPage": "Plugin settings page",
   "adminRevisionHistory": "Revision History",
   "adminNoChangelog": "No changelog available.",
-
   "adminRemoveRepository": "Remove Repository",
   "adminRemoveRepositoryConfirm": "Are you sure you want to remove \"{name}\"?",
   "@adminRemoveRepositoryConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminRepositoriesSaveFailed": "Failed to save repositories: {error}",
   "@adminRepositoriesSaveFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminRepositoriesLoadFailed": "Failed to load repositories: {error}",
   "@adminRepositoriesLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminRepositoryNameHint": "e.g. Jellyfin Stable",
   "adminRepositoryUrl": "Repository URL",
   "adminAddEntry": "Add entry",
-
   "adminInvalidUrl": "Invalid URL",
   "adminPluginSettingsLoadFailed": "Unable to load plugin settings: {error}",
   "@adminPluginSettingsLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminCouldNotOpenUrl": "Could not open {uri}",
   "@adminCouldNotOpenUrl": {
     "placeholders": {
-      "uri": {"type": "String"}
+      "uri": {
+        "type": "String"
+      }
     }
   },
   "adminOpenInBrowser": "Open in Browser",
   "adminOpenExternally": "Open externally",
-
   "adminGeneralSettings": "General Settings",
   "adminServerName": "Server name",
   "adminPreferredMetadataCountry": "Preferred metadata country",
@@ -9545,19 +9774,16 @@
   "adminLibraryScanConcurrency": "Library scan concurrency",
   "adminParallelImageEncodingLimit": "Parallel image encoding limit",
   "adminSlowResponseThreshold": "Slow response threshold (ms)",
-
   "adminBrandingLoadFailed": "Failed to load branding settings",
   "adminLoginDisclaimer": "Login disclaimer",
   "adminLoginDisclaimerHint": "HTML displayed below the login form",
   "adminCustomCss": "Custom CSS",
   "adminCustomCssHint": "Custom CSS applied to the web interface",
   "adminEnableSplashScreen": "Enable splash screen",
-
   "adminStreamingLoadFailed": "Failed to load streaming settings",
   "adminStreamingDescription": "Set global streaming bitrate limits for remote connections.",
   "adminRemoteBitrateLimitMbps": "Remote client bitrate limit (Mbps)",
   "adminLeaveEmptyForUnlimited": "Leave empty or 0 for unlimited",
-
   "adminPlaybackLoadFailed": "Failed to load playback settings",
   "adminHardwareAcceleration": "Hardware acceleration",
   "adminVaapiDevice": "VA-API device",
@@ -9571,7 +9797,6 @@
   "adminAllowSegmentDeletion": "Allow segment deletion",
   "adminSegmentKeepSeconds": "Segment keep (seconds)",
   "adminThrottleBuffering": "Throttle buffering",
-
   "adminTrickplayLoadFailed": "Failed to load trickplay settings",
   "adminEnableHardwareAcceleration": "Enable hardware acceleration",
   "adminEnableKeyFrameExtraction": "Enable key frame only extraction",
@@ -9586,7 +9811,6 @@
   "adminTileHeight": "Tile height",
   "adminQualitySubtitle": "Lower values = better quality, larger files",
   "adminProcessThreads": "Process threads",
-
   "adminResumeLoadFailed": "Failed to load resume settings",
   "adminResumeDescription": "Configure when content should be marked as partially played or fully played.",
   "adminMinResumePercentage": "Minimum resume percentage",
@@ -9597,7 +9821,6 @@
   "adminMinResumeDurationSubtitle": "Items shorter than this are not resumable",
   "adminMinAudiobookResume": "Minimum audiobook resume percentage",
   "adminMaxAudiobookResume": "Maximum audiobook resume percentage",
-
   "adminNetworkingLoadFailed": "Failed to load networking settings",
   "adminNetworkingWarning": "Changes to networking settings may require a server restart.",
   "adminEnableRemoteAccess": "Enable remote access",
@@ -9618,11 +9841,12 @@
   "whitelist": "Whitelist",
   "blacklist": "Blacklist",
   "notSet": "Not set",
-
   "adminMetadataLoadFailed": "Failed to load metadata: {error}",
   "@adminMetadataLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminRefreshMetadata": "Refresh Metadata",
@@ -9632,7 +9856,9 @@
   "adminMetadataRefreshFailed": "Failed to refresh metadata: {error}",
   "@adminMetadataRefreshFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminNoRemoteMatches": "No remote matches found",
@@ -9641,7 +9867,9 @@
   "adminRemoteSearchFailed": "Remote search failed: {error}",
   "@adminRemoteSearchFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminUpdateContentType": "Update Content Type",
@@ -9650,7 +9878,9 @@
   "adminContentTypeUpdateFailed": "Failed to update content type: {error}",
   "@adminContentTypeUpdateFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminMetadataEditorLoadFailed": "Failed to load metadata editor",
@@ -9659,13 +9889,17 @@
   "adminImageUpdated": "{imageType} image updated",
   "@adminImageUpdated": {
     "placeholders": {
-      "imageType": {"type": "String"}
+      "imageType": {
+        "type": "String"
+      }
     }
   },
   "adminImageDownloadFailed": "Failed to download image: {error}",
   "@adminImageDownloadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminUnsupportedImageFormat": "Unsupported image format",
@@ -9673,40 +9907,51 @@
   "adminImageUploaded": "{imageType} image uploaded",
   "@adminImageUploaded": {
     "placeholders": {
-      "imageType": {"type": "String"}
+      "imageType": {
+        "type": "String"
+      }
     }
   },
   "adminImageUploadFailed": "Failed to upload image: {error}",
   "@adminImageUploadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminDeleteImage": "Delete {imageType} image",
   "@adminDeleteImage": {
     "placeholders": {
-      "imageType": {"type": "String"}
+      "imageType": {
+        "type": "String"
+      }
     }
   },
   "adminImageDeleted": "{imageType} image deleted",
   "@adminImageDeleted": {
     "placeholders": {
-      "imageType": {"type": "String"}
+      "imageType": {
+        "type": "String"
+      }
     }
   },
   "adminImageDeleteFailed": "Failed to delete image: {error}",
   "@adminImageDeleteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminAllProviders": "All providers",
   "adminNoRemoteImages": "No remote images found",
-
   "adminTunerDiscoveryFailed": "Tuner discovery failed: {error}",
   "@adminTunerDiscoveryFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminTunerTypeM3u": "M3U Tuner",
@@ -9743,13 +9988,17 @@
   "adminTunerRemoveFailed": "Failed to remove tuner: {error}",
   "@adminTunerRemoveFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminProviderRemoveFailed": "Failed to remove provider: {error}",
   "@adminProviderRemoveFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminSeriesRecordingPath": "Series recording path",
@@ -9764,7 +10013,9 @@
   "adminSettingsSaveFailed": "Failed to save settings: {error}",
   "@adminSettingsSaveFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminLiveTvLoadFailed": "Failed to load Live TV administration",
@@ -9774,9 +10025,7 @@
   "adminGuideRefreshStarted": "Guide data refresh started",
   "adminGuideRefreshUnavailable": "Guide refresh task is not available on this server.",
   "adminNoListingProviders": "No listing providers configured",
-
   "adminSettingsSaved": "Settings saved",
-
   "adminBackupsNotAvailable": "Backups are not available on this server build.",
   "adminRestoreWarning1": "Restoring will replace ALL current server data with the backup data.",
   "adminRestoreWarning2": "Current server settings, users, and library data will be overwritten.",
@@ -9784,15 +10033,15 @@
   "adminRestoreConfirmMessage": "Restore backup {name} now?",
   "@adminRestoreConfirmMessage": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminBackupsTitle": "Backups",
   "adminUnknownDate": "Unknown date",
   "adminUnnamedBackup": "Unnamed Backup",
-
   "adminApply": "Apply",
-
   "adminLogsTitle": "Server Logs",
   "adminLogsNewestFirst": "Newest First",
   "adminLogsOldestFirst": "Oldest First",
@@ -9800,36 +10049,44 @@
   "adminLogsMinutesAgo": "{minutes}m ago",
   "@adminLogsMinutesAgo": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "adminLogsHoursAgo": "{hours}h ago",
   "@adminLogsHoursAgo": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "adminLogsDaysAgo": "{days}d ago",
   "@adminLogsDaysAgo": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
-
   "adminLogViewerLoadFailed": "Failed to load {fileName}",
   "@adminLogViewerLoadFailed": {
     "placeholders": {
-      "fileName": {"type": "String"}
+      "fileName": {
+        "type": "String"
+      }
     }
   },
   "adminLogViewerMatches": "{count} matches",
   "@adminLogViewerMatches": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "adminLogViewerNoMatches": "No matching lines",
-
   "adminMetadataEditorTitle": "Metadata Editor",
   "adminMetadataIdentify": "Identify",
   "adminMetadataType": "Type",
@@ -9926,57 +10183,72 @@
   "adminMetadataImageUpdated": "{imageType} image updated",
   "@adminMetadataImageUpdated": {
     "placeholders": {
-      "imageType": {"type": "String"}
+      "imageType": {
+        "type": "String"
+      }
     }
   },
   "adminMetadataImageUploaded": "{imageType} image uploaded",
   "@adminMetadataImageUploaded": {
     "placeholders": {
-      "imageType": {"type": "String"}
+      "imageType": {
+        "type": "String"
+      }
     }
   },
   "adminMetadataImageDeleted": "{imageType} image deleted",
   "@adminMetadataImageDeleted": {
     "placeholders": {
-      "imageType": {"type": "String"}
+      "imageType": {
+        "type": "String"
+      }
     }
   },
   "adminMetadataImageDownloadFailed": "Failed to download image: {error}",
   "@adminMetadataImageDownloadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminMetadataImageReadFailed": "Failed to read selected image",
   "adminMetadataImageUploadFailed": "Failed to upload image: {error}",
   "@adminMetadataImageUploadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminMetadataDeleteImageTitle": "Delete {imageType} image",
   "@adminMetadataDeleteImageTitle": {
     "placeholders": {
-      "imageType": {"type": "String"}
+      "imageType": {
+        "type": "String"
+      }
     }
   },
   "adminMetadataDeleteImageContent": "This removes the current image from the item.",
   "adminMetadataImageDeleteFailed": "Failed to delete image: {error}",
   "@adminMetadataImageDeleteFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminMetadataChooseImage": "Choose {imageType} image",
   "@adminMetadataChooseImage": {
     "placeholders": {
-      "imageType": {"type": "String"}
+      "imageType": {
+        "type": "String"
+      }
     }
   },
   "adminMetadataUpload": "Upload",
   "adminMetadataUpdate": "Update",
   "adminMetadataRemoteImage": "Remote image",
-
   "adminPluginsInstalled": "Installed",
   "adminPluginsCatalog": "Catalog",
   "adminPluginsActive": "Active",
@@ -9998,7 +10270,9 @@
   "adminPluginsUpdateAvailable": "Update available: v{version}",
   "@adminPluginsUpdateAvailable": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "adminPluginsUpdateAvailableGeneric": "Update available",
@@ -10010,7 +10284,9 @@
   "adminPluginsInstallUpdateVersioned": "Install update (v{version})",
   "@adminPluginsInstallUpdateVersioned": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "adminPluginsCatalogNoSearchResults": "No packages match your search",
@@ -10018,10 +10294,11 @@
   "adminPluginsInstalling": "\"{name}\" is being installed...",
   "@adminPluginsInstalling": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
-
   "adminPluginDetailExperimental": "Experimental Integration",
   "adminPluginDetailExperimentalContent": "Plugin settings integration is still experimental. Some fields or layouts may not render correctly yet.",
   "adminPluginDetailToggle404": "Failed to toggle plugin. The server could not find this plugin version. Try refreshing plugins, then retry.",
@@ -10029,7 +10306,9 @@
   "adminPluginDetailSettingsTitle": "{name} Settings",
   "@adminPluginDetailSettingsTitle": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminPluginDetailDetails": "Details",
@@ -10042,25 +10321,30 @@
   "adminPluginDetailMalfunctioned": "This plugin has malfunctioned and may not work correctly.",
   "adminPluginDetailNotSupported": "This plugin is not supported by the current server version.",
   "adminPluginDetailSuperseded": "This plugin has been superseded by a newer version.",
-
   "adminReposLoadFailed": "Failed to load repositories: {error}",
   "@adminReposLoadFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminReposRemoveTitle": "Remove Repository",
   "adminReposRemoveConfirm": "Are you sure you want to remove \"{name}\"?",
   "@adminReposRemoveConfirm": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adminReposRemove": "Remove",
   "adminReposSaveFailed": "Failed to save repositories: {error}",
   "@adminReposSaveFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminReposEmpty": "No repositories configured",
@@ -10070,9 +10354,7 @@
   "adminReposAddTitle": "Add Repository",
   "adminReposUrl": "Repository URL",
   "adminReposNameHint": "e.g. Jellyfin Stable",
-
   "adminPluginSettingsInvalidUrl": "Invalid URL",
-
   "adminGeneralSettingsTitle": "General Settings",
   "adminGeneralMetadataLanguage": "Preferred metadata language",
   "adminGeneralMetadataLanguageHint": "e.g. en, de, fr",
@@ -10083,7 +10365,6 @@
   "adminUnknownError": "Unknown error",
   "adminBrowse": "Browse",
   "adminCloseBrowser": "Close browser",
-
   "adminNetworkingTitle": "Networking",
   "adminNetworkingRestartWarning": "Changes to networking settings may require a server restart.",
   "adminNetworkingEnableHttps": "Enable HTTPS",
@@ -10093,7 +10374,6 @@
   "adminNetworkingWhitelist": "Whitelist",
   "adminNetworkingBlacklist": "Blacklist",
   "adminNetworkingAddEntry": "Add entry",
-
   "adminBrandingTitle": "Branding",
   "adminBrandingLoginDisclaimer": "Login disclaimer",
   "adminBrandingLoginDisclaimerHint": "HTML displayed below the login form",
@@ -10105,7 +10385,6 @@
   "adminBrandingSplashUploadFailed": "Failed to upload splashscreen",
   "adminBrandingSplashDeleted": "Splashscreen removed",
   "adminBrandingNoSplash": "No custom splashscreen",
-
   "adminPlaybackHwAccel": "Hardware Acceleration",
   "adminPlaybackHwAccelLabel": "Hardware acceleration",
   "adminPlaybackEnableHwEncoding": "Enable hardware encoding",
@@ -10149,13 +10428,10 @@
   "adminPlaybackFallbackFont": "Enable fallback font",
   "adminPlaybackFallbackFontPath": "Fallback font path",
   "adminPlaybackStreaming": "Streaming",
-
   "adminResumeVideo": "Video",
   "adminResumeAudiobooks": "Audiobooks",
-
   "adminStreamingBitrateLimit": "Remote client bitrate limit (Mbps)",
   "adminStreamingBitrateLimitHint": "Leave empty or 0 for unlimited",
-
   "adminTrickplayHwAccel": "Enable hardware acceleration",
   "adminTrickplayHwEncoding": "Enable hardware encoding",
   "adminTrickplayKeyFrameOnly": "Enable key frame only extraction",
@@ -10176,7 +10452,6 @@
   "adminTrickplayQScaleSubtitle": "Lower values = better quality, larger files",
   "adminTrickplayJpegQuality": "JPEG quality",
   "adminTrickplayProcessing": "Processing",
-
   "adminTasksEmpty": "No scheduled tasks found",
   "adminTasksNoFilterMatch": "No tasks match the current filter",
   "adminTaskCancelling": "Cancelling...",
@@ -10193,14 +10468,20 @@
   "adminTaskTriggerDaily": "Daily at {time}",
   "@adminTaskTriggerDaily": {
     "placeholders": {
-      "time": {"type": "String"}
+      "time": {
+        "type": "String"
+      }
     }
   },
   "adminTaskTriggerWeekly": "Every {day} at {time}",
   "@adminTaskTriggerWeekly": {
     "placeholders": {
-      "day": {"type": "String"},
-      "time": {"type": "String"}
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
     }
   },
   "adminTaskTriggerStartup": "On application startup",
@@ -10212,11 +10493,12 @@
   "adminTaskTriggerHours": "{count, plural, one{1 hour} other{{count} hours}}",
   "@adminTaskTriggerHours": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "adminTaskTriggerTime": "Time",
-
   "adminActivityJustNow": "Just now",
   "adminActivityLastHour": "Last hour",
   "adminActivityToday": "Today",
@@ -10225,50 +10507,64 @@
   "adminActivityDaysAgo": "{days}d ago",
   "@adminActivityDaysAgo": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "adminActivityHoursAgo": "{hours}h ago",
   "@adminActivityHoursAgo": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "adminActivityMinutesAgo": "{minutes}m ago",
   "@adminActivityMinutesAgo": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "adminActivityNow": "now",
   "adminActivityMinutesShort": "{minutes}m",
   "@adminActivityMinutesShort": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "adminActivityHoursShort": "{hours}h",
   "@adminActivityHoursShort": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "adminActivityDaysShort": "{days}d",
   "@adminActivityDaysShort": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "adminActivityDateShort": "{month}/{day}",
   "@adminActivityDateShort": {
     "placeholders": {
-      "month": {"type": "int"},
-      "day": {"type": "int"}
+      "month": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
     }
   },
-
   "adminTrickplayDescription": "Configure trickplay image generation for seek preview thumbnails.",
-
   "adminNetworkingPublicHttpsPort": "Public HTTPS port",
   "adminNetworkingBaseUrl": "Base URL",
   "adminNetworkingBaseUrlHint": "e.g. /jellyfin",
@@ -10280,7 +10576,6 @@
   "adminNetworkingEnableIpv6": "Enable IPv6",
   "adminNetworkingLocalSubnets": "LAN networks",
   "adminNetworkingRemoteIpFilterLabel": "Remote IP filter",
-
   "adminPlaybackVaapiDevice": "VA-API device",
   "adminPlaybackAutomatic": "0 = automatic",
   "adminPlaybackTranscodeTempPath": "Transcoding temp path",
@@ -10289,30 +10584,28 @@
   "adminPlaybackThrottleBuffering": "Throttle buffering",
   "adminPlaybackThrottleDelay": "Throttle delay (seconds)",
   "adminPlaybackEnableSubtitleExtraction": "Allow subtitle extraction on the fly",
-
   "adminResumeMinPct": "Minimum resume percentage",
   "adminResumeMinPctSubtitle": "Content must be played past this percentage to save progress",
   "adminResumeMaxPct": "Maximum resume percentage",
   "adminResumeMaxPctSubtitle": "Content is considered fully played after this percentage",
   "adminResumeMinDuration": "Minimum resume duration (seconds)",
   "adminResumeMinDurationSubtitle": "Items shorter than this are not resumable",
-
   "adminTrickplayScanBehavior": "Scan behavior",
   "adminTrickplayProcessPriority": "Process priority",
   "adminTrickplayTileWidth": "Tile width",
   "adminTrickplayTileHeight": "Tile height",
   "adminTrickplayProcessThreads": "Process threads",
   "adminTrickplayWidthResolutions": "Width resolutions",
-
   "adminMetadataDefault": "Default",
   "adminMetadataContentTypeUpdated": "Content type updated",
   "adminMetadataContentTypeFailed": "Failed to update content type: {error}",
   "@adminMetadataContentTypeFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
-
   "adminGeneralSlowResponseThreshold": "Slow response threshold (ms)",
   "adminGeneralEnableSlowResponse": "Enable slow response warnings",
   "adminGeneralQuickConnect": "Enable Quick Connect",
@@ -10328,16 +10621,19 @@
   "adminChannelMappingsUpdateFailed": "Failed to update mappings: {error}",
   "@adminChannelMappingsUpdateFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "adminTimeLimitDuration": "Time limit: {duration}",
   "@adminTimeLimitDuration": {
     "placeholders": {
-      "duration": {"type": "String"}
+      "duration": {
+        "type": "String"
+      }
     }
   },
-
   "folders": "Folders",
   "libraries": "Libraries",
   "syncPlay": "SyncPlay",
@@ -10351,7 +10647,9 @@
   "@syncPlayParticipantCount": {
     "description": "Participant count label shown in SyncPlay UI",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "syncPlayIgnoreWait": "Ignore wait",
@@ -10369,7 +10667,9 @@
   "@syncPlayQueueItemFallback": {
     "description": "Fallback title for SyncPlay queue item when media title is unavailable",
     "placeholders": {
-      "index": {"type": "int"}
+      "index": {
+        "type": "int"
+      }
     }
   },
   "syncPlayPlayNow": "Play now",
@@ -10390,14 +10690,18 @@
   "@syncPlayUserJoinedGroup": {
     "description": "Snackbar message when a user joins a SyncPlay group",
     "placeholders": {
-      "userName": {"type": "String"}
+      "userName": {
+        "type": "String"
+      }
     }
   },
   "syncPlayUserLeftGroup": "{userName} left SyncPlay group",
   "@syncPlayUserLeftGroup": {
     "description": "Snackbar message when a user leaves a SyncPlay group",
     "placeholders": {
-      "userName": {"type": "String"}
+      "userName": {
+        "type": "String"
+      }
     }
   },
   "syncPlayAccessDeniedTitle": "SyncPlay access denied",
@@ -10406,7 +10710,9 @@
   "@syncPlaySyncingPlaybackToGroup": {
     "description": "Snackbar message shown when starting playback in a SyncPlay group",
     "placeholders": {
-      "groupName": {"type": "String"}
+      "groupName": {
+        "type": "String"
+      }
     }
   },
   "voiceSearchUnavailable": "Voice search is unavailable.",
@@ -10422,17 +10728,17 @@
   "@integrationRowsDiscoveredCount": {
     "description": "Plural label for number of rows discovered in integration status",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "seeAll": "See All",
   "noItems": "No items",
   "switchUser": "Switch User",
   "remoteControl": "Remote Control",
-
   "mediaBarLoading": "Loading media bar...",
   "mediaBarError": "Media bar failed to load",
-
   "offlineServerUnavailable": "Connected to the internet, but the current server is unavailable.",
   "offlineNoInternet": "You are offline. Only downloaded content is available.",
   "offlineFileNotAvailable": "File not available",
@@ -10442,7 +10748,6 @@
   "offlineBannerSubtitle": "Showing your downloads",
   "serverUnreachableBannerTitle": "Can't reach your server",
   "serverUnreachableBannerSubtitle": "Playing from downloads until it's back",
-
   "castGoogleCast": "Google Cast",
   "castAirPlay": "AirPlay",
   "castDlna": "DLNA",
@@ -10450,13 +10755,17 @@
   "castControlFailed": "Cast control failed: {error}",
   "@castControlFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "castKindControls": "{kind} Controls",
   "@castKindControls": {
     "placeholders": {
-      "kind": {"type": "String"}
+      "kind": {
+        "type": "String"
+      }
     }
   },
   "castDeviceVolume": "Device Volume",
@@ -10464,12 +10773,13 @@
   "castStopKind": "Stop {kind}",
   "@castStopKind": {
     "placeholders": {
-      "kind": {"type": "String"}
+      "kind": {
+        "type": "String"
+      }
     }
   },
   "audioLabel": "Audio",
   "subtitlesLabel": "Subtitles",
-
   "pinConfirmTitle": "Confirm PIN",
   "pinSetTitle": "Set PIN",
   "pinEnterTitle": "Enter PIN",
@@ -10477,13 +10787,17 @@
   "pinEnterNDigit": "Enter a {length}-digit PIN",
   "@pinEnterNDigit": {
     "placeholders": {
-      "length": {"type": "int"}
+      "length": {
+        "type": "int"
+      }
     }
   },
   "pinEnterYourNDigit": "Enter your {length}-digit PIN",
   "@pinEnterYourNDigit": {
     "placeholders": {
-      "length": {"type": "int"}
+      "length": {
+        "type": "int"
+      }
     }
   },
   "kidsMode": "Kids Mode",
@@ -10517,7 +10831,6 @@
   "pinForgot": "Forgot PIN?",
   "pinClear": "Clear",
   "pinBackspace": "Backspace",
-
   "quickConnectAuthorized": "Quick Connect request authorized.",
   "quickConnectInvalidOrExpired": "Quick Connect code is invalid or expired.",
   "quickConnectNotSupported": "Quick Connect is not supported on this server.",
@@ -10528,16 +10841,19 @@
   "quickConnectFailedWithMessage": "Quick Connect failed: {message}",
   "@quickConnectFailedWithMessage": {
     "placeholders": {
-      "message": {"type": "String"}
+      "message": {
+        "type": "String"
+      }
     }
   },
   "quickConnectEnterCode": "Enter code",
   "quickConnectAuthorize": "Authorize",
-
   "remoteCommandFailed": "Command failed: {error}",
   "@remoteCommandFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "remoteControlTitle": "Remote Control",
@@ -10547,17 +10863,17 @@
   "unknownUser": "Unknown",
   "unknownItem": "Unknown",
   "remoteNothingPlaying": "Nothing playing on this session",
-
   "castingStarted": "Casting started on selected device",
   "castingFailed": "Failed to start casting: {error}",
   "@castingFailed": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "noRemoteDevices": "No remote playback devices available.",
   "noRemoteDevicesIos": "No remote playback devices available.\n\nOn iOS, AirPlay targets may be unavailable in the simulator.",
-
   "trackActionPlayNext": "Play Next",
   "trackActionViewDetails": "View Details",
   "trackActionAddToQueue": "Add to Queue",
@@ -10573,12 +10889,13 @@
   "trackActionDownloading": "Downloading {name}...",
   "@trackActionDownloading": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "trackActionDeletedFile": "Deleted downloaded file",
   "trackActionDeleteFileFailed": "Could not delete downloaded file",
-
   "shuffleBy": "Shuffle By",
   "shuffleSelectLibrary": "Select Library",
   "shuffleSelectGenre": "Select Genre",
@@ -10586,13 +10903,11 @@
   "shuffleGenre": "Genre",
   "shuffleNoLibraries": "No compatible libraries available.",
   "shuffleNoGenres": "No genres found for this shuffle mode.",
-
   "posterDisplayTitle": "Display",
   "posterImageType": "Image Type",
   "imageTypePoster": "Poster",
   "imageTypeThumbnail": "Thumbnail",
   "imageTypeBanner": "Banner",
-
   "playlistAddFailed": "Failed to add to playlist",
   "playlistCreateFailed": "Failed to create playlist",
   "playlistNew": "New Playlist",
@@ -10608,15 +10923,18 @@
   "@removeFromPlaylistConfirm": {
     "description": "Confirmation shown before removing an item from a playlist",
     "placeholders": {
-      "item": {"type": "String"},
-      "playlist": {"type": "String"}
+      "item": {
+        "type": "String"
+      },
+      "playlist": {
+        "type": "String"
+      }
     }
   },
   "removeFromPlaylistFailed": "Failed to remove from playlist",
   "@removeFromPlaylistFailed": {
     "description": "Error shown when removing an item from a playlist fails"
   },
-
   "lyricsNotAvailable": "No lyrics available",
   "upNext": "Up Next",
   "playNext": "Play Next",
@@ -10626,27 +10944,35 @@
   "skipSegment": "Skip {segment}",
   "@skipSegment": {
     "placeholders": {
-      "segment": {"type": "String"}
+      "segment": {
+        "type": "String"
+      }
     }
   },
-
   "liveTv": "Live TV",
   "continueWatchingAndNextUp": "Continue Watching & Next Up",
   "downloadingBatchProgress": "Downloading {current}/{total} — {fileName}",
   "@downloadingBatchProgress": {
     "placeholders": {
-      "current": {"type": "int"},
-      "total": {"type": "int"},
-      "fileName": {"type": "String"}
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "fileName": {
+        "type": "String"
+      }
     }
   },
   "downloadingFile": "Downloading {fileName}",
   "@downloadingFile": {
     "placeholders": {
-      "fileName": {"type": "String"}
+      "fileName": {
+        "type": "String"
+      }
     }
   },
-
   "nextEpisode": "Next Episode",
   "moreFromThisSeason": "More From This Season",
   "playerTooltipPlaybackSpeed": "Playback speed",
@@ -10745,8 +11071,12 @@
   "@removeFromCollectionConfirm": {
     "description": "Confirmation shown before removing an item from a collection",
     "placeholders": {
-      "item": {"type": "String"},
-      "collection": {"type": "String"}
+      "item": {
+        "type": "String"
+      },
+      "collection": {
+        "type": "String"
+      }
     }
   },
   "removeFromCollectionFailed": "Failed to remove from collection",
@@ -11006,7 +11336,7 @@
   "settingsShuffleContentTypeFilter": "Shuffle Content Type Filter",
   "settingsAudioPreferencesSubtitle": "Audio tracks, processing, and passthrough options",
   "settingsAutomationAndQueueSubtitle": "Automated playback and sequencing",
-  "settingsSyncplaySubtitle": "Synchronization logic for group sessions",
+  "settingsSyncplaySubtitle": "Watch with friends on this server, everyone in step",
   "settingsSkipIntrosAndOutros": "Skip Intros and Outros?",
   "settingsMediaSegmentTypeAction": "{segment} Segments",
   "@settingsMediaSegmentTypeAction": {
@@ -11057,7 +11387,11 @@
   "settingsDisplayIsSdrDescription": "Stop advertising HDR support for this display. Use this only if detection keeps reporting HDR your TV can't actually show.",
   "settingsDisplayRedetected": "Display re-detected: {formats}",
   "@settingsDisplayRedetected": {
-    "placeholders": { "formats": { "type": "String" } }
+    "placeholders": {
+      "formats": {
+        "type": "String"
+      }
+    }
   },
   "settingsDisplayNoHdrDetected": "No HDR formats detected",
   "settingsDisplayMarkedSdr": "Display saved as SDR",
@@ -11106,20 +11440,20 @@
   },
   "settingsLiveTvDirect": "Live TV Direct Play",
   "settingsLiveTvDirectSubtitle": "Enable direct play for Live TV",
-  "settingsOpenGroups": "Open Groups",
-  "settingsOpenGroupsSubtitle": "Create, join, or manage SyncPlay groups",
-  "settingsSyncplayEnabled": "SyncPlay Enabled",
-  "settingsSyncplayEnabledSubtitle": "Enable group watching features",
-  "settingsSyncplayButton": "SyncPlay Button",
-  "settingsSyncplayButtonSubtitle": "Show the SyncPlay button on the navigation bar",
-  "settingsSyncplayAdvancedCorrection": "Advanced Correction",
-  "settingsSyncplayAdvancedCorrectionSubtitle": "Enable fine-grained sync logic",
-  "settingsSyncplaySyncCorrection": "Sync Correction",
-  "settingsSyncplaySyncCorrectionSubtitle": "Automatically adjust playback to stay in sync",
-  "settingsSyncplaySpeedToSync": "Speed to Sync",
-  "settingsSyncplaySpeedToSyncSubtitle": "Use playback speed adjustment to sync",
-  "settingsSyncplaySkipToSync": "Skip to Sync",
-  "settingsSyncplaySkipToSyncSubtitle": "Use seeking to sync",
+  "settingsOpenGroups": "Open Watch Parties",
+  "settingsOpenGroupsSubtitle": "Start one or join one in progress",
+  "settingsSyncplayEnabled": "Watch Parties",
+  "settingsSyncplayEnabledSubtitle": "Watch with friends on this server, everyone in step",
+  "settingsSyncplayButton": "Watch Parties button",
+  "settingsSyncplayButtonSubtitle": "Show the Watch Parties button on the navigation bar",
+  "settingsSyncplayAdvancedCorrection": "Advanced correction",
+  "settingsSyncplayAdvancedCorrectionSubtitle": "Delays and extra offset",
+  "settingsSyncplaySyncCorrection": "Sync correction",
+  "settingsSyncplaySyncCorrectionSubtitle": "Keep this device in step with the room",
+  "settingsSyncplaySpeedToSync": "Speed to sync",
+  "settingsSyncplaySpeedToSyncSubtitle": "Play a little faster or slower to catch up",
+  "settingsSyncplaySkipToSync": "Skip to sync",
+  "settingsSyncplaySkipToSyncSubtitle": "Jump ahead when it's too far off",
   "settingsSyncplayMinimumSpeedDelay": "Minimum Speed Delay",
   "settingsSyncplayMaximumSpeedDelay": "Maximum Speed Delay",
   "settingsSyncplaySpeedDuration": "Speed Duration",
@@ -11166,7 +11500,6 @@
   "@autoplayNextEpisodeSubtitle": {
     "description": "Setting subtitle for autoplay next episode"
   },
-
   "skipSilenceTitle": "Skip Silence",
   "@skipSilenceTitle": {
     "description": "Setting title: skip silent audio segments during playback"
@@ -11175,7 +11508,6 @@
   "@skipSilenceSubtitle": {
     "description": "Setting subtitle for skip silence"
   },
-
   "allowExternalAudioEffectsTitle": "Allow External Audio Effects",
   "@allowExternalAudioEffectsTitle": {
     "description": "Setting title: allow equalizer apps to attach to Media3"
@@ -11184,7 +11516,6 @@
   "@allowExternalAudioEffectsSubtitle": {
     "description": "Setting subtitle for external audio effects"
   },
-
   "disableTunnelingTitle": "Disable tunneling",
   "@disableTunnelingTitle": {
     "description": "Setting title: force non-tunneled video playback"
@@ -11193,7 +11524,6 @@
   "@disableTunnelingSubtitle": {
     "description": "Setting subtitle for disable tunneling"
   },
-
   "enableTunnelingTitle": "Enable Tunneling",
   "@enableTunnelingTitle": {
     "description": "Setting title: enable tunneled video playback (advanced)"
@@ -11202,7 +11532,6 @@
   "@enableTunnelingSubtitle": {
     "description": "Setting subtitle for enable tunneling"
   },
-
   "mapDolbyVisionP7Title": "Always Play Dolby Vision Profile 7 as HDR10",
   "@mapDolbyVisionP7Title": {
     "description": "Setting title: force DV P7 streams to the HDR10 strip path"
@@ -11219,7 +11548,6 @@
   "@stripDolbyVisionHdr10PlusSubtitle": {
     "description": "Setting subtitle for dropping Dolby Vision from Dolby Vision plus HDR10+ videos"
   },
-
   "subtitlesUseEmbeddedStyles": "Use Embedded Subtitle Styles",
   "@subtitlesUseEmbeddedStyles": {
     "description": "Setting title: apply colours/positioning from the subtitle track"
@@ -11228,7 +11556,6 @@
   "@subtitlesUseEmbeddedStylesSubtitle": {
     "description": "Setting subtitle for embedded styles toggle"
   },
-
   "subtitlesUseEmbeddedFontSizes": "Use Embedded Subtitle Font Sizes",
   "@subtitlesUseEmbeddedFontSizes": {
     "description": "Setting title: apply font sizes from the subtitle track"
@@ -11628,7 +11955,9 @@
   "@watchPartyVoteCount": {
     "description": "How many votes a movie has in a Watch Party vote",
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "watchParty": "Watch Party",
@@ -11643,7 +11972,7 @@
   "@watchPartyRoomCode": {
     "description": "Label for a Watch Party room's join code"
   },
-  "watchPartyStart": "Start a Watch Party",
+  "watchPartyStart": "Start a watch party",
   "@watchPartyStart": {
     "description": "Button that opens a new Watch Party room"
   },
@@ -11714,7 +12043,7 @@
   "@watchPartyGuestsCanPause": {
     "description": "Host switch for guest transport control in a Watch Party"
   },
-  "watchPartyEnd": "End Watch Party",
+  "watchPartyEnd": "End for everyone",
   "@watchPartyEnd": {
     "description": "Host button that closes the Watch Party room for everyone"
   },
@@ -12192,7 +12521,7 @@
   "@achievementsShopSubtitle": {
     "description": "Subtitle on the row that opens the shop"
   },
-  "achievementsShopPack": "{name} \u00d7{count}",
+  "achievementsShopPack": "{name} ×{count}",
   "@achievementsShopPack": {
     "description": "A shop item that grants more than one of a power-up",
     "placeholders": {
@@ -13001,11 +13330,19 @@
   "audiobookExportAll": "Export All",
   "audiobookExportSuccess": "Exported to {path}",
   "@audiobookExportSuccess": {
-    "placeholders": {"path": {"type": "String"}}
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
   },
   "audiobookExportFailed": "Export failed: {error}",
   "@audiobookExportFailed": {
-    "placeholders": {"error": {"type": "String"}}
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "audiobookLyrics": "Lyrics",
   "audiobookAddBookmark": "Add bookmark",
@@ -13018,30 +13355,50 @@
   "audiobookSleepCustom": "Custom",
   "audiobookSleepRemaining": "{remaining} left",
   "@audiobookSleepRemaining": {
-    "placeholders": {"remaining": {"type": "String"}}
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
   },
   "audiobookSleepMinutes": "{count, plural, =1{1 min} other{{count} min}}",
   "@audiobookSleepMinutes": {
-    "placeholders": {"count": {"type": "int"}}
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "audiobookPlaybackSpeed": "Playback speed",
   "audiobookRemainingTime": "Remaining",
   "audiobookElapsedTime": "Elapsed",
   "audiobookSkipBackSeconds": "Back {seconds}s",
   "@audiobookSkipBackSeconds": {
-    "placeholders": {"seconds": {"type": "int"}}
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
   },
   "audiobookSkipForwardSeconds": "Forward {seconds}s",
   "@audiobookSkipForwardSeconds": {
-    "placeholders": {"seconds": {"type": "int"}}
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
   },
   "audiobookPreviousChapter": "Previous chapter",
   "audiobookNextChapter": "Next chapter",
   "audiobookChapterIndicator": "Chapter {current} of {total}",
   "@audiobookChapterIndicator": {
     "placeholders": {
-      "current": {"type": "int"},
-      "total": {"type": "int"}
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "audiobookNoChapters": "No chapters",
@@ -13049,12 +13406,20 @@
   "audiobookNoNotes": "No notes yet",
   "audiobookBookmarkAdded": "Bookmark added at {position}",
   "@audiobookBookmarkAdded": {
-    "placeholders": {"position": {"type": "String"}}
+    "placeholders": {
+      "position": {
+        "type": "String"
+      }
+    }
   },
   "audiobookSpeedReset": "Reset to 1.0x",
   "audiobookSpeedCustomLabel": "{value}x",
   "@audiobookSpeedCustomLabel": {
-    "placeholders": {"value": {"type": "String"}}
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
   },
   "audiobookSave": "Save",
   "audiobookCancel": "Cancel",
@@ -13123,19 +13488,32 @@
   "fileInformation": "File Information",
   "fileSizeFormat": "Size: {size}  •  Format: {format}",
   "@fileSizeFormat": {
-    "placeholders": { "size": {}, "format": {} }
+    "placeholders": {
+      "size": {},
+      "format": {}
+    }
   },
   "dateCreatedFormat": "Date Added: {date}",
   "@dateCreatedFormat": {
-    "placeholders": { "date": {} }
+    "placeholders": {
+      "date": {}
+    }
   },
   "showAllAudioTracks": "Show All ({count}) Audio Tracks",
   "@showAllAudioTracks": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "showAllSubtitleTracks": "Show All ({count}) Subtitle Tracks",
   "@showAllSubtitleTracks": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "checkingDirectPlay": "Checking Direct Play capability...",
   "directPlayCapabilityLabel": "Direct Play Capability: ",
@@ -13156,15 +13534,27 @@
   "transcodeAudioChannelsNotSupported": "Number of audio channels is not supported.",
   "transcodeAudioCodecWithCodec": "Audio codec ({codec}) is not supported directly.",
   "@transcodeAudioCodecWithCodec": {
-    "placeholders": { "codec": { "type": "String" } }
+    "placeholders": {
+      "codec": {
+        "type": "String"
+      }
+    }
   },
   "transcodeAudioCodecHintPassthrough": "Tip: If your audio receiver or soundbar supports {codec}, enable Audio Passthrough in Audio settings.",
   "@transcodeAudioCodecHintPassthrough": {
-    "placeholders": { "codec": { "type": "String" } }
+    "placeholders": {
+      "codec": {
+        "type": "String"
+      }
+    }
   },
   "transcodeAudioChannelsExceeded": "Audio channel count ({channels}ch) exceeds the player limit.",
   "@transcodeAudioChannelsExceeded": {
-    "placeholders": { "channels": { "type": "int" } }
+    "placeholders": {
+      "channels": {
+        "type": "int"
+      }
+    }
   },
   "transcodeAudioChannelsHint": "Tip: Adjust 'Max Audio Channels' or multichannel downmixing in Audio settings.",
   "transcodeSubtitleBurnInAssDisabled": "ASS/SSA subtitles require transcoding because direct play is turned off.",
@@ -13173,11 +13563,22 @@
   "transcodeSubtitleBurnInPgsHint": "Tip: Enable 'PGS Direct Play' in Playback settings to play directly without transcoding.",
   "transcodeSubtitleNotSupportedWithCodec": "Subtitle format ({codec}) is not supported directly and must be burned in.",
   "@transcodeSubtitleNotSupportedWithCodec": {
-    "placeholders": { "codec": { "type": "String" } }
+    "placeholders": {
+      "codec": {
+        "type": "String"
+      }
+    }
   },
   "transcodeBitrateExceededWithValues": "File bitrate ({fileBitrate}) exceeds the configured streaming limit ({maxBitrate}).",
   "@transcodeBitrateExceededWithValues": {
-    "placeholders": { "fileBitrate": { "type": "String" }, "maxBitrate": { "type": "String" } }
+    "placeholders": {
+      "fileBitrate": {
+        "type": "String"
+      },
+      "maxBitrate": {
+        "type": "String"
+      }
+    }
   },
   "transcodeBitrateHint": "Tip: Increase 'Maximum Bitrate' in Playback settings to allow direct streaming.",
   "transcodeResolutionHint": "Tip: Increase 'Maximum Resolution' in Playback settings to allow direct streaming.",
@@ -13213,7 +13614,14 @@
   "resetSort": "Reset Sort",
   "rewatchSeasonEpisode": "Rewatch S{season}:E{episode}",
   "@rewatchSeasonEpisode": {
-    "placeholders": { "season": { "type": "int" }, "episode": { "type": "int" } }
+    "placeholders": {
+      "season": {
+        "type": "int"
+      },
+      "episode": {
+        "type": "int"
+      }
+    }
   },
   "rewatchPlaylist": "Rewatch Playlist",
   "noSubtitlesFound": "No subtitles found.",
@@ -13531,12 +13939,20 @@
   "personalRatingOutOfTen": "{rating} / 10",
   "@personalRatingOutOfTen": {
     "description": "Numeric personal rating displayed on a scale out of ten.",
-    "placeholders": { "rating": { "type": "String" } }
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
   },
   "personalRatingOutOfFive": "{rating} / 5",
   "@personalRatingOutOfFive": {
     "description": "Personal rating displayed on a five-star scale.",
-    "placeholders": { "rating": { "type": "String" } }
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
   },
   "filterInProgress": "In Progress",
   "@filterInProgress": {
@@ -14624,7 +15040,7 @@
   "@settingsDetailsPageSubtitle": {
     "description": "Subtitle for the Details Page entry on the Appearance settings screen"
   },
-  "settingsPlaybackSubtitle": "Player, quality, audio, subtitles, skipping, and SyncPlay",
+  "settingsPlaybackSubtitle": "Player, quality, audio, subtitles, skipping, and watch parties",
   "@settingsPlaybackSubtitle": {
     "description": "Subtitle for the Playback settings root entry"
   },
@@ -14676,7 +15092,7 @@
   "@settingsSkippingAndQueueSection": {
     "description": "Section header on the Playback settings screen"
   },
-  "settingsWatchTogetherSection": "Watch Together",
+  "settingsWatchTogetherSection": "Watch Parties",
   "@settingsWatchTogetherSection": {
     "description": "Section header on the Playback settings screen for SyncPlay"
   },
@@ -16367,15 +16783,1357 @@
   "segmentSkipped": "{segment} skipped",
   "@segmentSkipped": {
     "description": "Confirmation after automatically skipping a playback segment",
-    "placeholders": {"segment": {"type": "String"}}
+    "placeholders": {
+      "segment": {
+        "type": "String"
+      }
+    }
   },
   "playSegment": "Play {segment}",
   "@playSegment": {
     "description": "Replay an automatically skipped playback segment",
-    "placeholders": {"segment": {"type": "String"}}
+    "placeholders": {
+      "segment": {
+        "type": "String"
+      }
+    }
   },
   "autoplayCanceled": "Canceled",
   "@autoplayCanceled": {
     "description": "Next episode autoplay countdown canceled after focus leaves Play next"
+  },
+  "episodeDirector": "Episode Director",
+  "@episodeDirector": {
+    "description": "Role label for an episode director"
+  },
+  "episodeDirectorWithRole": "{role} (Episode Director)",
+  "@episodeDirectorWithRole": {
+    "description": "Role label formatting an episode director with an existing role description",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "episodeWriter": "Episode Writer",
+  "@episodeWriter": {
+    "description": "Role label for an episode writer"
+  },
+  "episodeWriterWithRole": "{role} (Episode Writer)",
+  "@episodeWriterWithRole": {
+    "description": "Role label formatting an episode writer with an existing role description",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "guestStar": "Guest Star",
+  "@guestStar": {
+    "description": "Role label for a guest star"
+  },
+  "guestStarWithRole": "{role} (Guest Star)",
+  "@guestStarWithRole": {
+    "description": "Role label formatting a character role as a guest star",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "seasonalRowAllYear": "Show All Year",
+  "@seasonalRowAllYear": {
+    "description": "Setting that shows the seasonal row outside the holiday dates"
+  },
+  "seasonalRowAllYearDescription": "Show a holiday row outside the holiday dates too, a different ticked holiday each day.",
+  "@seasonalRowAllYearDescription": {
+    "description": "Explains the Show All Year setting for the seasonal row"
+  },
+  "screensaverDuringAudio": "Show During Music and Audiobooks",
+  "@screensaverDuringAudio": {
+    "description": "Screensaver setting that lets the screensaver start while music or an audiobook plays"
+  },
+  "screensaverDuringAudioDescription": "Let the screensaver start while audio plays, so cover art doesn't sit on screen for hours.",
+  "@screensaverDuringAudioDescription": {
+    "description": "Description under the Show During Music and Audiobooks screensaver setting"
+  },
+  "sleepAfterIdle": "Let TV Sleep After",
+  "@sleepAfterIdle": {
+    "description": "TV setting for how long without a button press before the TV's own screensaver and sleep timer take over"
+  },
+  "sleepAfterIdleDescriptionAndroid": "Close Moonfin after this long without a button press so your TV's own screensaver and sleep timer can take over. Anything paused is stopped first, so it keeps its resume point.",
+  "@sleepAfterIdleDescriptionAndroid": {
+    "description": "Description under the Let TV Sleep After setting on Android TV, where the app closes"
+  },
+  "sleepAfterIdleDescriptionAppleTv": "After this long without a button press, hand the screen back to your Apple TV's own screensaver and sleep setting. Moonfin stays open, so you pick up right where you left off.",
+  "@sleepAfterIdleDescriptionAppleTv": {
+    "description": "Description under the Let TV Sleep After setting on Apple TV, where the app stays open"
+  },
+  "seerrWaitingForImport": "Downloaded, waiting for import",
+  "@seerrWaitingForImport": {
+    "description": "Label on the Seerr download bar when the download has finished and Radarr/Sonarr has not imported it into the library yet"
+  },
+  "seerrDownloadStalled": "Stalled",
+  "@seerrDownloadStalled": {
+    "description": "Label on the Seerr download bar when the download is not making progress, for example a torrent with no seeders"
+  },
+  "seerrDownloadFailed": "Download failed",
+  "@seerrDownloadFailed": {
+    "description": "Label on the Seerr download bar when the download client reports the download as failed"
+  },
+  "seerrImportBlocked": "Import blocked",
+  "@seerrImportBlocked": {
+    "description": "Label on the Seerr download bar when the download finished but Radarr/Sonarr refuses to import it, for example because the release contains an executable"
+  },
+  "seerrNotFoundYet": "Not found yet",
+  "@seerrNotFoundYet": {
+    "description": "Shown where the Seerr download bar would be, when a request was approved and Radarr has the released movie but has not found a release to download yet"
+  },
+  "seerrGetDifferentRelease": "Get a different release",
+  "@seerrGetDifferentRelease": {
+    "description": "Admin-only button on a Seerr title's detail screen, and the title and confirm button of its dialog. It removes a stuck download, blocks that release, and has Radarr/Sonarr search for another one"
+  },
+  "seerrGetDifferentReleaseConfirm": "{service} will remove {release} from the download client, block it so it isn't grabbed again, and search for another release.",
+  "@seerrGetDifferentReleaseConfirm": {
+    "description": "Body of the confirm dialog for Get a different release",
+    "placeholders": {
+      "service": {
+        "type": "String",
+        "example": "Radarr"
+      },
+      "release": {
+        "type": "String",
+        "example": "Big.Buck.Bunny.2008.1080p.WEB-DL.x264"
+      }
+    }
+  },
+  "seerrGetDifferentReleaseDone": "Removed. {service} is searching for another release.",
+  "@seerrGetDifferentReleaseDone": {
+    "description": "Short confirmation after Get a different release removed the stuck download",
+    "placeholders": {
+      "service": {
+        "type": "String",
+        "example": "Radarr"
+      }
+    }
+  },
+  "seerrGetDifferentReleaseFailed": "Couldn't remove the download",
+  "@seerrGetDifferentReleaseFailed": {
+    "description": "Error shown when Get a different release could not remove the stuck download"
+  },
+  "syncPlayRepeatSubtitle": "Replay one item or the whole queue",
+  "@syncPlayRepeatSubtitle": {
+    "description": "Subtitle of the Repeat tile on the SyncPlay screen"
+  },
+  "syncPlayShuffleSubtitle": "Play the queue in order or shuffled",
+  "@syncPlayShuffleSubtitle": {
+    "description": "Subtitle of the Shuffle tile on the SyncPlay screen"
+  },
+  "syncPlayParticipantYou": "You",
+  "@syncPlayParticipantYou": {
+    "description": "Small label on the signed-in user's own chip in the SyncPlay participant list"
+  },
+  "syncPlayGroupSubtitle": "{participants} · {detail}",
+  "@syncPlayGroupSubtitle": {
+    "description": "Second line under the group name on the SyncPlay screen: the participant count, then what is playing or that nothing is queued",
+    "placeholders": {
+      "participants": {
+        "type": "String",
+        "example": "3 participants"
+      },
+      "detail": {
+        "type": "String",
+        "example": "nothing queued yet"
+      }
+    }
+  },
+  "syncPlayNothingQueued": "nothing queued yet",
+  "@syncPlayNothingQueued": {
+    "description": "Fills {detail} in syncPlayGroupSubtitle when the group queue is empty, e.g. '3 participants · nothing queued yet'"
+  },
+  "syncPlayOthersCanJoinHint": "Others can join from their SyncPlay screen while this group exists.",
+  "@syncPlayOthersCanJoinHint": {
+    "description": "Hint next to the participant chips on the SyncPlay screen, telling the user how others join the group"
+  },
+  "syncPlayCreateGroupSubtitle": "Watch together with everyone who joins",
+  "@syncPlayCreateGroupSubtitle": {
+    "description": "Subtitle under 'Create a new group' on the SyncPlay screen"
+  },
+  "syncPlayAvailableGroupsCount": "Available groups · {count}",
+  "@syncPlayAvailableGroupsCount": {
+    "description": "Heading of the SyncPlay available groups list with how many there are",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "syncPlayNoGroupsAvailableHint": "Groups other people create on this server will show up here.",
+  "@syncPlayNoGroupsAvailableHint": {
+    "description": "Second line of the empty state in the SyncPlay available groups list"
+  },
+  "syncPlayJoinReplacesQueueNote": "Joining a group may replace your current playback queue.",
+  "@syncPlayJoinReplacesQueueNote": {
+    "description": "Note with an info icon under the list of available groups on the SyncPlay screen"
+  },
+  "kidsModePinToSwitchUser": "Enter the Kids Mode PIN to switch to {name}",
+  "@kidsModePinToSwitchUser": {
+    "description": "Shown in the PIN dialog when a link asks to switch to another user while Kids Mode is on. {name} is the user being switched to",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsDateFormat": "Date Format",
+  "settingsDateFormatDescription": "Choose between month-day, day-month, or locale default for calendar and release dates",
+  "dateFormatSystem": "Locale Default",
+  "dateFormatMonthDay": "Month / Day (Nov 10)",
+  "dateFormatDayMonth": "Day / Month (10 Nov)",
+  "settingsHideControlsAfter": "Hide Controls After",
+  "@settingsHideControlsAfter": {
+    "description": "Playback setting for how long the player controls stay on screen after the last input"
+  },
+  "settingsHideControlsAfterDescription": "How long the player controls stay on screen after your last button press, tap or mouse move.",
+  "@settingsHideControlsAfterDescription": {
+    "description": "Description under the Hide Controls After playback setting"
+  },
+  "settingsHdrControlsDimming": "Dim Controls in HDR",
+  "@settingsHdrControlsDimming": {
+    "description": "Playback setting for how much the player controls dim while HDR video plays"
+  },
+  "settingsHdrControlsDimmingDescription": "White looks far brighter next to HDR video, so the player controls dim by this much while it plays.",
+  "@settingsHdrControlsDimmingDescription": {
+    "description": "Description under the Dim Controls in HDR playback setting"
+  },
+  "watchPartyResumeYours": "Where you left off. Everyone starts from there.",
+  "@watchPartyResumeYours": {
+    "description": "Note under the Watch Party resume button when it resumes from the host's own progress"
+  },
+  "watchParties": "Watch Parties",
+  "@watchParties": {
+    "description": "Name of the feature: the settings page, the screen with the room list and the Home row"
+  },
+  "watchPartyStartWith": "Start parties with",
+  "@watchPartyStartWith": {
+    "description": "Setting on Jellyfin that picks what kind of party the user starts: a Moonbase Watch Party or a SyncPlay group"
+  },
+  "watchPartyServiceMoonbaseHint": "Chat, reactions and voting. Runs on Moonbase.",
+  "@watchPartyServiceMoonbaseHint": {
+    "description": "Line under the Watch Party choice of the Start parties with setting"
+  },
+  "watchPartyServiceSyncPlayHint": "Jellyfin's own. Friends on other Jellyfin apps can join.",
+  "@watchPartyServiceSyncPlayHint": {
+    "description": "Line under the SyncPlay choice of the Start parties with setting"
+  },
+  "watchPartyServiceNote": "You can join rooms of both kinds. This only picks what you start.",
+  "@watchPartyServiceNote": {
+    "description": "Note under the Start parties with setting"
+  },
+  "watchPartyDuringParty": "During a party",
+  "@watchPartyDuringParty": {
+    "description": "Section heading on the Watch Parties settings page"
+  },
+  "watchPartyChatOverlay": "Show chat over the video",
+  "@watchPartyChatOverlay": {
+    "description": "Watch Parties setting: show new chat messages over the video for a few seconds"
+  },
+  "watchPartyChatOverlaySubtitle": "New messages show for a few seconds",
+  "@watchPartyChatOverlaySubtitle": {
+    "description": "Line under the Show chat over the video setting"
+  },
+  "watchPartyAlerts": "Party alerts",
+  "@watchPartyAlerts": {
+    "description": "Watch Parties setting: tell the user when someone on the server starts a party"
+  },
+  "watchPartyAlertsSubtitle": "Tell me when someone on this server starts one",
+  "@watchPartyAlertsSubtitle": {
+    "description": "Line under the Party alerts setting"
+  },
+  "watchPartyJoinWithCode": "Join with a code",
+  "@watchPartyJoinWithCode": {
+    "description": "TV button on the Watch Parties screen that opens the room code field"
+  },
+  "watchPartyOnThisServer": "On this server",
+  "@watchPartyOnThisServer": {
+    "description": "Heading of the list of rooms on the Watch Parties screen"
+  },
+  "watchPartyCountOnServer": "{count} on this server",
+  "@watchPartyCountOnServer": {
+    "description": "TV heading of the Watch Parties screen: how many rooms the user can join",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "watchPartyRoomsHint": "You need access to the item to join. A room closes when its last person leaves.",
+  "@watchPartyRoomsHint": {
+    "description": "Note under the room list on the Watch Parties screen"
+  },
+  "watchPartyRoomsEmpty": "Parties you can watch show up here. Got a code from someone? Pick Join with a code.",
+  "@watchPartyRoomsEmpty": {
+    "description": "Empty room list on the Watch Parties screen"
+  },
+  "watchPartyPasteHint": "Pasting an invite link here works too. On a phone, the link opens Moonfin straight into the party.",
+  "@watchPartyPasteHint": {
+    "description": "Hint under the room code field on the Watch Parties screen"
+  },
+  "watchPartyWatchingCount": "{count, plural, one{{count} watching} other{{count} watching}}",
+  "@watchPartyWatchingCount": {
+    "description": "How many people are in a room, on room cards",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "watchPartyHostsParty": "{name}'s party",
+  "@watchPartyHostsParty": {
+    "description": "Who hosts a room, on room cards and in the player, like \"Maya's party\"",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyEveryoneControlsShort": "Everyone controls",
+  "@watchPartyEveryoneControlsShort": {
+    "description": "Room card tag: every member can play, pause and skip"
+  },
+  "watchPartyVotingNow": "Voting on what to watch",
+  "@watchPartyVotingNow": {
+    "description": "Room card line: the lobby is voting on what to watch"
+  },
+  "watchPartyNeedsMoonbase": "Watch Parties need Moonbase on this server",
+  "@watchPartyNeedsMoonbase": {
+    "description": "Title when the server has no Moonbase plugin to host watch parties"
+  },
+  "watchPartyNeedsMoonbaseHint": "Ask whoever runs the server to install the Moonbase plugin. On Jellyfin, SyncPlay still works without it.",
+  "@watchPartyNeedsMoonbaseHint": {
+    "description": "Body under the Watch Parties need Moonbase title"
+  },
+  "watchPartyWrongPin": "That PIN didn't work. Try again.",
+  "@watchPartyWrongPin": {
+    "description": "Join error: wrong room PIN"
+  },
+  "watchPartyTooManyTries": "Too many tries. Wait a minute.",
+  "@watchPartyTooManyTries": {
+    "description": "Join error: too many wrong PINs"
+  },
+  "watchPartyFull": "This party is full.",
+  "@watchPartyFull": {
+    "description": "Join error: the room has no space left"
+  },
+  "watchPartyNoSuchCode": "No room has that code.",
+  "@watchPartyNoSuchCode": {
+    "description": "Join error: no room with that code"
+  },
+  "watchPartyNoAccess": "You don't have access to what they're watching.",
+  "@watchPartyNoAccess": {
+    "description": "Join error, and a notice in the room, when the user cannot play the room's item"
+  },
+  "watchPartyRemoved": "The host removed you from the party.",
+  "@watchPartyRemoved": {
+    "description": "Shown after the host removed this member"
+  },
+  "watchPartyYours": "Your watch party",
+  "@watchPartyYours": {
+    "description": "Title of the lobby and party controls"
+  },
+  "watchPartyInviteHint": "Paste it in any chat. It opens a page on this server with an Open in Moonfin button.",
+  "@watchPartyInviteHint": {
+    "description": "Hint under Copy invite link in the lobby"
+  },
+  "watchPartySendInvite": "Send the invite",
+  "@watchPartySendInvite": {
+    "description": "TV lobby heading over the invite QR code"
+  },
+  "watchPartyScanInvite": "Scan with your phone to get the invite link, then send it from there. Or just share the code.",
+  "@watchPartyScanInvite": {
+    "description": "TV lobby line next to the invite QR code"
+  },
+  "watchPartyStartsTogether": "Play waits for everyone's player, 10 seconds at most, then counts down 3, 2, 1.",
+  "@watchPartyStartsTogether": {
+    "description": "Lobby note on how a party starts"
+  },
+  "watchPartyStatusInSync": "In sync",
+  "@watchPartyStatusInSync": {
+    "description": "Member status in a watch party"
+  },
+  "watchPartyStatusCatchingUp": "Catching up",
+  "@watchPartyStatusCatchingUp": {
+    "description": "Member status in a watch party"
+  },
+  "watchPartyStatusBuffering": "Buffering",
+  "@watchPartyStatusBuffering": {
+    "description": "Member status in a watch party"
+  },
+  "watchPartyStatusNotWatching": "Not watching",
+  "@watchPartyStatusNotWatching": {
+    "description": "Member status in a watch party"
+  },
+  "watchPartyStatusReady": "Ready",
+  "@watchPartyStatusReady": {
+    "description": "Member status in a watch party lobby"
+  },
+  "watchPartyStatusJoining": "Joining",
+  "@watchPartyStatusJoining": {
+    "description": "Member status in a watch party lobby"
+  },
+  "watchPartyHost": "Host",
+  "@watchPartyHost": {
+    "description": "Tag on the host in a watch party's people list"
+  },
+  "watchPartyWaitingFor": "Waiting for {name}'s player",
+  "@watchPartyWaitingFor": {
+    "description": "Shown while a party waits for one member's player to load",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyWaitingForCount": "{count, plural, one{Waiting for {count} player} other{Waiting for {count} players}}",
+  "@watchPartyWaitingForCount": {
+    "description": "Shown while a party waits for several members' players to load",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "watchPartyStartingAnyway": "Starting anyway in {seconds} s",
+  "@watchPartyStartingAnyway": {
+    "description": "Countdown until the party starts without the players still loading",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "watchPartyStartingTogether": "Starting together",
+  "@watchPartyStartingTogether": {
+    "description": "Under the 3, 2, 1 countdown when a party starts"
+  },
+  "watchPartyToastPaused": "{name} paused",
+  "@watchPartyToastPaused": {
+    "description": "Toast in a watch party",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyToastResumed": "{name} resumed",
+  "@watchPartyToastResumed": {
+    "description": "Toast in a watch party",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyToastSkipped": "{name} skipped to {time}",
+  "@watchPartyToastSkipped": {
+    "description": "Toast in a watch party, the time like 1:14:02",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyToastJoined": "{name} joined",
+  "@watchPartyToastJoined": {
+    "description": "Toast and chat line in a watch party",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyToastLeft": "{name} left",
+  "@watchPartyToastLeft": {
+    "description": "Toast and chat line in a watch party",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyToastSwitched": "{name} switched to {title}",
+  "@watchPartyToastSwitched": {
+    "description": "Toast and chat line when the host picks another item",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyToastYouAreHost": "You're the host now",
+  "@watchPartyToastYouAreHost": {
+    "description": "Toast in a watch party"
+  },
+  "watchPartyToastNewHost": "{name} is the host now",
+  "@watchPartyToastNewHost": {
+    "description": "Toast in a watch party",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyToastEveryoneControls": "Everyone can control playback now",
+  "@watchPartyToastEveryoneControls": {
+    "description": "Toast when the host lets everyone control playback"
+  },
+  "watchPartyToastHostControls": "Only the host controls playback now",
+  "@watchPartyToastHostControls": {
+    "description": "Toast when the host takes playback control back"
+  },
+  "watchPartyOnlyHostControls": "Only the host can control playback.",
+  "@watchPartyOnlyHostControls": {
+    "description": "Toast when a Watch Party guest presses play, pause or skip while only the host may"
+  },
+  "watchPartyToastReconnecting": "Reconnecting to the party...",
+  "@watchPartyToastReconnecting": {
+    "description": "Toast when the connection to the room drops"
+  },
+  "watchPartyToastReconnected": "Back in the party",
+  "@watchPartyToastReconnected": {
+    "description": "Toast when the connection to the room is back"
+  },
+  "watchPartyToastEnded": "{name} ended the party",
+  "@watchPartyToastEnded": {
+    "description": "Toast when the host closes the room",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyChat": "Chat",
+  "@watchPartyChat": {
+    "description": "Tab and button for a watch party's chat"
+  },
+  "watchPartySendToParty": "Send to the party",
+  "@watchPartySendToParty": {
+    "description": "Hint in the watch party chat field"
+  },
+  "watchPartyBackToClose": "Back to close",
+  "@watchPartyBackToClose": {
+    "description": "TV hint on the watch party quick bar"
+  },
+  "watchPartyType": "Type",
+  "@watchPartyType": {
+    "description": "TV quick bar button that opens the keyboard to type a chat message"
+  },
+  "watchPartyReplyHaha": "Haha",
+  "@watchPartyReplyHaha": {
+    "description": "TV quick reply in a watch party chat"
+  },
+  "watchPartyReplyNoWay": "No way",
+  "@watchPartyReplyNoWay": {
+    "description": "TV quick reply in a watch party chat"
+  },
+  "watchPartyReplyPausePlease": "Pause please",
+  "@watchPartyReplyPausePlease": {
+    "description": "TV quick reply in a watch party chat"
+  },
+  "watchPartyReplyBrb": "Brb",
+  "@watchPartyReplyBrb": {
+    "description": "TV quick reply in a watch party chat, short for be right back"
+  },
+  "watchPartyReplyAgain": "Again!",
+  "@watchPartyReplyAgain": {
+    "description": "TV quick reply in a watch party chat"
+  },
+  "watchPartyReactionLove": "Love",
+  "@watchPartyReactionLove": {
+    "description": "Name of a watch party reaction"
+  },
+  "watchPartyReactionHaha": "Haha",
+  "@watchPartyReactionHaha": {
+    "description": "Name of a watch party reaction"
+  },
+  "watchPartyReactionWow": "Wow",
+  "@watchPartyReactionWow": {
+    "description": "Name of a watch party reaction"
+  },
+  "watchPartyReactionSad": "Sad",
+  "@watchPartyReactionSad": {
+    "description": "Name of a watch party reaction"
+  },
+  "watchPartyReactionFire": "Fire",
+  "@watchPartyReactionFire": {
+    "description": "Name of a watch party reaction"
+  },
+  "watchPartyReactionPopcorn": "Popcorn",
+  "@watchPartyReactionPopcorn": {
+    "description": "Name of a watch party reaction"
+  },
+  "watchPartyMakeHost": "Make host",
+  "@watchPartyMakeHost": {
+    "description": "Host action on a member of the watch party"
+  },
+  "watchPartyEveryoneControls": "Everyone can control playback",
+  "@watchPartyEveryoneControls": {
+    "description": "Host setting of a watch party"
+  },
+  "watchPartyEveryoneControlsHint": "Anyone can play, pause and skip",
+  "@watchPartyEveryoneControlsHint": {
+    "description": "Line under Everyone can control playback"
+  },
+  "watchPartyRoomPin": "Room PIN",
+  "@watchPartyRoomPin": {
+    "description": "Host setting of a watch party, and the title of the PIN dialog"
+  },
+  "watchPartyRoomPinHint": "Ask for a PIN before anyone joins",
+  "@watchPartyRoomPinHint": {
+    "description": "Line under Room PIN"
+  },
+  "watchPartyPinDigits": "4 to 8 digits",
+  "@watchPartyPinDigits": {
+    "description": "Hint in the room PIN field"
+  },
+  "watchPartyLeave": "Leave",
+  "@watchPartyLeave": {
+    "description": "Button that leaves the watch party"
+  },
+  "watchPartyLeaveHandsOver": "Leave · {name} hosts",
+  "@watchPartyLeaveHandsOver": {
+    "description": "Host button that leaves, naming who takes over",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyStartedBy": "{name} started a watch party",
+  "@watchPartyStartedBy": {
+    "description": "Party alert title",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "watchPartyInLobbyCount": "{count, plural, one{{title} · {count} in the lobby} other{{title} · {count} in the lobby}}",
+  "@watchPartyInLobbyCount": {
+    "description": "Party alert body",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "watchPartyFirstOnHome": "It's first in Watch Parties on Home",
+  "@watchPartyFirstOnHome": {
+    "description": "Line on the TV party alert banner"
+  },
+  "watchPartyAddServerQuestion": "This invite is for a server you have not added yet, {address}. Add it and sign in to join.",
+  "@watchPartyAddServerQuestion": {
+    "description": "Dialog when a party link names a server the app does not have",
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "subtitleBold": "Bold Text",
+  "@subtitleBold": {
+    "description": "Toggle that draws subtitles in a bold weight."
+  },
+  "subtitleStrokeWidth": "Text Stroke Width",
+  "@subtitleStrokeWidth": {
+    "description": "Setting for how thick the outline around subtitle text is."
+  },
+  "subtitleFont": "Font",
+  "@subtitleFont": {
+    "description": "Setting for which font subtitles are drawn in."
+  },
+  "subtitleFontDescription": "Fonts are downloaded from Google Fonts the first time you pick them",
+  "@subtitleFontDescription": {
+    "description": "Explains that subtitle fonts are not built in and are downloaded when chosen."
+  },
+  "subtitleFontDownloadFailed": "Couldn't download {font}",
+  "@subtitleFontDownloadFailed": {
+    "description": "Shown when a subtitle font could not be downloaded.",
+    "placeholders": {
+      "font": {
+        "type": "String"
+      }
+    }
+  },
+  "subtitleShadow": "Text Shadow",
+  "@subtitleShadow": {
+    "description": "Toggle for a drop shadow behind subtitle text."
+  },
+  "subtitleShadowIntensity": "Shadow Intensity",
+  "@subtitleShadowIntensity": {
+    "description": "How dark the subtitle drop shadow is."
+  },
+  "subtitleShadowOffset": "Shadow Offset",
+  "@subtitleShadowOffset": {
+    "description": "How far the subtitle drop shadow sits from the text."
+  },
+  "subtitleShadowBlur": "Shadow Blur",
+  "@subtitleShadowBlur": {
+    "description": "How soft the edge of the subtitle drop shadow is."
+  },
+  "bookFoldersAsSeries": "Treat book folders as series",
+  "@bookFoldersAsSeries": {
+    "description": "Setting to determine book series based on folders instead of item metadata"
+  },
+  "bookFoldersAsSeriesDescription": "Treat folders containing books as series instead of relying on the individual books' metadata",
+  "@bookFoldersAsSeriesDescription": {
+    "description": "Explains the setting to determine book series based on folders instead of item metadata"
+  },
+  "removeWatchedAsk": "Ask me",
+  "@removeWatchedAsk": {
+    "description": "Remove-watched-downloads option: ask whether to delete a download once it is played to the end"
+  },
+  "deleteFinishedDownloadTitle": "Delete this download?",
+  "@deleteFinishedDownloadTitle": {
+    "description": "Title of the dialog shown after a downloaded episode or movie is played to the end"
+  },
+  "deleteFinishedDownloadMessage": "You finished {title}. Delete its download to free up space, or keep it and stop asking.",
+  "@deleteFinishedDownloadMessage": {
+    "description": "Body of the dialog shown after a downloaded episode or movie is played to the end",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "notNow": "Not Now",
+  "@notNow": {
+    "description": "Button that closes a question without answering it, so it can be asked again later"
+  },
+  "settingsDecodingAndRenderingSection": "Decoding & Rendering",
+  "@settingsDecodingAndRenderingSection": {
+    "description": "Section header on the Quality & Decoding settings screen"
+  },
+  "settingsAudioStreamSection": "Audio Stream",
+  "@settingsAudioStreamSection": {
+    "description": "Section header on the Audio settings screen for the default audio track choices"
+  },
+  "settingsAudioOutputSection": "Audio Output",
+  "@settingsAudioOutputSection": {
+    "description": "Section header on the Audio settings screen for the passthrough mode"
+  },
+  "settingsPassthroughSettingsSection": "Passthrough Settings",
+  "@settingsPassthroughSettingsSection": {
+    "description": "Section header on the Audio settings screen for the per-codec passthrough switches"
+  },
+  "settingsImdbListsSection": "IMDb Lists",
+  "@settingsImdbListsSection": {
+    "description": "Section header on the IMDb Lists settings screen over the IMDb row switches"
+  },
+  "settingsTmdbListsSection": "TMDB Lists",
+  "@settingsTmdbListsSection": {
+    "description": "Section header on the TMDB Lists settings screen over the TMDB row switches"
+  },
+  "settingsSeerrHomePageRowsSection": "Seerr Home Page Rows",
+  "@settingsSeerrHomePageRowsSection": {
+    "description": "Section header on the Seerr Lists settings screen for the Seerr rows shown on the home page"
+  },
+  "settingsSavedCustomHomeRowsSection": "Saved Custom Home Rows",
+  "@settingsSavedCustomHomeRowsSection": {
+    "description": "Section header on the Custom Rows settings screen over the rows the user already saved"
+  },
+  "settingsRewatchSection": "Rewatch",
+  "@settingsRewatchSection": {
+    "description": "Section header on the Home Sections settings screen for the Rewatch row"
+  },
+  "favoritesSwitchViewSection": "Switch View",
+  "@favoritesSwitchViewSection": {
+    "description": "Section header in the Favorites display options for choosing between Home and Library view"
+  },
+  "siloPinRemember": "Remember PIN on this device",
+  "@siloPinRemember": {
+    "description": "Checkbox in the Silo profile PIN dialog. Ticked, the PIN isn't asked for again on this device; unticked, it is asked for each time the app starts or this profile is switched to"
+  },
+  "settingsPreviewAudioRowsOffInHomeRows": "Albums, Artists and Audio Playlists are all turned off. To show one, go to Rows, open {group} under {disabled}, and turn it on.",
+  "@settingsPreviewAudioRowsOffInHomeRows": {
+    "description": "Notice over the dimmed Settings live preview while an audio Row Options setting has focus, Display Audio Rows is on, and none of the audio sections is turned on in Settings > Appearance > Home Screen > Rows, so Home doesn't change. It says where on the Rows screen the turned-off audio rows are",
+    "placeholders": {
+      "group": {
+        "type": "String",
+        "example": "General"
+      },
+      "disabled": {
+        "type": "String",
+        "example": "Disabled"
+      }
+    }
+  },
+  "settingsPreviewAudioRowsOffInHomeRowsSwitchOff": "To see Albums, Artists or Audio Playlists on Home, first turn on {setting}. Then go to Rows, open {group} under {disabled}, and turn one on.",
+  "@settingsPreviewAudioRowsOffInHomeRowsSwitchOff": {
+    "description": "Notice over the dimmed Settings live preview while an audio Row Options setting has focus, Display Audio Rows is off, and none of the audio sections is turned on in Settings > Appearance > Home Screen > Rows. The Rows screen only lists the audio rows once the switch is on, so it gives the steps in that order",
+    "placeholders": {
+      "setting": {
+        "type": "String",
+        "example": "Display Audio Rows"
+      },
+      "group": {
+        "type": "String",
+        "example": "General"
+      },
+      "disabled": {
+        "type": "String",
+        "example": "Disabled"
+      }
+    }
+  },
+  "settingsPreviewCollectionsOffInHomeRows": "The Collections row is turned off. To show it, go to Rows, open {group} under {disabled}, and turn it on.",
+  "@settingsPreviewCollectionsOffInHomeRows": {
+    "description": "Notice over the dimmed Settings live preview while a Collections Row Options setting has focus, Display Collections Rows is on, and the Collections section is turned off in Settings > Appearance > Home Screen > Rows, so Home doesn't change. It says where on the Rows screen the turned-off row is",
+    "placeholders": {
+      "group": {
+        "type": "String",
+        "example": "Collections"
+      },
+      "disabled": {
+        "type": "String",
+        "example": "Disabled"
+      }
+    }
+  },
+  "settingsPreviewCollectionsOffInHomeRowsSwitchOff": "To see the Collections row on Home, first turn on {setting}. Then go to Rows, open {group} under {disabled}, and turn it on.",
+  "@settingsPreviewCollectionsOffInHomeRowsSwitchOff": {
+    "description": "Notice over the dimmed Settings live preview while a Collections Row Options setting has focus, Display Collections Rows is off, and the Collections section is turned off in Settings > Appearance > Home Screen > Rows. The Rows screen only lists the Collections row once the switch is on, so it gives the steps in that order",
+    "placeholders": {
+      "setting": {
+        "type": "String",
+        "example": "Display Collections Rows"
+      },
+      "group": {
+        "type": "String",
+        "example": "Collections"
+      },
+      "disabled": {
+        "type": "String",
+        "example": "Disabled"
+      }
+    }
+  },
+  "settingsPreviewRowsOffInKidsMode": "Kids Mode keeps these rows off Home, so these settings don't change it.",
+  "@settingsPreviewRowsOffInKidsMode": {
+    "description": "Notice over the dimmed Settings live preview while a Row Options setting has focus whose rows Kids Mode hides from Home, so Home doesn't change"
+  },
+  "settingsPreviewNeedsRowInRows": "Turn on a row in Rows, under {disabled}",
+  "@settingsPreviewNeedsRowInRows": {
+    "description": "Status line under the Settings live preview, in place of 'Shows on the Home preview', for a Row Options setting whose rows are all turned off in Settings > Appearance > Home Screen > Rows while the setting's Display switch is on",
+    "placeholders": {
+      "disabled": {
+        "type": "String",
+        "example": "Disabled"
+      }
+    }
+  },
+  "settingsPreviewNeedsSwitchAndRow": "Turn on {setting}, then turn on a row in Rows",
+  "@settingsPreviewNeedsSwitchAndRow": {
+    "description": "Status line under the Settings live preview, in place of 'Shows on the Home preview', for a Row Options setting whose rows are all turned off in Settings > Appearance > Home Screen > Rows while the setting's Display switch is off. The Rows screen only lists those rows once the switch is on",
+    "placeholders": {
+      "setting": {
+        "type": "String",
+        "example": "Display Audio Rows"
+      }
+    }
+  },
+  "settingsPreviewKeptOffByKidsMode": "Kids Mode keeps this off Home",
+  "@settingsPreviewKeptOffByKidsMode": {
+    "description": "Status line under the Settings live preview, in place of 'Shows on the Home preview', for a Row Options setting whose rows Kids Mode hides from Home"
+  },
+  "settingsPreviewAudioRowsEmpty": "There's no music to show, so Home leaves these rows out.",
+  "@settingsPreviewAudioRowsEmpty": {
+    "description": "Note over the Settings live preview while an audio Row Options setting has focus and there are no albums, artists or audio playlists to show, so Home shows no audio rows"
+  },
+  "settingsPreviewRowsEmpty": "There's nothing to show in these rows, so Home leaves them out.",
+  "@settingsPreviewRowsEmpty": {
+    "description": "Note over the Settings live preview while a Favorites, Genres, Playlists or Studios Row Options setting has focus and those rows have nothing to show, so Home leaves them out"
+  },
+  "settingsPreviewCollectionsEmpty": "There are no collections to show, so Home leaves this row out.",
+  "@settingsPreviewCollectionsEmpty": {
+    "description": "Note over the Settings live preview while a Collections Row Options setting has focus and there are no collections to show, so Home shows no Collections row"
+  },
+  "settingsPreviewShowEpisodesNote": "This only changes rows for a single collection added in Rows. The Collections row looks the same.",
+  "@settingsPreviewShowEpisodesNote": {
+    "description": "Note over the Settings live preview while the Show Individual Episodes setting in Row Options has focus, explaining that it doesn't change the Collections row the preview shows"
+  },
+  "afterHoursTitle": "After Hours",
+  "@afterHoursTitle": {
+    "description": "Name of the hidden arcade in Settings > About. A product name, keep it short"
+  },
+  "afterHoursUnlocked": "After Hours unlocked",
+  "@afterHoursUnlocked": {
+    "description": "Toast when the seventh press on the Version row opens the hidden arcade"
+  },
+  "afterHoursPressesLeft": "{count, plural, =1{1 more press} other{{count} more presses}}",
+  "@afterHoursPressesLeft": {
+    "description": "Toast counting down the remote presses on the Version row left before the hidden arcade opens",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "afterHoursTapsLeft": "{count, plural, =1{1 more tap} other{{count} more taps}}",
+  "@afterHoursTapsLeft": {
+    "description": "Toast counting down the taps on the Version row left before the hidden arcade opens",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "afterHoursPlay": "Play",
+  "@afterHoursPlay": {
+    "description": "Button that starts playing a game in the arcade. Play as in playing a game, not playing media"
+  },
+  "afterHoursLeaderboards": "Leaderboards",
+  "@afterHoursLeaderboards": {
+    "description": "Title of the screen and the card that show the top 3 scores for every arcade game"
+  },
+  "afterHoursTop3": "Top 3",
+  "@afterHoursTop3": {
+    "description": "Heading over the three best scores in an arcade game"
+  },
+  "afterHoursScoresFrom": "Scores from {server}",
+  "@afterHoursScoresFrom": {
+    "description": "Note saying the arcade scores shown come from the named server",
+    "placeholders": {
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "afterHoursScoresOnDevice": "Scores on this device",
+  "@afterHoursScoresOnDevice": {
+    "description": "Note saying the arcade scores shown are the ones kept on this device, because the server has none"
+  },
+  "afterHoursGameOver": "Game over",
+  "@afterHoursGameOver": {
+    "description": "Shown when a run in an arcade game ends"
+  },
+  "afterHoursNewRank": "New #{rank} on the board",
+  "@afterHoursNewRank": {
+    "description": "Shown when a finished arcade run places in the top 3, with its place",
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      }
+    }
+  },
+  "afterHoursPlayAgain": "Play again",
+  "@afterHoursPlayAgain": {
+    "description": "Button that starts a new run of the same arcade game"
+  },
+  "afterHoursBackToArcade": "Back to the arcade",
+  "@afterHoursBackToArcade": {
+    "description": "Button that leaves a finished game for the arcade menu"
+  },
+  "afterHoursArcade": "Arcade",
+  "@afterHoursArcade": {
+    "description": "Short button on a phone that leaves a finished game for the arcade menu"
+  },
+  "afterHoursLandscapeNote": "Turns to landscape while you play",
+  "@afterHoursLandscapeNote": {
+    "description": "Note under the Play button on a phone: the screen rotates to landscape during the game"
+  },
+  "afterHoursTouch": "Touch",
+  "@afterHoursTouch": {
+    "description": "Label before the touchscreen controls of an arcade game"
+  },
+  "afterHoursNewTag": "NEW",
+  "@afterHoursNewTag": {
+    "description": "Short tag on the leaderboard row the player just set. Keep it very short"
+  },
+  "afterHoursNoScores": "No scores yet",
+  "@afterHoursNoScores": {
+    "description": "Shown in place of a leaderboard nobody has played yet"
+  },
+  "afterHoursPerfect": "PERFECT",
+  "@afterHoursPerfect": {
+    "description": "Flashes in the Case Stack arcade game when a case lands exactly on the one below"
+  },
+  "afterHoursBoxSet": "BOX SET",
+  "@afterHoursBoxSet": {
+    "description": "Flashes in the Case Stack arcade game on every third perfect landing in a row, which widens the stack. A box set of discs"
+  },
+  "afterHoursBufferRun": "Buffer Run",
+  "@afterHoursBufferRun": {
+    "description": "Name of an After Hours arcade game, the easter egg in Settings > About. A pun on video buffering"
+  },
+  "afterHoursBufferRunGenre": "Endless runner with a gravity flip",
+  "@afterHoursBufferRunGenre": {
+    "description": "Kind of game Buffer Run is"
+  },
+  "afterHoursBufferRunPitch": "The runner from the loading screen finally gets somewhere to go. Double jump and gravity flips it onto the ceiling.",
+  "@afterHoursBufferRunPitch": {
+    "description": "Two sentence description of the Buffer Run arcade game. The runner is the running figure of the app's loading animation"
+  },
+  "afterHoursBufferRunRemote": "OK jumps, again mid-air to flip sides. Down slides. On the ceiling Up and Down swap.",
+  "@afterHoursBufferRunRemote": {
+    "description": "Remote controls of the Buffer Run arcade game. Flip means turning gravity over onto the ceiling. Keep under about 90 characters, it also shows as one line on the How to play card"
+  },
+  "afterHoursBufferRunTouch": "Tap to jump, and tap again in the air to flip. Swipe toward the side you're running on to slide.",
+  "@afterHoursBufferRunTouch": {
+    "description": "Touchscreen controls of the Buffer Run arcade game. Keep under about 90 characters, it also shows as one line on the How to play card"
+  },
+  "afterHoursFastForward": "Fast Forward",
+  "@afterHoursFastForward": {
+    "description": "Name of an After Hours arcade game, the easter egg in Settings > About. Named after the playback control"
+  },
+  "afterHoursFastForwardGenre": "Three-lane runner",
+  "@afterHoursFastForwardGenre": {
+    "description": "Kind of game Fast Forward is"
+  },
+  "afterHoursFastForwardPitch": "A sprint down three lobby aisles. Hop the low stuff, and remember the popcorn carts don't move for anyone.",
+  "@afterHoursFastForwardPitch": {
+    "description": "Two sentence description of the Fast Forward arcade game, set in a cinema lobby"
+  },
+  "afterHoursFastForwardRemote": "Up and Down change lanes. OK jumps.",
+  "@afterHoursFastForwardRemote": {
+    "description": "Remote controls of the Fast Forward arcade game. Keep under about 90 characters, it also shows as one line on the How to play card"
+  },
+  "afterHoursFastForwardTouch": "Swipe up or down to change lanes. Tap to jump.",
+  "@afterHoursFastForwardTouch": {
+    "description": "Touchscreen controls of the Fast Forward arcade game. Keep under about 90 characters, it also shows as one line on the How to play card"
+  },
+  "afterHoursCableCrawl": "Cable Crawl",
+  "@afterHoursCableCrawl": {
+    "description": "Name of an After Hours arcade game, the easter egg in Settings > About, where you steer an HDMI cable"
+  },
+  "afterHoursCableCrawlGenre": "Grid crawler",
+  "@afterHoursCableCrawlGenre": {
+    "description": "Kind of game Cable Crawl is, a snake-like game on a grid"
+  },
+  "afterHoursCableCrawlPitch": "Steer an HDMI cable around the back of the TV cabinet and plug into signal. Every bar makes it longer.",
+  "@afterHoursCableCrawlPitch": {
+    "description": "Two sentence description of the Cable Crawl arcade game. A bar is one bar of signal strength"
+  },
+  "afterHoursCableCrawlRemote": "Arrows turn. The cable never stops.",
+  "@afterHoursCableCrawlRemote": {
+    "description": "Remote controls of the Cable Crawl arcade game. Keep under about 90 characters, it also shows as one line on the How to play card"
+  },
+  "afterHoursCableCrawlTouch": "Swipe to turn.",
+  "@afterHoursCableCrawlTouch": {
+    "description": "Touchscreen controls of the Cable Crawl arcade game. Keep under about 90 characters, it also shows as one line on the How to play card"
+  },
+  "afterHoursCaseStack": "Case Stack",
+  "@afterHoursCaseStack": {
+    "description": "Name of an After Hours arcade game, the easter egg in Settings > About, where you stack Blu-ray cases"
+  },
+  "afterHoursCaseStackGenre": "One-button stacker",
+  "@afterHoursCaseStackGenre": {
+    "description": "Kind of game Case Stack is"
+  },
+  "afterHoursCaseStackPitch": "Build a shelf-high tower of Blu-ray cases, each one a title from your own library. Whatever hangs over the edge gets trimmed off, so land them dead on.",
+  "@afterHoursCaseStackPitch": {
+    "description": "Two sentence description of the Case Stack arcade game"
+  },
+  "afterHoursCaseStackRemote": "OK drops the case.",
+  "@afterHoursCaseStackRemote": {
+    "description": "Remote controls of the Case Stack arcade game. Keep under about 90 characters, it also shows as one line on the How to play card"
+  },
+  "afterHoursCaseStackTouch": "Tap anywhere to drop.",
+  "@afterHoursCaseStackTouch": {
+    "description": "Touchscreen controls of the Case Stack arcade game. Keep under about 90 characters, it also shows as one line on the How to play card"
+  },
+  "afterHoursPixelPurge": "Pixel Purge",
+  "@afterHoursPixelPurge": {
+    "description": "Name of an After Hours arcade game, the easter egg in Settings > About, where you clear video compression artifacts"
+  },
+  "afterHoursPixelPurgeGenre": "Paddle breaker",
+  "@afterHoursPixelPurgeGenre": {
+    "description": "Kind of game Pixel Purge is, a brick breaker with a paddle"
+  },
+  "afterHoursPixelPurgePitch": "A bad encode left the picture full of blocky artifacts, and they creep down a little every second. Bounce the play button off the seek bar to clear them before they reach it.",
+  "@afterHoursPixelPurgePitch": {
+    "description": "Two sentence description of the Pixel Purge arcade game. The ball is a play button and the paddle is the seek bar"
+  },
+  "afterHoursPixelPurgeRemote": "Left and Right slide the scrubber. The ball launches on its own.",
+  "@afterHoursPixelPurgeRemote": {
+    "description": "Remote controls of the Pixel Purge arcade game. The scrubber is the seek bar used as the paddle. Keep under about 90 characters, it also shows as one line on the How to play card"
+  },
+  "afterHoursPixelPurgeTouch": "Drag to slide the scrubber.",
+  "@afterHoursPixelPurgeTouch": {
+    "description": "Touchscreen controls of the Pixel Purge arcade game. Keep under about 90 characters, it also shows as one line on the How to play card"
+  },
+  "afterHoursHowToPlay": "How to play",
+  "@afterHoursHowToPlay": {
+    "description": "Title of the card that explains an arcade game's controls, enemies, obstacles and powerups, and the button that opens it"
+  },
+  "afterHoursStart": "Start",
+  "@afterHoursStart": {
+    "description": "Button on the How to play card that starts the game. Start as in begin playing"
+  },
+  "afterHoursBackToGame": "Back to the game",
+  "@afterHoursBackToGame": {
+    "description": "Button on the How to play card opened from the pause menu, which returns to the paused game"
+  },
+  "afterHoursEnemies": "Enemies",
+  "@afterHoursEnemies": {
+    "description": "Heading over the enemies on an arcade game's How to play card"
+  },
+  "afterHoursObstacles": "Obstacles",
+  "@afterHoursObstacles": {
+    "description": "Heading over the obstacles on an arcade game's How to play card"
+  },
+  "afterHoursPowerups": "Powerups",
+  "@afterHoursPowerups": {
+    "description": "Heading over the powerups on an arcade game's How to play card"
+  },
+  "afterHoursCastShieldLine": "A shield that takes one hit.",
+  "@afterHoursCastShieldLine": {
+    "description": "What a shield powerup does in an arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastPointsLine": "25 points a piece.",
+  "@afterHoursCastPointsLine": {
+    "description": "What a collectible is worth in an arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastLagBat": "Lag Bat",
+  "@afterHoursCastLagBat": {
+    "description": "Name of an enemy in the Buffer Run arcade game, shown on its How to play card. A bat named after video lag. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastLagBatLine": "Swoops in at head height. Slide under it.",
+  "@afterHoursCastLagBatLine": {
+    "description": "What the Lag Bat does in the Buffer Run arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastGremlin": "Static Gremlin",
+  "@afterHoursCastGremlin": {
+    "description": "Name of an enemy in the Buffer Run arcade game, shown on its How to play card. A gremlin made of TV static. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastGremlinLine": "Hops along the floor or the ceiling toward you. Jump it.",
+  "@afterHoursCastGremlinLine": {
+    "description": "What the Static Gremlin does in the Buffer Run arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastCable": "Cable Coil",
+  "@afterHoursCastCable": {
+    "description": "Name of an obstacle in the Buffer Run arcade game, shown on its How to play card. A coiled cable on the floor. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastCableLine": "Low on the floor or the ceiling. Jump it.",
+  "@afterHoursCastCableLine": {
+    "description": "What the Cable Coil does in the Buffer Run arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastBanner": "Buffering Banner",
+  "@afterHoursCastBanner": {
+    "description": "Name of an obstacle in the Buffer Run arcade game, shown on its How to play card. A sign showing a buffering spinner. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastBannerLine": "Slide under the sign. Its pole is a wall on the other side.",
+  "@afterHoursCastBannerLine": {
+    "description": "What the Buffering Banner does in the Buffer Run arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastSkipIntro": "Skip Intro",
+  "@afterHoursCastSkipIntro": {
+    "description": "Name of a powerup in the Buffer Run arcade game, shown on its How to play card, named after the Skip Intro button. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastSkipIntroLine": "Three seconds of dash that smashes anything.",
+  "@afterHoursCastSkipIntroLine": {
+    "description": "What the Skip Intro powerup does in the Buffer Run arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastPopcorn": "Popcorn",
+  "@afterHoursCastPopcorn": {
+    "description": "Name of a collectible in the Buffer Run arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastRollingReel": "Loose Reel",
+  "@afterHoursCastRollingReel": {
+    "description": "Name of an enemy in the Fast Forward arcade game, shown on its How to play card. A film reel rolling loose. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastRollingReelLine": "Rolls down your lane faster than you run. Jump it.",
+  "@afterHoursCastRollingReelLine": {
+    "description": "What the Loose Reel does in the Fast Forward arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastUsher": "Usher",
+  "@afterHoursCastUsher": {
+    "description": "Name of an enemy in the Fast Forward arcade game, shown on its How to play card. A cinema usher. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastUsherLine": "Walks toward you and changes lanes once.",
+  "@afterHoursCastUsherLine": {
+    "description": "What the Usher does in the Fast Forward arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastVelvetRope": "Velvet Rope",
+  "@afterHoursCastVelvetRope": {
+    "description": "Name of an obstacle in the Fast Forward arcade game, shown on its How to play card. The rope barrier at a cinema. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastVelvetRopeLine": "Low. Jump it or change lanes.",
+  "@afterHoursCastVelvetRopeLine": {
+    "description": "What the Velvet Rope does in the Fast Forward arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastPopcornCart": "Popcorn Cart",
+  "@afterHoursCastPopcornCart": {
+    "description": "Name of an obstacle in the Fast Forward arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastPopcornCartLine": "Too tall to jump. Change lanes.",
+  "@afterHoursCastPopcornCartLine": {
+    "description": "What the Popcorn Cart does in the Fast Forward arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastFrontRowPass": "Front Row Pass",
+  "@afterHoursCastFrontRowPass": {
+    "description": "Name of a powerup in the Fast Forward arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastMagnet": "Magnet",
+  "@afterHoursCastMagnet": {
+    "description": "Name of a powerup in the Fast Forward arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastMagnetLine": "Pulls in tickets from every lane for eight seconds.",
+  "@afterHoursCastMagnetLine": {
+    "description": "What the Magnet does in the Fast Forward arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastTicket": "Ticket",
+  "@afterHoursCastTicket": {
+    "description": "Name of a collectible cinema ticket in the Fast Forward arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastBug": "Interference Bug",
+  "@afterHoursCastBug": {
+    "description": "Name of an enemy in the Cable Crawl arcade game, shown on its How to play card. A bug causing signal interference. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastBugLine": "Wanders at random.",
+  "@afterHoursCastBugLine": {
+    "description": "What the Interference Bug does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastTangle": "Tangle",
+  "@afterHoursCastTangle": {
+    "description": "Name of an enemy in the Cable Crawl arcade game, shown on its How to play card. A tangle of cable. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastTangleLine": "Slowly chases your plug.",
+  "@afterHoursCastTangleLine": {
+    "description": "What the Tangle does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastStatic": "Static",
+  "@afterHoursCastStatic": {
+    "description": "Name of an obstacle in the Cable Crawl arcade game, shown on its How to play card. A cell of TV static. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastStaticLine": "A dead cell. One appears every third signal.",
+  "@afterHoursCastStaticLine": {
+    "description": "What the Static block does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastBrick": "Power Brick",
+  "@afterHoursCastBrick": {
+    "description": "Name of an obstacle in the Cable Crawl arcade game, shown on its How to play card. A power supply brick. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastBrickLine": "A 2 by 2 block every fifth signal.",
+  "@afterHoursCastBrickLine": {
+    "description": "What the Power Brick does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastGhost": "Ghost",
+  "@afterHoursCastGhost": {
+    "description": "Name of a powerup in the Cable Crawl arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastGhostLine": "Five seconds of passing through everything but the edge.",
+  "@afterHoursCastGhostLine": {
+    "description": "What the Ghost powerup does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastSnip": "Snip",
+  "@afterHoursCastSnip": {
+    "description": "Name of a powerup in the Cable Crawl arcade game, shown on its How to play card. A cut with scissors. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastSnipLine": "Cuts the cable in half for bonus points.",
+  "@afterHoursCastSnipLine": {
+    "description": "What the Snip powerup does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastSignal": "Signal",
+  "@afterHoursCastSignal": {
+    "description": "Name of the pickup in the Cable Crawl arcade game, bars of signal strength, shown on its How to play card. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastSignalLine": "Points, and two more segments.",
+  "@afterHoursCastSignalLine": {
+    "description": "What the Signal pickup does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastShelfCat": "Shelf Cat",
+  "@afterHoursCastShelfCat": {
+    "description": "Name of an enemy in the Case Stack arcade game, shown on its How to play card. A cat on the shelf. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastShelfCatLine": "Bats a case as it comes in, so that one slides faster.",
+  "@afterHoursCastShelfCatLine": {
+    "description": "What the Shelf Cat does in the Case Stack arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastBluCase": "Blu-ray Case",
+  "@afterHoursCastBluCase": {
+    "description": "Name of an obstacle in the Case Stack arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastBluCaseLine": "A title from your library. The overhang gets trimmed off.",
+  "@afterHoursCastBluCaseLine": {
+    "description": "What the Blu-ray Case does in the Case Stack arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastSteelbook": "Steelbook",
+  "@afterHoursCastSteelbook": {
+    "description": "Name of an obstacle in the Case Stack arcade game, shown on its How to play card. A metal disc case. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastSteelbookLine": "Every tenth case. Slides much faster.",
+  "@afterHoursCastSteelbookLine": {
+    "description": "What the Steelbook does in the Case Stack arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastPerfect": "Perfect Drop",
+  "@afterHoursCastPerfect": {
+    "description": "Name of a powerup in the Case Stack arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastPerfectLine": "Land it dead on and the stack grows a little wider.",
+  "@afterHoursCastPerfectLine": {
+    "description": "What the Perfect Drop does in the Case Stack arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastBoxSet": "Box Set",
+  "@afterHoursCastBoxSet": {
+    "description": "Name of a powerup in the Case Stack arcade game, shown on its How to play card. A box set of discs. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastBoxSetLine": "Three perfect drops in a row grow it a lot wider.",
+  "@afterHoursCastBoxSetLine": {
+    "description": "What the Box Set does in the Case Stack arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastDeadPixel": "Dead Pixel",
+  "@afterHoursCastDeadPixel": {
+    "description": "Name of an enemy in the Pixel Purge arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastDeadPixelLine": "Falls from cleared blocks. Catching it shrinks the scrubber.",
+  "@afterHoursCastDeadPixelLine": {
+    "description": "What the Dead Pixel does in the Pixel Purge arcade game, one line on its How to play card. The scrubber is the seek bar used as the paddle. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastMacroblock": "Macroblock",
+  "@afterHoursCastMacroblock": {
+    "description": "Name of an obstacle in the Pixel Purge arcade game, shown on its How to play card. A blocky video compression artifact. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastMacroblockLine": "One hit clears it.",
+  "@afterHoursCastMacroblockLine": {
+    "description": "What the Macroblock does in the Pixel Purge arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastKeyframe": "Keyframe",
+  "@afterHoursCastKeyframe": {
+    "description": "Name of an obstacle in the Pixel Purge arcade game, shown on its How to play card. A video keyframe. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastKeyframeLine": "Takes three hits and drops a powerup.",
+  "@afterHoursCastKeyframeLine": {
+    "description": "What the Keyframe does in the Pixel Purge arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastHdrLine": "A scrubber twice as wide for eight seconds.",
+  "@afterHoursCastHdrLine": {
+    "description": "What the HDR powerup does in the Pixel Purge arcade game, one line on its How to play card. The scrubber is the seek bar used as the paddle. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursCastBufferNet": "Buffer",
+  "@afterHoursCastBufferNet": {
+    "description": "Name of a powerup in the Pixel Purge arcade game, shown on its How to play card. A safety net named after video buffering. Keep it short, it shows as a heading in a small column"
+  },
+  "afterHoursCastBufferNetLine": "A net under the scrubber that saves one miss.",
+  "@afterHoursCastBufferNetLine": {
+    "description": "What the Buffer powerup does in the Pixel Purge arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column"
+  },
+  "afterHoursBufferRunCardTouch": "Tap to jump, again mid-air to flip sides. Swipe toward your side to slide.",
+  "@afterHoursBufferRunCardTouch": {
+    "description": "Short touchscreen controls of the Buffer Run arcade game on its How to play card. Flip means turning gravity over onto the ceiling. Keep under about 90 characters, it shows as one line"
+  },
+  "afterHoursPixelPurgeCardRemote": "Left and Right slide the scrubber.",
+  "@afterHoursPixelPurgeCardRemote": {
+    "description": "Short remote controls of the Pixel Purge arcade game on its How to play card. The scrubber is the seek bar used as the paddle. Keep under about 90 characters, it shows as one line"
   }
 }

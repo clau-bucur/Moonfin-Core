@@ -24,6 +24,6 @@ Shared offline/settings code still exists; this is an experiment in stages.
 APK size and startup timings do not by themselves demonstrate smoother UI.
 
 Based on [Moonfin Core](https://github.com/Moonfin-Client/Moonfin-Core).
-See the [upstream integration report](docs/android-tv-upstream-integration-2026-11-06.md)
+See the [upstream integration report](docs/android-tv-upstream-integration-2026-11-11.md)
 for imported features, TV adaptations and validation.
 The existing [license](LICENSE) applies.

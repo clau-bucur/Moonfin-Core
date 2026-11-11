@@ -21,6 +21,7 @@ import 'letterbox_croppers.dart';
 import 'lossless_audio_bridge.dart';
 import 'server_transcode_capabilities.dart';
 import 'subtitle_cues.dart';
+import 'subtitle_fonts.dart';
 
 class NativeApplePlayerBackend
     with SubtitleDelayState, AppleSecondarySubtitleControls
@@ -141,6 +142,14 @@ class NativeApplePlayerBackend
   Future<void> setReconnecting(String? label) =>
       _invoke<void>('setReconnecting', {'label': label});
 
+  /// The watch party the player follows, or null when there's none.
+  Future<void> setWatchParty(Map<String, dynamic>? party) =>
+      _invoke<void>('setWatchParty', {'party': party});
+
+  /// A toast, chat line or reaction to show over the video once.
+  Future<void> showWatchPartyEvent(Map<String, dynamic> event) =>
+      _invoke<void>('showWatchPartyEvent', event);
+
   /// An alert over the player. [actionLabel] adds a button that answers with
   /// a `messageAction` event.
   Future<void> showMessage(
@@ -227,6 +236,10 @@ class NativeApplePlayerBackend
       case 'downloadSubtitle':
       case 'syncplayLeave':
       case 'syncplayIgnoreWait':
+      case 'partyReaction':
+      case 'partyChat':
+      case 'partyLeave':
+      case 'partyEnd':
       case 'openEpisodes':
       case 'selectEpisodesSeason':
       case 'selectEpisode':
@@ -986,6 +999,11 @@ class NativeApplePlayerBackend
     double? fontSize,
     int? fontWeight,
     double? verticalOffset,
+    double? strokeScale,
+    int? shadowColor,
+    double? shadowOffset,
+    double? shadowBlur,
+    String? fontFamily,
   }) async {
     await _invoke<void>('configureSubtitleStyle', {
       'textColor': textColor,
@@ -994,6 +1012,11 @@ class NativeApplePlayerBackend
       'fontSize': fontSize,
       'fontWeight': fontWeight,
       'verticalOffset': verticalOffset,
+      'strokeScale': strokeScale,
+      'shadowColor': shadowColor,
+      'shadowOffset': shadowOffset,
+      'shadowBlur': shadowBlur,
+      ...await subtitleFontPaths(fontFamily),
     });
   }
 

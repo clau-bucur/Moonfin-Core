@@ -25,6 +25,7 @@ import 'data/services/deep_link_service.dart';
 import 'data/services/watch_next_service.dart';
 import 'di/providers.dart';
 import 'l10n/app_localizations.dart';
+import 'l10n/current_app_localizations.dart';
 import 'preference/preference_constants.dart' show GlassSettledQuality;
 import 'preference/user_preferences.dart';
 import 'syncplay/syncplay_manager.dart';
@@ -40,7 +41,11 @@ import 'ui/widgets/cast_mini_player.dart';
 import 'ui/widgets/video_mini_player.dart';
 import 'ui/screens/settings/achievements_screen.dart';
 import 'ui/widgets/floating_notification.dart';
+import 'ui/screens/watch_party/silo_watch_party_screen.dart';
+import 'watch_party/moonbase_watch_party_api.dart';
+import 'watch_party/watch_party_rooms_service.dart';
 import 'ui/widgets/offline_banner.dart';
+
 import 'ui/widgets/times_up_gate.dart';
 import 'ui/widgets/settings/settings_panel.dart';
 import 'ui/widgets/server_messages_dialog.dart';
@@ -209,21 +214,8 @@ class _MoonfinAppState extends State<MoonfinApp> {
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               locale: _lastResolvedLocale,
-              localeResolutionCallback: (locale, supportedLocales) {
-                // Prefer exact match (language + country/script)
-                for (final supported in supportedLocales) {
-                  if (supported == locale) {
-                    return supported;
-                  }
-                }
-                // Fall back to language-only match
-                for (final supported in supportedLocales) {
-                  if (supported.languageCode == locale?.languageCode) {
-                    return supported;
-                  }
-                }
-                return const Locale('en');
-              },
+              localeResolutionCallback: (locale, _) =>
+                  resolveAppUiLocale(locale),
               builder: (context, child) {
                 final l10n = AppLocalizations.of(context);
                 CustomKeyboard.strings = KeyboardStrings(
@@ -347,7 +339,7 @@ class _MoonfinAppState extends State<MoonfinApp> {
                   ],
                 );
 
-                return ListenableBuilder(
+                final app = ListenableBuilder(
                   listenable: _prefs,
                   builder: (context, _) {
                     // Read here rather than hoisted above the builder, so a
@@ -374,6 +366,7 @@ class _MoonfinAppState extends State<MoonfinApp> {
                     );
                   },
                 );
+                return app;
               },
             );
           },
@@ -998,11 +991,17 @@ class _ConnectivityListenerState extends ConsumerState<_ConnectivityListener>
   StreamSubscription<SyncPlayUiEvent>? _syncPlayEventsSub;
   StreamSubscription<ChatThread>? _chatMessageSub;
   StreamSubscription<AchievementUnlocks>? _unlockSub;
+  StreamSubscription<MoonbaseRoomSummary>? _partyAlertSub;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    if (GetIt.instance.isRegistered<WatchPartyRoomsService>()) {
+      _partyAlertSub = GetIt.instance<WatchPartyRoomsService>().alerts.listen(
+        _handlePartyAlert,
+      );
+    }
     ref.read(syncPlayRuntimeCoordinatorProvider);
     final manager = ref.read(syncPlayManagerProvider);
     _syncPlayEventsSub = manager.uiEvents.listen(_handleSyncPlayEvent);
@@ -1028,6 +1027,7 @@ class _ConnectivityListenerState extends ConsumerState<_ConnectivityListener>
     _syncPlayEventsSub?.cancel();
     _chatMessageSub?.cancel();
     _unlockSub?.cancel();
+    _partyAlertSub?.cancel();
     if (GetIt.instance.isRegistered<ServerMessagesService>()) {
       GetIt.instance<ServerMessagesService>().removeListener(
         _handleServerMessagesChanged,
@@ -1107,6 +1107,55 @@ class _ConnectivityListenerState extends ConsumerState<_ConnectivityListener>
     final matches = appRouter.routerDelegate.currentConfiguration.matches;
     final path = matches.isEmpty ? '' : matches.last.matchedLocation;
     return Destinations.isPlayerRoute(path);
+  }
+
+  /// Party alerts: a TV banner that never takes focus and stays 8 seconds,
+  /// with the room first in the Home row, a toast with Join and Not now on
+  /// desktop, and a banner to tap on a phone.
+  void _handlePartyAlert(MoonbaseRoomSummary room) {
+    final navContext = _navigatorContext();
+    if (navContext == null) return;
+    final l10n = AppLocalizations.of(navContext);
+    final title = l10n.watchPartyStartedBy(room.hostName);
+    final body = room.isPlaying
+        ? '${watchPartyRoomTitle(l10n, room)} · '
+              '${l10n.watchPartyWatchingCount(room.memberCount)}'
+        : l10n.watchPartyInLobbyCount(
+            watchPartyRoomTitle(l10n, room),
+            room.memberCount,
+          );
+    void join() {
+      final context = _navigatorContext();
+      if (context != null) unawaited(joinListedRoom(context, room));
+    }
+
+    if (PlatformDetection.useLeanbackUi) {
+      FloatingNotification.show(
+        navContext,
+        title,
+        '$body\n${l10n.watchPartyFirstOnHome}',
+        null,
+        icon: Icons.groups_rounded,
+        duration: const Duration(seconds: 8),
+      );
+    } else if (PlatformDetection.isDesktop) {
+      FloatingNotification.show(
+        navContext,
+        title,
+        body,
+        null,
+        icon: Icons.groups_rounded,
+        actions: [(l10n.notNow, () {}), (l10n.syncPlayJoin, join)],
+      );
+    } else {
+      FloatingNotification.show(
+        navContext,
+        title,
+        body,
+        join,
+        icon: Icons.groups_rounded,
+      );
+    }
   }
 
   /// A banner for a chat message from a friend. Tapping it opens the chat.

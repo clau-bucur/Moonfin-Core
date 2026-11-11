@@ -69,6 +69,10 @@ class Destinations {
 
   // General
   static const home = '/home';
+
+  /// The Watch Parties screen, `?code=` joining a room as it opens. Party
+  /// pushes and invite links land here.
+  static const watchParty = '/watch-party';
   static const search = '/search';
 
   // Browsing
@@ -210,14 +214,18 @@ class Destinations {
     bool autoPlay = false,
     String? seasonContext,
     bool full = false,
+    String? libraryId,
   }) {
-    final base = '/item/$itemId';
+    // A book series id carries its name, which can hold a slash or a question
+    // mark.
+    final base = '/${Uri(pathSegments: ['item', itemId]).path}';
     final params = <String>[
       if (serverId != null) 'serverId=$serverId',
       if (autoPlay) 'autoPlay=true',
       if (seasonContext != null && seasonContext.isNotEmpty)
         'seasonContext=${Uri.encodeQueryComponent(seasonContext)}',
       if (full) 'full=true',
+      if (libraryId != null) 'libraryId=$libraryId',
     ];
     return params.isEmpty ? base : '$base?${params.join('&')}';
   }

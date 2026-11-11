@@ -2,10 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
+import 'package:moonfin_native_video/moonfin_native_video.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
-enum _EmbeddedPlayerMode { manualIframe, unsupported }
+import '../../util/platform_detection.dart';
+
+enum _EmbeddedPlayerMode {
+  manualIframe,
+  unsupported,
+}
 
 class WebYouTubeTrailer extends StatefulWidget {
   final String videoId;
@@ -51,10 +57,17 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
   static const _origin = 'https://www.youtube-nocookie.com';
   static const _playerElementId = 'moonfin-player';
   static const _stageElementId = 'moonfin-stage';
-  // Rendered at this fixed size and CSS-scaled to the box; YouTube picks quality
-  // from the player's pixel size, so a 1080p stage yields 1080p trailers.
+  // YouTube picks the quality from the player's pixel size, so a 1080p stage
+  // gets 1080p trailers.
   static const _stageWidth = 1920;
   static const _stageHeight = 1080;
+  // Amazon WebView's hardware video overlay follows the element's layout box
+  // but not CSS transforms, so on Android TV the stage is sized to cover the
+  // box instead of being scaled. The WebView's density still gives YouTube a
+  // 1080p-sized player on a 1080p TV. Phones keep the scaled stage, since
+  // their smaller box would get a lower quality.
+  static bool get _layoutSizedStage =>
+      PlatformDetection.isAndroid && !PlatformDetection.isMobile;
   static const _startupChromeMaskDuration = Duration(milliseconds: 700);
 
   WebViewController? _controller;
@@ -450,7 +463,6 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
   String get _playerHtml {
     final pointerEvents = widget.ignorePointer ? 'none' : 'auto';
     final playerVars = <String, dynamic>{
-      'autoplay': 1,
       'cc_load_policy': widget.showCaptions ? 1 : 0,
       'controls': widget.showControls ? 1 : 0,
       'disablekb': 1,
@@ -477,6 +489,7 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
     final playerVarsJson = jsonEncode(playerVars);
     final stageWidth = _stageWidth;
     final stageHeight = _stageHeight;
+    final layoutSizedStage = _layoutSizedStage;
 
     return '''
 <!DOCTYPE html>
@@ -522,6 +535,7 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
   const playerVars = $playerVarsJson;
   const stageWidth = $stageWidth;
   const stageHeight = $stageHeight;
+  const layoutSizedStage = $layoutSizedStage;
 
   let player = null;
   let currentVideoId = $initialVideoId;
@@ -603,6 +617,13 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
     );
     const tx = (window.innerWidth - stageWidth * scale) / 2;
     const ty = (window.innerHeight - stageHeight * scale) / 2;
+    if (layoutSizedStage) {
+      stage.style.width = (stageWidth * scale) + 'px';
+      stage.style.height = (stageHeight * scale) + 'px';
+      stage.style.left = tx + 'px';
+      stage.style.top = ty + 'px';
+      return;
+    }
     stage.style.transform =
         'translate(' + tx + 'px, ' + ty + 'px) scale(' + scale + ')';
   };
@@ -623,11 +644,14 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
       applyMute();
     },
     stop: function() {
-      if (player) {
-        // Mute first so audio dies immediately even if stopVideo lags.
-        try { player.mute(); } catch (_) {}
-        try { player.stopVideo(); } catch (_) {}
+      if (!player) {
+        // Ready hasn't fired yet, so drop the video or Ready would start it.
+        currentVideoId = null;
+        return;
       }
+      // Mute first so audio dies immediately even if stopVideo lags.
+      try { player.mute(); } catch (_) {}
+      try { player.stopVideo(); } catch (_) {}
     }
   };
 
@@ -661,16 +685,13 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
       host: host,
       width: stageWidth,
       height: stageHeight,
-      videoId: currentVideoId,
       playerVars: playerVars,
       events: {
+        // The video only loads here. Passing it to the constructor too would
+        // load it twice.
         onReady: function() {
           postMessage('Ready', null);
-          if (playerVars.autoplay === 1) {
-            loadCurrentVideo();
-          } else {
-            applyMute();
-          }
+          loadCurrentVideo();
         },
         onApiChange: function() {
           // The captions module reports itself here once it loads, which is the
@@ -716,7 +737,12 @@ class _WebYouTubeTrailerState extends State<WebYouTubeTrailer> {
 
         // The chrome mask only ever shows when the player is interactive, so
         // skip the wrapping Stack for the muted background preview.
-        final view = WebViewWidget(controller: controller);
+        // Sized in the view's own points: a WebView that plays on a hardware
+        // video overlay (Amazon WebView on Fire TV) draws the video at the
+        // native view's size, so under TvUiScale it came out zoomed.
+        final view = UnscaledPlatformView(
+          child: WebViewWidget(controller: controller),
+        );
         return IgnorePointer(
           ignoring: widget.ignorePointer,
           child: widget.ignorePointer

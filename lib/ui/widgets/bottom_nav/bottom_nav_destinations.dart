@@ -39,7 +39,7 @@ String bottomNavHubActionLabel(
 }) =>
     switch (action) {
       BottomNavHubAction.shuffle => l10n.shuffle,
-      BottomNavHubAction.syncPlay => l10n.syncPlay,
+      BottomNavHubAction.syncPlay => l10n.watchParties,
       BottomNavHubAction.quickConnect =>
         silo ? l10n.siloApproveSignIn : l10n.quickConnect,
       BottomNavHubAction.remoteControl => l10n.remoteControl,

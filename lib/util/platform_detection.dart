@@ -248,6 +248,10 @@ class PlatformDetection {
   static String? get deviceHardware => _capabilityString('deviceHardware');
   static String? get deviceSocModel => _capabilityString('deviceSocModel');
 
+  /// Amazon starts every Fire TV model name with AFT.
+  static bool get isFireTv =>
+      isAndroid && (deviceModel?.toUpperCase().startsWith('AFT') ?? false);
+
   static void setDisplayHdrTypes(Iterable<String>? values) {
     final wasProbed = _hasDisplayHdrCapabilities;
     final previous = Set<String>.of(_displayHdrTypes);

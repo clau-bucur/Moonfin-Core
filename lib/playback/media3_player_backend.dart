@@ -16,6 +16,7 @@ import 'known_defects.dart';
 import 'media3_letterbox_crop.dart';
 import 'media3_playback_status.dart';
 import 'server_transcode_capabilities.dart';
+import 'subtitle_fonts.dart';
 
 class Media3PlayerBackend extends PlayerBackend
     with SubtitleDelayState
@@ -1865,6 +1866,11 @@ class Media3PlayerBackend extends PlayerBackend
     double? fontSize,
     int? fontWeight,
     double? verticalOffset,
+    double? strokeScale,
+    int? shadowColor,
+    double? shadowOffset,
+    double? shadowBlur,
+    String? fontFamily,
     bool? applyEmbeddedStyles,
     bool? applyEmbeddedFontSizes,
   }) async {
@@ -1875,6 +1881,11 @@ class Media3PlayerBackend extends PlayerBackend
       'fontSize': fontSize,
       'fontWeight': fontWeight,
       'verticalOffset': verticalOffset,
+      'strokeScale': strokeScale,
+      'shadowColor': shadowColor,
+      'shadowOffset': shadowOffset,
+      'shadowBlur': shadowBlur,
+      ...await subtitleFontPaths(fontFamily),
       'applyEmbeddedStyles': applyEmbeddedStyles,
       'applyEmbeddedFontSizes': applyEmbeddedFontSizes,
     });

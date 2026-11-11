@@ -245,7 +245,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get detailScreenStyleSubtitle =>
-      'Clàssic és la disposició original centrada de moonfin. Modern és una disposició cinematogràfica adaptativa. Spotlight és una disposició que posa la il·lustració al davant, amb targetes de contingut emergents. Nouveau és una disposició a pantalla completa amb les seccions apilades al llarg de la pàgina. Minimalista és la il·lustració, un botó de reproducció i els episodis. Escenari posa el pòster al davant, amb el botó de reproducció a sota i els detalls al costat. Estrena centra el títol sobre un teló de fons que omple la pantalla, amb totes les seccions a sota al llarg de la pàgina. Vista ràpida obre un calaix sobre la pantalla on eres, amb la pàgina completa a només una pulsació. Esmerilat fa surar el títol en una finestra de vidre sobre una còpia difuminada de la seva il·lustració, amb les seves parts en pestanyes sota els botons.';
+      'Com es mostra una pel·lícula o una sèrie quan l\'obres.';
 
   @override
   String get detailScreenStyleMoonfin => 'Clàssic';
@@ -1714,7 +1714,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get audioTrack => 'Pista d\'àudio';
 
   @override
-  String get noOtherAudioTracks => 'No other audio tracks';
+  String get noOtherAudioTracks => 'No hi ha cap altra pista d\'àudio';
 
   @override
   String get subtitleTrack => 'Pista de subtítols';
@@ -2755,7 +2755,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String playerMatchingDisplayRate(String fps) {
-    return 'Matching display to $fps fps…';
+    return 'S\'està ajustant la pantalla a $fps fps…';
   }
 
   @override
@@ -3190,11 +3190,11 @@ class AppLocalizationsCa extends AppLocalizations {
   String get watchedIndicators => 'Indicadors de contingut vist';
 
   @override
-  String get showPosterLabels => 'Poster Labels';
+  String get showPosterLabels => 'Etiquetes dels pòsters';
 
   @override
   String get showPosterLabelsSubtitle =>
-      'Show the labels on posters, such as 4K or HDR.';
+      'Mostra les etiquetes als pòsters, com ara 4K o HDR.';
 
   @override
   String get always => 'Sempre';
@@ -3902,31 +3902,31 @@ class AppLocalizationsCa extends AppLocalizations {
   String get upcomingEpisodeTomorrow => 'Demà';
 
   @override
-  String get radarrCalendarRow => 'Upcoming Movies (Radarr)';
+  String get radarrCalendarRow => 'Properes pel·lícules (Radarr)';
 
   @override
-  String get sonarrCalendarRow => 'Upcoming TV Shows (Sonarr)';
+  String get sonarrCalendarRow => 'Properes sèries (Sonarr)';
 
   @override
-  String get mergedCalendarRow => 'Upcoming Releases';
+  String get mergedCalendarRow => 'Properes estrenes';
 
   @override
-  String get arrCalendarsRowSubtitle => 'Radarr and Sonarr Calendars';
+  String get arrCalendarsRowSubtitle => 'Calendaris de Radarr i Sonarr';
 
   @override
-  String get radarrCalendarRowSubtitle => 'Radarr Calendar';
+  String get radarrCalendarRowSubtitle => 'Calendari de Radarr';
 
   @override
-  String get sonarrCalendarRowSubtitle => 'Sonarr Calendar';
+  String get sonarrCalendarRowSubtitle => 'Calendari de Sonarr';
 
   @override
   String calendarReleaseIn(int days, String date) {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'In $days days',
-      one: 'Tomorrow',
-      zero: 'Today',
+      other: 'D\'aquí a $days dies',
+      one: 'Demà',
+      zero: 'Avui',
     );
     return '$_temp0 ($date)';
   }
@@ -3938,46 +3938,54 @@ class AppLocalizationsCa extends AppLocalizations {
   String get calendarReleaseDigital => 'Digital';
 
   @override
-  String get calendarReleasePhysical => 'Physical';
+  String get calendarReleasePhysical => 'Format físic';
 
   @override
-  String get upcomingCalendars => 'Upcoming Calendars';
+  String get upcomingCalendars => 'Calendaris de properes estrenes';
 
   @override
   String get upcomingCalendarsDescription =>
-      'Toggle Upcoming Calendars from Radarr/Sonarr.';
+      'Activa o desactiva els calendaris de properes estrenes de Radarr/Sonarr.';
 
   @override
-  String get enableRadarrCalendar => 'Enable Radarr\'s Upcoming Calendar';
+  String get enableRadarrCalendar =>
+      'Activa el calendari de properes estrenes de Radarr';
 
   @override
-  String get radarrCalendarShowCinema => 'Show Upcoming Cinema Releases';
+  String get radarrCalendarShowCinema =>
+      'Mostra les properes estrenes al cinema';
 
   @override
-  String get radarrCalendarShowDigital => 'Show Upcoming Digital Releases';
+  String get radarrCalendarShowDigital =>
+      'Mostra les properes estrenes digitals';
 
   @override
-  String get radarrCalendarShowPhysical => 'Show Upcoming Physical Releases';
+  String get radarrCalendarShowPhysical =>
+      'Mostra les properes estrenes en format físic';
 
   @override
-  String get calendarShowReleaseDate => 'Show Release Date on Home Screen';
+  String get calendarShowReleaseDate =>
+      'Mostra la data d\'estrena a la pantalla d\'inici';
 
   @override
   String get radarrCalendarHideDownloaded =>
-      'Hide Movies Already on the Server';
+      'Amaga les pel·lícules que ja són al servidor';
 
   @override
-  String get enableSonarrCalendar => 'Enable Sonarr\'s Upcoming Calendar';
+  String get enableSonarrCalendar =>
+      'Activa el calendari de properes estrenes de Sonarr';
 
   @override
-  String get sonarrCalendarShowEpisodeInfo => 'Display Episode Information';
+  String get sonarrCalendarShowEpisodeInfo =>
+      'Mostra la informació de l\'episodi';
 
   @override
   String get sonarrCalendarHideDownloaded =>
-      'Hide Episodes Already on the Server';
+      'Amaga els episodis que ja són al servidor';
 
   @override
-  String get mergeRadarrSonarrCalendars => 'Merge Sonarr and Radarr Calendars';
+  String get mergeRadarrSonarrCalendars =>
+      'Combina els calendaris de Sonarr i Radarr';
 
   @override
   String get moveUp => 'Pujar';
@@ -3991,7 +3999,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get buttonShownInSyncPlayGroup =>
-      'Només es mostra quan ets en un grup de SyncPlay';
+      'Només es mostra quan ets en una Watch Party';
 
   @override
   String get orientationLock => 'Bloqueig d\'orientació';
@@ -5088,30 +5096,30 @@ class AppLocalizationsCa extends AppLocalizations {
   String get mediaBarSourceRandom => 'Aleatori';
 
   @override
-  String get mediaBarSourceNewReleases => 'New Seasons & Episodes';
+  String get mediaBarSourceNewReleases => 'Temporades i episodis nous';
 
   @override
-  String get mediaBarNewReleaseBanner => 'New Release Banner';
+  String get mediaBarNewReleaseBanner => 'Bàner de novetat';
 
   @override
   String get mediaBarNewReleaseBannerDescription =>
-      'Flag series with a new season or new episodes that aired recently.';
+      'Destaca les sèries amb una temporada nova o episodis nous emesos recentment.';
 
   @override
-  String get mediaBarNewReleaseDays => 'New Release Window';
+  String get mediaBarNewReleaseDays => 'Període de novetat';
 
   @override
   String get mediaBarNewReleaseDaysDescription =>
-      'How long after an episode airs it still counts as new.';
+      'Quant de temps després de l\'emissió d\'un episodi encara es considera nou.';
 
   @override
-  String get mediaBarNewSeries => 'New Series';
+  String get mediaBarNewSeries => 'Sèrie nova';
 
   @override
-  String get mediaBarNewSeason => 'New Season';
+  String get mediaBarNewSeason => 'Temporada nova';
 
   @override
-  String get mediaBarNewEpisodes => 'New Episodes';
+  String get mediaBarNewEpisodes => 'Episodis nous';
 
   @override
   String get moviesAndTvShows => 'Pel·lícules i Sèries';
@@ -5515,20 +5523,20 @@ class AppLocalizationsCa extends AppLocalizations {
   String get additionalRatings => 'Valoracions addicionals';
 
   @override
-  String get mdblistWatchingNow => 'Watching on MDBList';
+  String get mdblistWatchingNow => 'Ara es mira a MDBList';
 
   @override
   String get mdblistWatchingNowDescription =>
-      'Show what MDBList users are currently watching';
+      'Mostra què miren ara mateix els usuaris de MDBList';
 
   @override
   String watchingNowWatchersCount(int count) {
-    return '$count watching';
+    return '$count mirant';
   }
 
   @override
   String watchingNowLiveSummary(String users, String movies, String shows) {
-    return '$users watching now · $movies movies · $shows shows';
+    return '$users mirant ara · $movies pel·lícules · $shows sèries';
   }
 
   @override
@@ -5537,7 +5545,7 @@ class AppLocalizationsCa extends AppLocalizations {
     String movies,
     String shows,
   ) {
-    return '$users watched today · $movies movies · $shows shows';
+    return '$users han mirat avui · $movies pel·lícules · $shows sèries';
   }
 
   @override
@@ -6056,15 +6064,15 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get seerrSeriesMatchDescription =>
-      'We couldn\'t match this series automatically. Pick the right one below.';
+      'No hem pogut trobar automàticament aquesta sèrie. Tria la correcta a continuació.';
 
   @override
   String get seerrSeriesNoMatch =>
-      'We couldn\'t find a match for this series, so it can\'t be requested.';
+      'No hem trobat cap coincidència per a aquesta sèrie, així que no es pot sol·licitar.';
 
   @override
   String get seerrSeriesMatchFailed =>
-      'Sonarr couldn\'t find a match for this series, or couldn\'t be reached. Try again, or check the series on Seerr.';
+      'Sonarr no ha trobat cap coincidència per a aquesta sèrie o no s\'hi ha pogut connectar. Torna-ho a provar o comprova la sèrie a Seerr.';
 
   @override
   String get advancedOptions => 'Opcions avançades';
@@ -11594,15 +11602,16 @@ class AppLocalizationsCa extends AppLocalizations {
   String get addToPlaylist => 'Afegeix a la llista de reproducció';
 
   @override
-  String get removeFromPlaylist => 'Remove from Playlist';
+  String get removeFromPlaylist => 'Elimina de la llista de reproducció';
 
   @override
   String removeFromPlaylistConfirm(String item, String playlist) {
-    return 'Remove $item from $playlist?';
+    return 'Vols eliminar $item de $playlist?';
   }
 
   @override
-  String get removeFromPlaylistFailed => 'Failed to remove from playlist';
+  String get removeFromPlaylistFailed =>
+      'No s\'ha pogut eliminar de la llista de reproducció';
 
   @override
   String get lyricsNotAvailable => 'No hi ha lletra disponible';
@@ -12072,7 +12081,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get settingsSyncplaySubtitle =>
-      'Lògica de sincronització per a sessions de grup';
+      'Mira contingut amb amics d\'aquest servidor, tots sincronitzats';
 
   @override
   String get settingsSkipIntrosAndOutros => 'Ometeu introduccions i altres?';
@@ -12271,53 +12280,53 @@ class AppLocalizationsCa extends AppLocalizations {
       'Activa la reproducció directa per a la televisió en directe';
 
   @override
-  String get settingsOpenGroups => 'Grups oberts';
+  String get settingsOpenGroups => 'Watch Parties obertes';
 
   @override
   String get settingsOpenGroupsSubtitle =>
-      'Crea, uneix-te o gestiona grups de SyncPlay';
+      'Inicia\'n una o uneix-te a una que ja hagi començat';
 
   @override
-  String get settingsSyncplayEnabled => 'SyncPlay habilitat';
+  String get settingsSyncplayEnabled => 'Watch Parties';
 
   @override
   String get settingsSyncplayEnabledSubtitle =>
-      'Activa les funcions de visualització en grup';
+      'Mira contingut amb amics d\'aquest servidor, tots sincronitzats';
 
   @override
-  String get settingsSyncplayButton => 'Botó SyncPlay';
+  String get settingsSyncplayButton => 'Botó de Watch Parties';
 
   @override
   String get settingsSyncplayButtonSubtitle =>
-      'Mostra el botó SyncPlay a la barra de navegació';
+      'Mostra el botó de Watch Parties a la barra de navegació';
 
   @override
   String get settingsSyncplayAdvancedCorrection => 'Correcció avançada';
 
   @override
   String get settingsSyncplayAdvancedCorrectionSubtitle =>
-      'Activa la lògica de sincronització detallada';
+      'Retards i desplaçament addicional';
 
   @override
   String get settingsSyncplaySyncCorrection => 'Correcció de sincronització';
 
   @override
   String get settingsSyncplaySyncCorrectionSubtitle =>
-      'Ajusta automàticament la reproducció per mantenir-se sincronitzat';
+      'Mantén aquest dispositiu sincronitzat amb la sala';
 
   @override
   String get settingsSyncplaySpeedToSync => 'Velocitat per sincronitzar';
 
   @override
   String get settingsSyncplaySpeedToSyncSubtitle =>
-      'Utilitzeu l\'ajust de velocitat de reproducció per sincronitzar';
+      'Reprodueix una mica més ràpid o més lent per posar-te al dia';
 
   @override
-  String get settingsSyncplaySkipToSync => 'Passeu a la sincronització';
+  String get settingsSyncplaySkipToSync => 'Salta per sincronitzar';
 
   @override
   String get settingsSyncplaySkipToSyncSubtitle =>
-      'Utilitzeu la cerca de sincronització';
+      'Salta endavant quan vagi massa desfasat';
 
   @override
   String get settingsSyncplayMinimumSpeedDelay => 'Retard de velocitat mínima';
@@ -12647,74 +12656,75 @@ class AppLocalizationsCa extends AppLocalizations {
       'Mostra la fila de l\'estudi a les seccions d\'inici.';
 
   @override
-  String get sinceYouWatched => 'Since You Watched';
+  String get sinceYouWatched => 'Ja que vas veure';
 
   @override
-  String get sinceYouWatchedRowTitle => 'Since you watched';
+  String get sinceYouWatchedRowTitle => 'Ja que vas veure';
 
   @override
   String sinceYouWatchedItemRowTitle(String title) {
-    return 'Since you watched \"$title\"';
+    return 'Ja que vas veure «$title»';
   }
 
   @override
   String sinceYouWatchedRowNumber(int number) {
-    return 'Since You Watched Row $number';
+    return 'Fila $number de «Ja que vas veure»';
   }
 
   @override
-  String get displaySinceYouWatchedRows => 'Display Since You Watched Rows';
+  String get displaySinceYouWatchedRows =>
+      'Mostra les files de «Ja que vas veure»';
 
   @override
   String get displaySinceYouWatchedRowsSubtitle =>
-      'Show and customize Since You Watched rows in Home Sections.';
+      'Mostra i personalitza les files de «Ja que vas veure» a les seccions d\'inici.';
 
   @override
-  String get sinceYouWatchedSource => 'Recommendation Source';
+  String get sinceYouWatchedSource => 'Font de les recomanacions';
 
   @override
   String get sinceYouWatchedSourceDescription =>
-      'Choose recommendation source (Moonfin Recommends custom local algorithm, Jellyfin Recommends server engine, or TMDb\'s similarity metrics. Note: Online recommendations require Seerr integration).';
+      'Tria la font de les recomanacions (Recomanacions Moonfin, l\'algorisme local personalitzat; Recomanacions Jellyfin, el motor del servidor; o les mètriques de similitud de TMDb. Nota: les recomanacions en línia requereixen la integració amb Seerr).';
 
   @override
-  String get sinceYouWatchedSourceLocal => 'Moonfin Recommends';
+  String get sinceYouWatchedSourceLocal => 'Recomanacions Moonfin';
 
   @override
-  String get sinceYouWatchedSourceServer => 'Jellyfin Recommends';
+  String get sinceYouWatchedSourceServer => 'Recomanacions Jellyfin';
 
   @override
-  String get sinceYouWatchedSourceOnline => 'TMDb Similarity';
+  String get sinceYouWatchedSourceOnline => 'Similitud de TMDb';
 
   @override
-  String get sinceYouWatchedSourceType => 'Source Type';
+  String get sinceYouWatchedSourceType => 'Tipus de font';
 
   @override
   String get sinceYouWatchedSourceTypeDescription =>
-      'Choose type of items to recommend';
+      'Tria el tipus d\'elements que es recomanaran';
 
   @override
-  String get sinceYouWatchedSourceItem => 'Source Item';
+  String get sinceYouWatchedSourceItem => 'Element font';
 
   @override
   String get sinceYouWatchedSourceItemDescription =>
-      'Choose which source item to base recommendations on';
+      'Tria en quin element d\'origen es basen les recomanacions';
 
   @override
-  String get sinceYouWatchedRecentlyWatched => 'Recently Watched';
+  String get sinceYouWatchedRecentlyWatched => 'Vist recentment';
 
   @override
-  String get sinceYouWatchedNumRows => 'Number of Rows to Add';
+  String get sinceYouWatchedNumRows => 'Nombre de files a afegir';
 
   @override
   String get sinceYouWatchedNumRowsDescription =>
-      'Choose how many Since You Watched rows to display (1-5)';
+      'Tria quantes files de «Ja que vas veure» vols mostrar (1-5)';
 
   @override
-  String get sinceYouWatchedIncludeWatched => 'Include Previously Watched';
+  String get sinceYouWatchedIncludeWatched => 'Inclou el que ja s\'ha vist';
 
   @override
   String get sinceYouWatchedIncludeWatchedSubtitle =>
-      'Include watched items in recommendations';
+      'Inclou els elements vistos a les recomanacions';
 
   @override
   String get studiosRowSorting => 'Ordenació de files d\'estudi';
@@ -12964,22 +12974,22 @@ class AppLocalizationsCa extends AppLocalizations {
       'Reprodueix AV1 per sobre de 1080p, inclòs HDR10, des del fitxer original en lloc de demanar al servidor que el transcodifiqui. Aquest dispositiu descodifica AV1 per programari, així que els fitxers 4K pesants o amb una taxa de bits alta poden anar a batzegades.';
 
   @override
-  String get cadenceSlowdown => 'Smooth 24 fps on a 60 Hz TV';
+  String get cadenceSlowdown => '24 fps fluids en un televisor de 60 Hz';
 
   @override
   String get cadenceSlowdownSubtitle =>
-      'When Match Frame Rate is off, play 24 fps video 0.1% slower so it fits the TV without dropped frames. Not used when audio is passed through to a receiver.';
+      'Quan Match Frame Rate està desactivat, reprodueix el vídeo de 24 fps un 0,1 % més lent perquè s\'ajusti al televisor sense perdre fotogrames. No s\'utilitza quan l\'àudio passa directament a un receptor.';
 
   @override
-  String get cadenceTipTitle => 'Turn On Match Frame Rate';
+  String get cadenceTipTitle => 'Activa Match Frame Rate';
 
   @override
   String get cadenceTipMessage =>
-      'This video can\'t play smoothly at your TV\'s current refresh rate. On your Apple TV, open Settings > Video and Audio > Match Content and turn on Match Frame Rate.';
+      'Aquest vídeo no es pot reproduir de manera fluida amb la freqüència de refresc actual del televisor. A l\'Apple TV, obre Settings > Video and Audio > Match Content i activa Match Frame Rate.';
 
   @override
   String get cadenceTipSlowdownHint =>
-      'Or turn on Smooth 24 fps on a 60 Hz TV in Moonfin under Playback > Quality & Decoding.';
+      'O activa «24 fps fluids en un televisor de 60 Hz» a Moonfin, a Reproducció > Qualitat i descodificació.';
 
   @override
   String get useExternalPlayer => 'Utilitza sempre un reproductor extern';
@@ -13310,28 +13320,28 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String watchPartyResumeAt(String time) {
-    return 'Resume at $time';
+    return 'Reprèn a $time';
   }
 
   @override
-  String get watchPartyStartFromBeginning => 'Start from the beginning';
+  String get watchPartyStartFromBeginning => 'Comença des del principi';
 
   @override
   String watchPartyResumeWhere(String name) {
-    return 'Where $name left off, the earliest anyone here has reached.';
+    return 'On ho va deixar $name, el punt menys avançat de la sala.';
   }
 
   @override
   String get watchPartyResumeEarliest =>
-      'The earliest point anyone here has reached.';
+      'El punt menys avançat al qual ha arribat algú de la sala.';
 
   @override
   String watchPartyResumeNotStarted(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count people haven\'t started it yet.',
-      one: '1 person hasn\'t started it yet.',
+      other: '$count persones encara no l\'han començat.',
+      one: '1 persona encara no l\'ha començat.',
     );
     return '$_temp0';
   }
@@ -13344,7 +13354,7 @@ class AppLocalizationsCa extends AppLocalizations {
       'Els convidats poden reproduir i posar en pausa';
 
   @override
-  String get watchPartyEnd => 'Finalitza la Watch Party';
+  String get watchPartyEnd => 'Finalitza per a tothom';
 
   @override
   String get watchPartyEnded => 'La Watch Party ha finalitzat.';
@@ -15474,59 +15484,65 @@ class AppLocalizationsCa extends AppLocalizations {
   String get setupCurrent => 'Actual';
 
   @override
-  String get setupMoonbaseTitle => 'Add Moonbase to your server';
+  String get setupMoonbaseTitle => 'Afegeix Moonbase al servidor';
 
   @override
   String get setupMoonbaseHint =>
-      'A free server plugin that unlocks more of Moonfin';
+      'Un connector de servidor gratuït que desbloqueja més funcions de Moonfin';
 
   @override
   String get setupMoonbaseIntro =>
-      'Moonbase is free and runs on your server. With it, Moonfin gets:';
+      'Moonbase és gratuït i s\'executa al teu servidor. Amb ell, Moonfin obté:';
 
   @override
   String get setupMoonbaseAskAdmin =>
-      'Only a server admin can install it. Send them this link.';
+      'Només un administrador del servidor el pot instal·lar. Envia-li aquest enllaç.';
 
   @override
   String get setupMoonbaseManualSteps =>
-      'It takes a few steps on your server to install. They\'re all at this link.';
+      'Cal fer uns quants passos al servidor per instal·lar-lo. Els tens tots en aquest enllaç.';
 
   @override
-  String get setupMoonbaseInstalling => 'Installing Moonbase...';
+  String get setupMoonbaseInstalling => 'S\'està instal·lant Moonbase...';
 
   @override
   String get setupMoonbaseInstalled =>
-      'Moonbase is installed. It turns on when the server restarts, which stops anything playing right now.';
+      'Moonbase està instal·lat. S\'activarà quan es reiniciï el servidor, cosa que aturarà tot el que s\'estigui reproduint ara mateix.';
 
   @override
   String get setupMoonbaseRestarting =>
-      'The server is restarting. Moonbase turns on once it\'s back.';
+      'El servidor s\'està reiniciant. Moonbase s\'activarà quan torni a estar disponible.';
 
   @override
-  String get moonbaseFeatureSync => 'Settings synced across your devices';
+  String get moonbaseFeatureSync =>
+      'Configuració sincronitzada entre els teus dispositius';
 
   @override
-  String get moonbaseFeatureRatings => 'Extra ratings and TMDB reviews';
+  String get moonbaseFeatureRatings =>
+      'Valoracions addicionals i ressenyes de TMDB';
 
   @override
-  String get moonbaseFeatureRows => 'Custom rows from your favorite lists';
+  String get moonbaseFeatureRows =>
+      'Files personalitzades a partir de les teves llistes preferides';
 
   @override
-  String get moonbaseFeatureGames => 'Retro games with synced saves';
+  String get moonbaseFeatureGames =>
+      'Jocs retro amb partides desades sincronitzades';
 
   @override
-  String get moonbaseFeatureCalendar => 'A calendar of what\'s coming up';
+  String get moonbaseFeatureCalendar => 'Un calendari del que arriba aviat';
 
   @override
-  String get moonbaseFeatureCollections => 'Your own order for each collection';
+  String get moonbaseFeatureCollections =>
+      'El teu propi ordre per a cada col·lecció';
 
   @override
-  String get moonbaseFeatureMessages => 'Messages from your server admin';
+  String get moonbaseFeatureMessages =>
+      'Missatges de l\'administrador del servidor';
 
   @override
   String setupMoonbaseInstallFailed(String error) {
-    return 'Moonbase couldn\'t be installed. $error';
+    return 'No s\'ha pogut instal·lar Moonbase. $error';
   }
 
   @override
@@ -16114,7 +16130,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get settingsPlaybackSubtitle =>
-      'Reproductor, qualitat, àudio, subtítols, salts i SyncPlay';
+      'Reproductor, qualitat, àudio, subtítols, salts i Watch Parties';
 
   @override
   String get settingsStorageSubtitle =>
@@ -16154,7 +16170,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get settingsSkippingAndQueueSection => 'Salts i cua';
 
   @override
-  String get settingsWatchTogetherSection => 'Veure junts';
+  String get settingsWatchTogetherSection => 'Watch Parties';
 
   @override
   String get settingsAdvancedSection => 'Avançat';
@@ -16322,10 +16338,10 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get playbackInfoServerCompatibilityCheck =>
-      'Server compatibility check';
+      'Comprovació de compatibilitat del servidor';
 
   @override
-  String get playbackInfoBitrateUnavailable => 'Bitrate unavailable';
+  String get playbackInfoBitrateUnavailable => 'Taxa de bits no disponible';
 
   @override
   String get playbackInfoQualityLimit => 'Límit de qualitat';
@@ -16391,7 +16407,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get playbackInfoNoteLiveRelay =>
-      'The server is relaying the channel without converting it.';
+      'El servidor retransmet el canal sense convertir-lo.';
 
   @override
   String playbackInfoFrameRateFrom(String rate, String source) {
@@ -16399,31 +16415,32 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
-  String get playbackInfoRateSourceHeader => 'stream header';
+  String get playbackInfoRateSourceHeader => 'capçalera del flux';
 
   @override
-  String get playbackInfoRateSourceMeasured => 'measured';
+  String get playbackInfoRateSourceMeasured => 'mesurada';
 
   @override
-  String get playbackInfoRateSourceServer => 'server';
+  String get playbackInfoRateSourceServer => 'servidor';
 
   @override
-  String get playbackInfoServerFrameRate => 'Server Frame Rate';
+  String get playbackInfoServerFrameRate =>
+      'Velocitat de fotogrames del servidor';
 
   @override
-  String get playbackInfoScan => 'Scan';
+  String get playbackInfoScan => 'Escombratge';
 
   @override
-  String get playbackInfoProgressive => 'Progressive';
+  String get playbackInfoProgressive => 'Progressiu';
 
   @override
-  String get playbackInfoInterlaced => 'Interlaced';
+  String get playbackInfoInterlaced => 'Entrellaçat';
 
   @override
-  String get playbackInfoRepeatedFields => 'Telecined (repeated fields)';
+  String get playbackInfoRepeatedFields => 'Amb telecinema (camps repetits)';
 
   @override
-  String get playbackInfoHdmiOutput => 'HDMI Output';
+  String get playbackInfoHdmiOutput => 'Sortida HDMI';
 
   @override
   String playbackInfoDisplayMode(String width, String height, String rate) {
@@ -16431,10 +16448,10 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
-  String get playbackInfoRateCorrections => 'Rate Corrections';
+  String get playbackInfoRateCorrections => 'Correccions de freqüència';
 
   @override
-  String get playbackInfoAudioOutput => 'Output';
+  String get playbackInfoAudioOutput => 'Sortida';
 
   @override
   String playbackInfoPassthroughOf(String codec) {
@@ -16443,7 +16460,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String playbackInfoDecodedTo(String channels) {
-    return 'Decoded ($channels)';
+    return 'Descodificat ($channels)';
   }
 
   @override
@@ -16514,7 +16531,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String playbackInfoWhyVideoProfileUnknown(String codec) {
-    return 'The server couldn\'t verify this stream\'s $codec profile.';
+    return 'El servidor no ha pogut verificar el perfil $codec d\'aquest flux.';
   }
 
   @override
@@ -17215,237 +17232,237 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
-  String get calendar => 'Calendar';
+  String get calendar => 'Calendari';
 
   @override
-  String get showCalendarButton => 'Show Calendar Button';
+  String get showCalendarButton => 'Mostra el botó del calendari';
 
   @override
   String get showCalendarButtonSubtitle =>
-      'Show the calendar of upcoming episodes and movies in the navigation bar';
+      'Mostra el calendari de properes estrenes d\'episodis i pel·lícules a la barra de navegació';
 
   @override
-  String get calendarFullCalendar => 'Full calendar';
+  String get calendarFullCalendar => 'Calendari complet';
 
   @override
-  String get calendarUpcoming => 'Upcoming';
+  String get calendarUpcoming => 'Properament';
 
   @override
-  String get calendarRecentlyAired => 'Recently aired';
+  String get calendarRecentlyAired => 'Emès recentment';
 
   @override
-  String get calendarRemindMe => 'Remind me';
+  String get calendarRemindMe => 'Recorda-m\'ho';
 
   @override
-  String get calendarReminderSet => 'Reminder set';
+  String get calendarReminderSet => 'Recordatori definit';
 
   @override
-  String get calendarReminderFailed => 'Couldn\'t save the reminder';
+  String get calendarReminderFailed => 'No s\'ha pogut desar el recordatori';
 
   @override
-  String get calendarReadyToWatch => 'Ready to watch';
+  String get calendarReadyToWatch => 'Llest per veure';
 
   @override
-  String get calendarComingUpThisWeek => 'Coming up this week';
+  String get calendarComingUpThisWeek => 'Properament aquesta setmana';
 
   @override
-  String get calendarNothingUpcoming => 'Nothing coming up';
+  String get calendarNothingUpcoming => 'No hi ha res previst';
 
   @override
-  String get calendarNothingRecent => 'Nothing aired recently';
+  String get calendarNothingRecent => 'No s\'ha emès res recentment';
 
   @override
-  String get calendarEmptyDay => 'Nothing on this day';
+  String get calendarEmptyDay => 'No hi ha res aquest dia';
 
   @override
-  String get calendarStartsIn => 'Starts in';
+  String get calendarStartsIn => 'Comença d\'aquí a';
 
   @override
-  String get calendarUnitDays => 'days';
+  String get calendarUnitDays => 'dies';
 
   @override
-  String get calendarUnitHours => 'hr';
+  String get calendarUnitHours => 'h';
 
   @override
   String get calendarUnitMinutes => 'min';
 
   @override
   String calendarDayAtTime(String day, String time) {
-    return '$day at $time';
+    return '$day a les $time';
   }
 
   @override
-  String get calendarAllDay => 'All day';
+  String get calendarAllDay => 'Tot el dia';
 
   @override
-  String get calendarBadgeSeriesPremiere => 'Series premiere';
+  String get calendarBadgeSeriesPremiere => 'Estrena de la sèrie';
 
   @override
-  String get calendarBadgeSeasonPremiere => 'New season';
+  String get calendarBadgeSeasonPremiere => 'Temporada nova';
 
   @override
-  String get calendarBadgeSeasonFinale => 'Finale';
+  String get calendarBadgeSeasonFinale => 'Final de temporada';
 
   @override
-  String get calendarBadgeMidseasonFinale => 'Midseason finale';
+  String get calendarBadgeMidseasonFinale => 'Final de mitja temporada';
 
   @override
-  String get calendarBadgeSeriesFinale => 'Series finale';
+  String get calendarBadgeSeriesFinale => 'Final de la sèrie';
 
   @override
-  String get calendarBadgeNew => 'NEW';
+  String get calendarBadgeNew => 'NOU';
 
   @override
-  String get calendarStatusInLibrary => 'In library';
+  String get calendarStatusInLibrary => 'A la biblioteca';
 
   @override
-  String get calendarNotMonitored => 'Not monitored';
+  String get calendarNotMonitored => 'No monitorat';
 
   @override
-  String get calendarMovieDetails => 'Movie details';
+  String get calendarMovieDetails => 'Detalls de la pel·lícula';
 
   @override
   String get calendarProblemAdminsOnly =>
-      'The calendar is limited to admins on this server.';
+      'En aquest servidor, el calendari només és per als administradors.';
 
   @override
   String get calendarProblemNeedsSeerr =>
-      'An admin needs to sign in to Seerr in Moonfin before the calendar can load.';
+      'Cal que un administrador iniciï la sessió a Seerr a Moonfin perquè es pugui carregar el calendari.';
 
   @override
   String get calendarProblemNotConfigured =>
-      'No Sonarr or Radarr server is linked yet.';
+      'Encara no hi ha cap servidor de Sonarr o Radarr enllaçat.';
 
   @override
-  String get calendarProblemFailed => 'Couldn\'t load the calendar.';
+  String get calendarProblemFailed => 'No s\'ha pogut carregar el calendari.';
 
   @override
   String get calendarSettingsSubtitle =>
-      'Style, filters and actions for the calendar';
+      'Estil, filtres i accions del calendari';
 
   @override
-  String get calendarSettingsView => 'View';
+  String get calendarSettingsView => 'Veure';
 
   @override
-  String get calendarSettingsStyle => 'Calendar style';
+  String get calendarSettingsStyle => 'Estil del calendari';
 
   @override
   String get calendarSettingsStyleDescription =>
-      'What the Calendar button opens. The full month is one button away in both.';
+      'Què obre el botó del calendari. En tots dos casos, el mes complet és a un botó de distància.';
 
   @override
   String get calendarSettingsStyleAgenda => 'Agenda';
 
   @override
-  String get calendarSettingsStyleCountdown => 'Countdown';
+  String get calendarSettingsStyleCountdown => 'Compte enrere';
 
   @override
-  String get calendarSettingsWeekStart => 'Week starts on';
+  String get calendarSettingsWeekStart => 'La setmana comença';
 
   @override
-  String get calendarSettingsWhatShows => 'What shows';
+  String get calendarSettingsWhatShows => 'Què es mostra';
 
   @override
-  String get calendarSettingsScope => 'Show';
+  String get calendarSettingsScope => 'Mostra';
 
   @override
   String get calendarSettingsScopeDescription =>
-      'My shows keeps the series you favorited or started watching';
+      '«Les meves sèries» mostra les sèries que has marcat com a preferides o que has començat a veure';
 
   @override
-  String get calendarSettingsScopeEverything => 'Everything';
+  String get calendarSettingsScopeEverything => 'Tot';
 
   @override
-  String get calendarSettingsScopeMyShows => 'My shows';
+  String get calendarSettingsScopeMyShows => 'Les meves sèries';
 
   @override
-  String get calendarSettingsUnmonitored => 'Include unmonitored';
+  String get calendarSettingsUnmonitored => 'Inclou els no monitorats';
 
   @override
   String get calendarSettingsUnmonitoredSubtitle =>
-      'Also list episodes and movies Sonarr and Radarr aren\'t set to download';
+      'Mostra també els episodis i les pel·lícules que Sonarr i Radarr no tenen configurats per baixar';
 
   @override
-  String get calendarSettingsSpecials => 'Specials';
+  String get calendarSettingsSpecials => 'Especials';
 
   @override
   String get calendarSettingsSpecialsSubtitle =>
-      'Season 0 episodes, like extras and holiday specials';
+      'Episodis de la temporada 0, com ara extres i especials de festes';
 
   @override
-  String get calendarSettingsBadges => 'Premiere and finale tags';
+  String get calendarSettingsBadges => 'Etiquetes d\'estrena i de final';
 
   @override
   String get calendarSettingsBadgesSubtitle =>
-      'Mark premieres, finales and new seasons';
+      'Marca les estrenes, els finals i les temporades noves';
 
   @override
-  String get calendarSettingsColorBy => 'Color by';
+  String get calendarSettingsColorBy => 'Color segons';
 
   @override
   String get calendarSettingsColorByDescription =>
-      'Type tells episodes from movies. Status shows what\'s in your library, coming up or missing.';
+      '«Tipus» distingeix els episodis de les pel·lícules. «Estat» mostra què hi ha a la biblioteca, què arriba aviat o què falta.';
 
   @override
-  String get calendarSettingsColorByType => 'Type';
+  String get calendarSettingsColorByType => 'Tipus';
 
   @override
-  String get calendarSettingsImageType => 'Card image';
+  String get calendarSettingsImageType => 'Imatge de la targeta';
 
   @override
   String get calendarSettingsImageTypeDescription =>
-      'The artwork on the Countdown rows';
+      'La il·lustració de les files de compte enrere';
 
   @override
-  String get calendarSettingsSpoilerSafe => 'Spoiler safe';
+  String get calendarSettingsSpoilerSafe => 'Sense espòilers';
 
   @override
   String get calendarSettingsSpoilerSafeSubtitle =>
-      'Hide episode titles and stills for shows you\'re behind on';
+      'Amaga els títols i les imatges dels episodis de les sèries que no tens al dia';
 
   @override
-  String get calendarSettingsActions => 'Actions';
+  String get calendarSettingsActions => 'Accions';
 
   @override
-  String get calendarSettingsSelectAction => 'Selecting an item';
+  String get calendarSettingsSelectAction => 'En seleccionar un element';
 
   @override
   String get calendarSettingsSelectActionDescription =>
-      'What OK or a tap does on something that\'s already in your library';
+      'Què fa OK o un toc en un element que ja és a la biblioteca';
 
   @override
-  String get calendarSettingsSelectDetails => 'Open details';
+  String get calendarSettingsSelectDetails => 'Obre els detalls';
 
   @override
-  String get calendarSettingsSelectPlay => 'Play when in library';
+  String get calendarSettingsSelectPlay => 'Reprodueix si és a la biblioteca';
 
   @override
-  String get calendarSettingsRequestButton => 'Request button';
+  String get calendarSettingsRequestButton => 'Botó de sol·licitud';
 
   @override
   String get calendarSettingsRequestButtonSubtitle =>
-      'Show the Seerr request button on missing movies and seasons';
+      'Mostra el botó de sol·licitud de Seerr a les pel·lícules i temporades que falten';
 
   @override
-  String get calendarSettingsReminders => 'Reminders';
+  String get calendarSettingsReminders => 'Recordatoris';
 
   @override
   String get calendarSettingsRemindersSubtitle =>
-      'Show Remind me, which sends a notification when a title lands in your library';
+      'Mostra «Recorda-m\'ho», que envia una notificació quan un títol arriba a la biblioteca';
 
   @override
-  String get calendarRowSeeAll => 'See All card';
+  String get calendarRowSeeAll => 'Targeta «Veure-ho tot»';
 
   @override
   String get calendarRowSeeAllSubtitle =>
-      'End the upcoming rows with a card that opens the calendar';
+      'Acaba les files de properes estrenes amb una targeta que obre el calendari';
 
   @override
-  String get showNextAirDate => 'Next air date at the end';
+  String get showNextAirDate => 'Data de la propera emissió al final';
 
   @override
   String get showNextAirDateSubtitle =>
-      'When the next episode isn\'t in your library yet, the end of episode card says when it airs';
+      'Quan el següent episodi encara no és a la biblioteca, la targeta de final d\'episodi indica quan s\'emet';
 
   @override
   String segmentSkipped(String segment) {
@@ -17459,4 +17476,1035 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get autoplayCanceled => 'Canceled';
+
+  @override
+  String get episodeDirector => 'Director de l\'episodi';
+
+  @override
+  String episodeDirectorWithRole(String role) {
+    return '$role (Director de l\'episodi)';
+  }
+
+  @override
+  String get episodeWriter => 'Escriptor de l\'episodi';
+
+  @override
+  String episodeWriterWithRole(String role) {
+    return '$role (Escriptor de l\'episodi)';
+  }
+
+  @override
+  String get guestStar => 'Estrella convidada';
+
+  @override
+  String guestStarWithRole(String role) {
+    return '$role (Estrella convidada)';
+  }
+
+  @override
+  String get seasonalRowAllYear => 'Mostra tot l\'any';
+
+  @override
+  String get seasonalRowAllYearDescription =>
+      'Mostra una fila de festes també fora de les dates festives, amb una festa marcada diferent cada dia.';
+
+  @override
+  String get screensaverDuringAudio =>
+      'Mostra durant la música i els audiollibres';
+
+  @override
+  String get screensaverDuringAudioDescription =>
+      'Permet que el salvapantalles s\'activi mentre es reprodueix àudio, perquè la portada no es quedi hores a la pantalla.';
+
+  @override
+  String get sleepAfterIdle =>
+      'Deixa que el televisor entri en repòs després de';
+
+  @override
+  String get sleepAfterIdleDescriptionAndroid =>
+      'Tanca Moonfin després d\'aquest temps sense prémer cap botó perquè el salvapantalles i el temporitzador de repòs del televisor puguin prendre el relleu. Abans s\'atura el que estigui en pausa, de manera que conserva el punt on es reprèn.';
+
+  @override
+  String get sleepAfterIdleDescriptionAppleTv =>
+      'Després d\'aquest temps sense prémer cap botó, torna la pantalla al salvapantalles i a la configuració de repòs de l\'Apple TV. Moonfin es manté obert, de manera que continues just on ho havies deixat.';
+
+  @override
+  String get seerrWaitingForImport => 'Downloaded, waiting for import';
+
+  @override
+  String get seerrDownloadStalled => 'Stalled';
+
+  @override
+  String get seerrDownloadFailed => 'Download failed';
+
+  @override
+  String get seerrImportBlocked => 'Import blocked';
+
+  @override
+  String get seerrNotFoundYet => 'Not found yet';
+
+  @override
+  String get seerrGetDifferentRelease => 'Get a different release';
+
+  @override
+  String seerrGetDifferentReleaseConfirm(String service, String release) {
+    return '$service will remove $release from the download client, block it so it isn\'t grabbed again, and search for another release.';
+  }
+
+  @override
+  String seerrGetDifferentReleaseDone(String service) {
+    return 'Removed. $service is searching for another release.';
+  }
+
+  @override
+  String get seerrGetDifferentReleaseFailed => 'Couldn\'t remove the download';
+
+  @override
+  String get syncPlayRepeatSubtitle =>
+      'Torna a reproduir un element o tota la cua';
+
+  @override
+  String get syncPlayShuffleSubtitle =>
+      'Reprodueix la cua en ordre o de manera aleatòria';
+
+  @override
+  String get syncPlayParticipantYou => 'Tu';
+
+  @override
+  String syncPlayGroupSubtitle(String participants, String detail) {
+    return '$participants · $detail';
+  }
+
+  @override
+  String get syncPlayNothingQueued => 'encara no hi ha res a la cua';
+
+  @override
+  String get syncPlayOthersCanJoinHint =>
+      'Els altres s\'hi poden unir des de la seva pantalla de SyncPlay mentre aquest grup existeixi.';
+
+  @override
+  String get syncPlayCreateGroupSubtitle =>
+      'Mira-ho amb tothom qui s\'hi uneixi';
+
+  @override
+  String syncPlayAvailableGroupsCount(int count) {
+    return 'Grups disponibles · $count';
+  }
+
+  @override
+  String get syncPlayNoGroupsAvailableHint =>
+      'Els grups que creïn altres persones en aquest servidor apareixeran aquí.';
+
+  @override
+  String get syncPlayJoinReplacesQueueNote =>
+      'Unir-te a un grup pot substituir la teva cua de reproducció actual.';
+
+  @override
+  String kidsModePinToSwitchUser(String name) {
+    return 'Enter the Kids Mode PIN to switch to $name';
+  }
+
+  @override
+  String get settingsDateFormat => 'Format de la data';
+
+  @override
+  String get settingsDateFormatDescription =>
+      'Tria entre mes-dia, dia-mes o el format predeterminat de la configuració regional per a les dates del calendari i d\'estrena';
+
+  @override
+  String get dateFormatSystem => 'Predeterminat de la configuració regional';
+
+  @override
+  String get dateFormatMonthDay => 'Mes / Dia (nov. 10)';
+
+  @override
+  String get dateFormatDayMonth => 'Dia / Mes (10 nov.)';
+
+  @override
+  String get settingsHideControlsAfter => 'Amaga els controls després de';
+
+  @override
+  String get settingsHideControlsAfterDescription =>
+      'Quant de temps es mantenen els controls del reproductor a la pantalla després de l\'última pulsació de botó, toc o moviment del ratolí.';
+
+  @override
+  String get settingsHdrControlsDimming => 'Atenua els controls en HDR';
+
+  @override
+  String get settingsHdrControlsDimmingDescription =>
+      'El blanc es veu molt més brillant al costat del vídeo HDR, així que els controls del reproductor s\'atenuen aquesta quantitat mentre es reprodueix.';
+
+  @override
+  String get watchPartyResumeYours =>
+      'On ho vas deixar. Tothom comença des d\'aquí.';
+
+  @override
+  String get watchParties => 'Watch Parties';
+
+  @override
+  String get watchPartyStartWith => 'Inicia les festes amb';
+
+  @override
+  String get watchPartyServiceMoonbaseHint =>
+      'Xat, reaccions i votacions. Funciona amb Moonbase.';
+
+  @override
+  String get watchPartyServiceSyncPlayHint =>
+      'El de Jellyfin. Els amics que facin servir altres apps de Jellyfin s\'hi poden unir.';
+
+  @override
+  String get watchPartyServiceNote =>
+      'Pots unir-te a sales de tots dos tipus. Això només tria el que inicies tu.';
+
+  @override
+  String get watchPartyDuringParty => 'Durant una festa';
+
+  @override
+  String get watchPartyChatOverlay => 'Mostra el xat sobre el vídeo';
+
+  @override
+  String get watchPartyChatOverlaySubtitle =>
+      'Els missatges nous es mostren uns segons';
+
+  @override
+  String get watchPartyAlerts => 'Alertes de festes';
+
+  @override
+  String get watchPartyAlertsSubtitle =>
+      'Avisa\'m quan algú d\'aquest servidor n\'iniciï una';
+
+  @override
+  String get watchPartyJoinWithCode => 'Uneix-te amb un codi';
+
+  @override
+  String get watchPartyOnThisServer => 'En aquest servidor';
+
+  @override
+  String watchPartyCountOnServer(int count) {
+    return '$count en aquest servidor';
+  }
+
+  @override
+  String get watchPartyRoomsHint =>
+      'Necessites accés a l\'element per unir-t\'hi. Una sala es tanca quan en surt l\'última persona.';
+
+  @override
+  String get watchPartyRoomsEmpty =>
+      'Aquí apareixen les Watch Parties que pots veure. T\'han passat un codi? Tria «Uneix-te amb un codi».';
+
+  @override
+  String get watchPartyPasteHint =>
+      'També hi pots enganxar un enllaç d\'invitació. En un telèfon, l\'enllaç obre Moonfin directament a la Watch Party.';
+
+  @override
+  String watchPartyWatchingCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count espectadors',
+      one: '$count espectador',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String watchPartyHostsParty(String name) {
+    return 'Watch Party de $name';
+  }
+
+  @override
+  String get watchPartyEveryoneControlsShort => 'Tothom controla';
+
+  @override
+  String get watchPartyVotingNow => 'Es vota què veure';
+
+  @override
+  String get watchPartyNeedsMoonbase =>
+      'Les Watch Parties necessiten Moonbase en aquest servidor';
+
+  @override
+  String get watchPartyNeedsMoonbaseHint =>
+      'Demana a qui gestiona el servidor que instal·li el connector Moonbase. A Jellyfin, SyncPlay funciona igualment sense aquest connector.';
+
+  @override
+  String get watchPartyWrongPin =>
+      'Aquest PIN no ha funcionat. Torna-ho a provar.';
+
+  @override
+  String get watchPartyTooManyTries => 'Massa intents. Espera un minut.';
+
+  @override
+  String get watchPartyFull => 'Aquesta Watch Party és plena.';
+
+  @override
+  String get watchPartyNoSuchCode => 'Cap sala no té aquest codi.';
+
+  @override
+  String get watchPartyNoAccess => 'No tens accés al que estan veient.';
+
+  @override
+  String get watchPartyRemoved =>
+      'L\'amfitrió t\'ha expulsat de la Watch Party.';
+
+  @override
+  String get watchPartyYours => 'La teva Watch Party';
+
+  @override
+  String get watchPartyInviteHint =>
+      'Enganxa\'l a qualsevol xat. Obre una pàgina d\'aquest servidor amb un botó «Obre a Moonfin».';
+
+  @override
+  String get watchPartySendInvite => 'Envia la invitació';
+
+  @override
+  String get watchPartyScanInvite =>
+      'Escaneja-ho amb el telèfon per obtenir l\'enllaç d\'invitació i envia\'l des d\'allà. O simplement comparteix el codi.';
+
+  @override
+  String get watchPartyStartsTogether =>
+      'La reproducció espera que el reproductor de tothom estigui a punt, 10 segons com a màxim, i després fa un compte enrere 3, 2, 1.';
+
+  @override
+  String get watchPartyStatusInSync => 'Sincronitzat';
+
+  @override
+  String get watchPartyStatusCatchingUp => 'Posant-se al dia';
+
+  @override
+  String get watchPartyStatusBuffering => 'Carregant';
+
+  @override
+  String get watchPartyStatusNotWatching => 'No està mirant';
+
+  @override
+  String get watchPartyStatusReady => 'A punt';
+
+  @override
+  String get watchPartyStatusJoining => 'Unint-se';
+
+  @override
+  String get watchPartyHost => 'Amfitrió';
+
+  @override
+  String watchPartyWaitingFor(String name) {
+    return 'S\'està esperant el reproductor de $name';
+  }
+
+  @override
+  String watchPartyWaitingForCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'S\'estan esperant $count reproductors',
+      one: 'S\'està esperant $count reproductor',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String watchPartyStartingAnyway(int seconds) {
+    return 'Començarà igualment d\'aquí a $seconds s';
+  }
+
+  @override
+  String get watchPartyStartingTogether => 'Comencem tots alhora';
+
+  @override
+  String watchPartyToastPaused(String name) {
+    return '$name ha posat en pausa';
+  }
+
+  @override
+  String watchPartyToastResumed(String name) {
+    return '$name ha reprès la reproducció';
+  }
+
+  @override
+  String watchPartyToastSkipped(String name, String time) {
+    return '$name ha saltat a $time';
+  }
+
+  @override
+  String watchPartyToastJoined(String name) {
+    return '$name s\'ha unit';
+  }
+
+  @override
+  String watchPartyToastLeft(String name) {
+    return '$name ha marxat';
+  }
+
+  @override
+  String watchPartyToastSwitched(String name, String title) {
+    return '$name ha canviat a $title';
+  }
+
+  @override
+  String get watchPartyToastYouAreHost => 'Ara ets l\'amfitrió';
+
+  @override
+  String watchPartyToastNewHost(String name) {
+    return 'Ara $name és l\'amfitrió';
+  }
+
+  @override
+  String get watchPartyToastEveryoneControls =>
+      'Ara tothom pot controlar la reproducció';
+
+  @override
+  String get watchPartyToastHostControls =>
+      'Ara només l\'amfitrió controla la reproducció';
+
+  @override
+  String get watchPartyOnlyHostControls =>
+      'Només l\'amfitrió pot controlar la reproducció.';
+
+  @override
+  String get watchPartyToastReconnecting =>
+      'S\'està tornant a connectar a la Watch Party...';
+
+  @override
+  String get watchPartyToastReconnected => 'Has tornat a la Watch Party';
+
+  @override
+  String watchPartyToastEnded(String name) {
+    return '$name ha finalitzat la Watch Party';
+  }
+
+  @override
+  String get watchPartyChat => 'Xat';
+
+  @override
+  String get watchPartySendToParty => 'Envia a la Watch Party';
+
+  @override
+  String get watchPartyBackToClose => 'Prem Enrere per tancar';
+
+  @override
+  String get watchPartyType => 'Escriu';
+
+  @override
+  String get watchPartyReplyHaha => 'Haha';
+
+  @override
+  String get watchPartyReplyNoWay => 'No pot ser';
+
+  @override
+  String get watchPartyReplyPausePlease => 'Pausa, si us plau';
+
+  @override
+  String get watchPartyReplyBrb => 'Ara torno';
+
+  @override
+  String get watchPartyReplyAgain => 'Un altre cop!';
+
+  @override
+  String get watchPartyReactionLove => 'M\'encanta';
+
+  @override
+  String get watchPartyReactionHaha => 'Haha';
+
+  @override
+  String get watchPartyReactionWow => 'Uau';
+
+  @override
+  String get watchPartyReactionSad => 'Trist';
+
+  @override
+  String get watchPartyReactionFire => 'Foc';
+
+  @override
+  String get watchPartyReactionPopcorn => 'Crispetes';
+
+  @override
+  String get watchPartyMakeHost => 'Fes amfitrió';
+
+  @override
+  String get watchPartyEveryoneControls =>
+      'Tothom pot controlar la reproducció';
+
+  @override
+  String get watchPartyEveryoneControlsHint =>
+      'Tothom pot reproduir, posar en pausa i saltar';
+
+  @override
+  String get watchPartyRoomPin => 'PIN de la sala';
+
+  @override
+  String get watchPartyRoomPinHint =>
+      'Demana un PIN abans que algú s\'hi uneixi';
+
+  @override
+  String get watchPartyPinDigits => 'De 4 a 8 dígits';
+
+  @override
+  String get watchPartyLeave => 'Surt';
+
+  @override
+  String watchPartyLeaveHandsOver(String name) {
+    return 'Surt · $name fa d\'amfitrió';
+  }
+
+  @override
+  String watchPartyStartedBy(String name) {
+    return '$name ha iniciat una Watch Party';
+  }
+
+  @override
+  String watchPartyInLobbyCount(String title, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$title · $count a la sala d\'espera',
+      one: '$title · $count a la sala d\'espera',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get watchPartyFirstOnHome =>
+      'És la primera de la fila Watch Parties de l\'inici';
+
+  @override
+  String watchPartyAddServerQuestion(String address) {
+    return 'Aquesta invitació és per a un servidor que encara no has afegit, $address. Afegeix-lo i inicia la sessió per unir-t\'hi.';
+  }
+
+  @override
+  String get subtitleBold => 'Text en negreta';
+
+  @override
+  String get subtitleStrokeWidth => 'Gruix del contorn del text';
+
+  @override
+  String get subtitleFont => 'Tipus de lletra';
+
+  @override
+  String get subtitleFontDescription =>
+      'Els tipus de lletra es baixen de Google Fonts la primera vegada que els tries';
+
+  @override
+  String subtitleFontDownloadFailed(String font) {
+    return 'No s\'ha pogut baixar $font';
+  }
+
+  @override
+  String get subtitleShadow => 'Ombra del text';
+
+  @override
+  String get subtitleShadowIntensity => 'Intensitat de l\'ombra';
+
+  @override
+  String get subtitleShadowOffset => 'Desplaçament de l\'ombra';
+
+  @override
+  String get subtitleShadowBlur => 'Difuminat de l\'ombra';
+
+  @override
+  String get bookFoldersAsSeries =>
+      'Tracta les carpetes de llibres com a sèries';
+
+  @override
+  String get bookFoldersAsSeriesDescription =>
+      'Tracta les carpetes que contenen llibres com a sèries en lloc de basar-te en les metadades de cada llibre';
+
+  @override
+  String get removeWatchedAsk => 'Pregunta-m\'ho';
+
+  @override
+  String get deleteFinishedDownloadTitle => 'Vols suprimir aquesta baixada?';
+
+  @override
+  String deleteFinishedDownloadMessage(String title) {
+    return 'Has acabat $title. Suprimeix-ne la baixada per alliberar espai, o conserva-la i no t\'ho tornarem a preguntar.';
+  }
+
+  @override
+  String get notNow => 'Ara no';
+
+  @override
+  String get settingsDecodingAndRenderingSection => 'Decoding & Rendering';
+
+  @override
+  String get settingsAudioStreamSection => 'Audio Stream';
+
+  @override
+  String get settingsAudioOutputSection => 'Audio Output';
+
+  @override
+  String get settingsPassthroughSettingsSection => 'Passthrough Settings';
+
+  @override
+  String get settingsImdbListsSection => 'IMDb Lists';
+
+  @override
+  String get settingsTmdbListsSection => 'TMDB Lists';
+
+  @override
+  String get settingsSeerrHomePageRowsSection => 'Seerr Home Page Rows';
+
+  @override
+  String get settingsSavedCustomHomeRowsSection => 'Saved Custom Home Rows';
+
+  @override
+  String get settingsRewatchSection => 'Rewatch';
+
+  @override
+  String get favoritesSwitchViewSection => 'Switch View';
+
+  @override
+  String get siloPinRemember => 'Recorda el PIN en aquest dispositiu';
+
+  @override
+  String settingsPreviewAudioRowsOffInHomeRows(String group, String disabled) {
+    return 'Albums, Artists and Audio Playlists are all turned off. To show one, go to Rows, open $group under $disabled, and turn it on.';
+  }
+
+  @override
+  String settingsPreviewAudioRowsOffInHomeRowsSwitchOff(
+    String setting,
+    String group,
+    String disabled,
+  ) {
+    return 'To see Albums, Artists or Audio Playlists on Home, first turn on $setting. Then go to Rows, open $group under $disabled, and turn one on.';
+  }
+
+  @override
+  String settingsPreviewCollectionsOffInHomeRows(
+    String group,
+    String disabled,
+  ) {
+    return 'The Collections row is turned off. To show it, go to Rows, open $group under $disabled, and turn it on.';
+  }
+
+  @override
+  String settingsPreviewCollectionsOffInHomeRowsSwitchOff(
+    String setting,
+    String group,
+    String disabled,
+  ) {
+    return 'To see the Collections row on Home, first turn on $setting. Then go to Rows, open $group under $disabled, and turn it on.';
+  }
+
+  @override
+  String get settingsPreviewRowsOffInKidsMode =>
+      'Kids Mode keeps these rows off Home, so these settings don\'t change it.';
+
+  @override
+  String settingsPreviewNeedsRowInRows(String disabled) {
+    return 'Turn on a row in Rows, under $disabled';
+  }
+
+  @override
+  String settingsPreviewNeedsSwitchAndRow(String setting) {
+    return 'Turn on $setting, then turn on a row in Rows';
+  }
+
+  @override
+  String get settingsPreviewKeptOffByKidsMode =>
+      'Kids Mode keeps this off Home';
+
+  @override
+  String get settingsPreviewAudioRowsEmpty =>
+      'There\'s no music to show, so Home leaves these rows out.';
+
+  @override
+  String get settingsPreviewRowsEmpty =>
+      'There\'s nothing to show in these rows, so Home leaves them out.';
+
+  @override
+  String get settingsPreviewCollectionsEmpty =>
+      'There are no collections to show, so Home leaves this row out.';
+
+  @override
+  String get settingsPreviewShowEpisodesNote =>
+      'This only changes rows for a single collection added in Rows. The Collections row looks the same.';
+
+  @override
+  String get afterHoursTitle => 'After Hours';
+
+  @override
+  String get afterHoursUnlocked => 'S\'ha desbloquejat After Hours';
+
+  @override
+  String afterHoursPressesLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pulsacions més',
+      one: '1 pulsació més',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String afterHoursTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tocs més',
+      one: '1 toc més',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get afterHoursPlay => 'Reprodueix';
+
+  @override
+  String get afterHoursLeaderboards => 'Classificacions';
+
+  @override
+  String get afterHoursTop3 => 'Top 3';
+
+  @override
+  String afterHoursScoresFrom(String server) {
+    return 'Puntuacions de $server';
+  }
+
+  @override
+  String get afterHoursScoresOnDevice => 'Puntuacions d\'aquest dispositiu';
+
+  @override
+  String get afterHoursGameOver => 'Fi de la partida';
+
+  @override
+  String afterHoursNewRank(int rank) {
+    return 'Nou #$rank a la classificació';
+  }
+
+  @override
+  String get afterHoursPlayAgain => 'Torna a jugar';
+
+  @override
+  String get afterHoursBackToArcade => 'Torna a la sala de jocs';
+
+  @override
+  String get afterHoursArcade => 'Sala de jocs';
+
+  @override
+  String get afterHoursLandscapeNote => 'Gira a horitzontal mentre jugues';
+
+  @override
+  String get afterHoursTouch => 'Tàctil';
+
+  @override
+  String get afterHoursNewTag => 'NOU';
+
+  @override
+  String get afterHoursNoScores => 'Encara no hi ha puntuacions';
+
+  @override
+  String get afterHoursPerfect => 'PERFECTE';
+
+  @override
+  String get afterHoursBoxSet => 'ESTOIG';
+
+  @override
+  String get afterHoursBufferRun => 'Buffer Run';
+
+  @override
+  String get afterHoursBufferRunGenre =>
+      'Corredor infinit amb inversió de gravetat';
+
+  @override
+  String get afterHoursBufferRunPitch =>
+      'El corredor de la pantalla de càrrega per fi té on anar. El doble salt i la inversió de gravetat el porten al sostre.';
+
+  @override
+  String get afterHoursBufferRunRemote =>
+      'OK salta; torna-hi a l\'aire per canviar de costat. Avall per esmunyir-te. Al sostre, Amunt i Avall s\'inverteixen.';
+
+  @override
+  String get afterHoursBufferRunTouch =>
+      'Toca per saltar i torna a tocar a l\'aire per invertir la gravetat. Fes lliscar el dit cap al costat per on corres per esmunyir-te.';
+
+  @override
+  String get afterHoursFastForward => 'Fast Forward';
+
+  @override
+  String get afterHoursFastForwardGenre => 'Corredor de tres carrils';
+
+  @override
+  String get afterHoursFastForwardPitch =>
+      'Un esprint per tres passadissos del vestíbul. Salta per sobre de les coses baixes i recorda que els carretons de crispetes no s\'aparten per ningú.';
+
+  @override
+  String get afterHoursFastForwardRemote =>
+      'Amunt i Avall canvien de carril. OK salta.';
+
+  @override
+  String get afterHoursFastForwardTouch =>
+      'Fes lliscar el dit amunt o avall per canviar de carril. Toca per saltar.';
+
+  @override
+  String get afterHoursCableCrawl => 'Cable Crawl';
+
+  @override
+  String get afterHoursCableCrawlGenre => 'Serp en quadrícula';
+
+  @override
+  String get afterHoursCableCrawlPitch =>
+      'Guia un cable HDMI per darrere del moble de la tele i connecta\'l al senyal. Cada barra el fa més llarg.';
+
+  @override
+  String get afterHoursCableCrawlRemote =>
+      'Les fletxes giren. El cable no s\'atura mai.';
+
+  @override
+  String get afterHoursCableCrawlTouch => 'Fes lliscar el dit per girar.';
+
+  @override
+  String get afterHoursCaseStack => 'Case Stack';
+
+  @override
+  String get afterHoursCaseStackGenre => 'Apilador d\'un sol botó';
+
+  @override
+  String get afterHoursCaseStackPitch =>
+      'Construeix una torre de capses de Blu-ray fins a l\'alçada de la prestatgeria, cadascuna amb un títol de la teva biblioteca. El que sobresurt es retalla, així que encerta-les de ple.';
+
+  @override
+  String get afterHoursCaseStackRemote => 'OK deixa caure la capsa.';
+
+  @override
+  String get afterHoursCaseStackTouch => 'Toca on sigui per deixar caure.';
+
+  @override
+  String get afterHoursPixelPurge => 'Pixel Purge';
+
+  @override
+  String get afterHoursPixelPurgeGenre => 'Trencamaons';
+
+  @override
+  String get afterHoursPixelPurgePitch =>
+      'Una codificació dolenta ha deixat la imatge plena d\'artefactes de blocs, i baixen una mica cada segon. Fes rebotar el botó de reproducció a la barra de progrés per eliminar-los abans que hi arribin.';
+
+  @override
+  String get afterHoursPixelPurgeRemote =>
+      'Esquerra i Dreta mouen la barra. La bola surt sola.';
+
+  @override
+  String get afterHoursPixelPurgeTouch => 'Arrossega per moure la barra.';
+
+  @override
+  String get afterHoursHowToPlay => 'Com s\'hi juga';
+
+  @override
+  String get afterHoursStart => 'Inici';
+
+  @override
+  String get afterHoursBackToGame => 'Torna al joc';
+
+  @override
+  String get afterHoursEnemies => 'Enemics';
+
+  @override
+  String get afterHoursObstacles => 'Obstacles';
+
+  @override
+  String get afterHoursPowerups => 'Potenciadors';
+
+  @override
+  String get afterHoursCastShieldLine => 'Un escut que aguanta un cop.';
+
+  @override
+  String get afterHoursCastPointsLine => '25 punts cadascuna.';
+
+  @override
+  String get afterHoursCastLagBat => 'Ratpenat del retard';
+
+  @override
+  String get afterHoursCastLagBatLine =>
+      'Baixa en picat a l\'altura del cap. Esmuny-te per sota.';
+
+  @override
+  String get afterHoursCastGremlin => 'Follet d\'estàtica';
+
+  @override
+  String get afterHoursCastGremlinLine =>
+      'Salta per terra o pel sostre cap a tu. Salta\'l.';
+
+  @override
+  String get afterHoursCastCable => 'Rotlle de cable';
+
+  @override
+  String get afterHoursCastCableLine => 'Baix, a terra o al sostre. Salta\'l.';
+
+  @override
+  String get afterHoursCastBanner => 'Cartell carregant';
+
+  @override
+  String get afterHoursCastBannerLine =>
+      'Esmuny-te sota el cartell. El pal és una paret a l\'altra banda.';
+
+  @override
+  String get afterHoursCastSkipIntro => 'Salta la introducció';
+
+  @override
+  String get afterHoursCastSkipIntroLine =>
+      'Tres segons d\'embranzida que ho destrossen tot.';
+
+  @override
+  String get afterHoursCastPopcorn => 'Crispetes';
+
+  @override
+  String get afterHoursCastRollingReel => 'Bobina solta';
+
+  @override
+  String get afterHoursCastRollingReelLine =>
+      'Roda pel teu carril més de pressa del que corres. Salta-la.';
+
+  @override
+  String get afterHoursCastUsher => 'Acomodador';
+
+  @override
+  String get afterHoursCastUsherLine =>
+      'Camina cap a tu i canvia de carril un cop.';
+
+  @override
+  String get afterHoursCastVelvetRope => 'Cordó de vellut';
+
+  @override
+  String get afterHoursCastVelvetRopeLine =>
+      'Baix. Salta\'l o canvia de carril.';
+
+  @override
+  String get afterHoursCastPopcornCart => 'Carretó de crispetes';
+
+  @override
+  String get afterHoursCastPopcornCartLine =>
+      'Massa alt per saltar-lo. Canvia de carril.';
+
+  @override
+  String get afterHoursCastFrontRowPass => 'Passi de primera fila';
+
+  @override
+  String get afterHoursCastMagnet => 'Imant';
+
+  @override
+  String get afterHoursCastMagnetLine =>
+      'Atrau les entrades de tots els carrils durant vuit segons.';
+
+  @override
+  String get afterHoursCastTicket => 'Entrada';
+
+  @override
+  String get afterHoursCastBug => 'Insecte d\'interferències';
+
+  @override
+  String get afterHoursCastBugLine => 'Va voltant a l\'atzar.';
+
+  @override
+  String get afterHoursCastTangle => 'Embolic';
+
+  @override
+  String get afterHoursCastTangleLine => 'Persegueix lentament el teu endoll.';
+
+  @override
+  String get afterHoursCastStatic => 'Estàtic';
+
+  @override
+  String get afterHoursCastStaticLine =>
+      'Una cel·la morta. N\'apareix una cada tres senyals.';
+
+  @override
+  String get afterHoursCastBrick => 'Transformador';
+
+  @override
+  String get afterHoursCastBrickLine => 'Un bloc de 2 per 2 cada cinc senyals.';
+
+  @override
+  String get afterHoursCastGhost => 'Fantasma';
+
+  @override
+  String get afterHoursCastGhostLine =>
+      'Cinc segons travessant-ho tot menys la vora.';
+
+  @override
+  String get afterHoursCastSnip => 'Tisorada';
+
+  @override
+  String get afterHoursCastSnipLine =>
+      'Talla el cable per la meitat per obtenir punts extra.';
+
+  @override
+  String get afterHoursCastSignal => 'Senyal';
+
+  @override
+  String get afterHoursCastSignalLine => 'Punts i dos segments més.';
+
+  @override
+  String get afterHoursCastShelfCat => 'Gat de la prestatgeria';
+
+  @override
+  String get afterHoursCastShelfCatLine =>
+      'Colpeja una capsa quan arriba i fa que llisqui més de pressa.';
+
+  @override
+  String get afterHoursCastBluCase => 'Capsa de Blu-ray';
+
+  @override
+  String get afterHoursCastBluCaseLine =>
+      'Un títol de la teva biblioteca. El que sobresurt es retalla.';
+
+  @override
+  String get afterHoursCastSteelbook => 'Steelbook';
+
+  @override
+  String get afterHoursCastSteelbookLine =>
+      'Una de cada deu capses. Llisca molt més de pressa.';
+
+  @override
+  String get afterHoursCastPerfect => 'Caiguda perfecta';
+
+  @override
+  String get afterHoursCastPerfectLine =>
+      'Encerta-la de ple i la pila s\'eixampla una mica.';
+
+  @override
+  String get afterHoursCastBoxSet => 'Estoig';
+
+  @override
+  String get afterHoursCastBoxSetLine =>
+      'Tres caigudes perfectes seguides l\'eixamplen molt més.';
+
+  @override
+  String get afterHoursCastDeadPixel => 'Píxel mort';
+
+  @override
+  String get afterHoursCastDeadPixelLine =>
+      'Cau dels blocs eliminats. Si l\'atrapes, la barra s\'escurça.';
+
+  @override
+  String get afterHoursCastMacroblock => 'Macrobloc';
+
+  @override
+  String get afterHoursCastMacroblockLine => 'Un cop l\'elimina.';
+
+  @override
+  String get afterHoursCastKeyframe => 'Fotograma clau';
+
+  @override
+  String get afterHoursCastKeyframeLine =>
+      'Aguanta tres cops i deixa anar un potenciador.';
+
+  @override
+  String get afterHoursCastHdrLine =>
+      'Una barra de progrés el doble d\'ampla durant vuit segons.';
+
+  @override
+  String get afterHoursCastBufferNet => 'Búfer';
+
+  @override
+  String get afterHoursCastBufferNetLine =>
+      'Una xarxa sota la barra que salva una errada.';
+
+  @override
+  String get afterHoursBufferRunCardTouch =>
+      'Toca per saltar; torna-hi a l\'aire per canviar de costat. Fes lliscar el dit cap al teu costat per esmunyir-te.';
+
+  @override
+  String get afterHoursPixelPurgeCardRemote =>
+      'Esquerra i Dreta mouen la barra.';
 }

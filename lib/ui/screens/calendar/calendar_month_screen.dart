@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:moonfin_design/moonfin_design.dart';
 
@@ -7,12 +6,14 @@ import '../../../data/models/calendar_entry.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../preference/preference_constants.dart';
 import '../../../preference/user_preferences.dart';
+import '../../../util/date_format_util.dart';
 import '../../../util/platform_detection.dart';
 import '../../navigation/destinations.dart';
 import '../../widgets/bottom_nav/bottom_navbar.dart';
 import '../../widgets/focus/focusable_wrapper.dart';
 import '../../widgets/focus/request_initial_focus.dart';
 import '../../widgets/navigation_layout.dart';
+import '../../widgets/settings/settings_preview_scope.dart';
 import 'calendar_agenda_view.dart';
 import 'calendar_common.dart';
 import 'calendar_controller.dart';
@@ -57,9 +58,7 @@ class _CalendarMonthScreenState extends State<CalendarMonthScreen> {
   }
 
   int _weekStart(BuildContext context) =>
-      switch (GetIt.instance<UserPreferences>().get(
-        UserPreferences.calendarWeekStart,
-      )) {
+      switch (previewValue(context, UserPreferences.calendarWeekStart)) {
         CalendarWeekStart.sunday => DateTime.sunday,
         CalendarWeekStart.monday => DateTime.monday,
         // Material counts from Sunday as 0, DateTime from Monday as 1.
@@ -131,19 +130,23 @@ class _CalendarMonthScreenState extends State<CalendarMonthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final body = ListenableBuilder(
+      listenable: _c,
+      builder: (context, _) => PlatformDetection.useMobileUi
+          ? _buildMobile(context)
+          : _buildWide(context),
+    );
     return Scaffold(
       backgroundColor: AppColorScheme.background,
-      body: NavigationLayout(
-        activeRoute: Destinations.calendar,
-        showBackButton: true,
-        pinTopToolbar: true,
-        child: ListenableBuilder(
-          listenable: _c,
-          builder: (context, _) => PlatformDetection.useMobileUi
-              ? _buildMobile(context)
-              : _buildWide(context),
-        ),
-      ),
+      // The settings preview draws its own navbar around the grid.
+      body: inSettingsPreview(context)
+          ? body
+          : NavigationLayout(
+              activeRoute: Destinations.calendar,
+              showBackButton: true,
+              pinTopToolbar: true,
+              child: body,
+            ),
     );
   }
 
@@ -292,6 +295,12 @@ class _CalendarMonthScreenState extends State<CalendarMonthScreen> {
     final insets = calendarChromeInsets(context);
     final days = _gridDays(context);
     final dayEntries = _c.on(_selected);
+    final dayName = calendarDayName(context, _selected, _c.today);
+    final fullDate = formatFullCalendarDate(_selected, locale: l10n.localeName);
+    // Today, tomorrow and yesterday keep their word above the date. Any other
+    // day's name would only repeat the date.
+    final relativeDay =
+        dayName != formatShortDayName(_selected, locale: l10n.localeName);
     final state = calendarStateView(context, _c, empty: false, emptyText: '');
     final rows = days.length ~/ 7;
     final selectedNode =
@@ -361,20 +370,23 @@ class _CalendarMonthScreenState extends State<CalendarMonthScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  calendarDayName(context, _selected, _c.today),
+                  relativeDay ? dayName : fullDate,
                   style: TextStyle(
                     color: AppColorScheme.onSurface,
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Text(
-                  DateFormat.yMMMMd(l10n.localeName).format(_selected),
-                  style: TextStyle(
-                    color: AppColorScheme.onSurface.withValues(alpha: 0.55),
-                    fontSize: 14,
+                if (relativeDay) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    fullDate,
+                    style: TextStyle(
+                      color: AppColorScheme.onSurface.withValues(alpha: 0.55),
+                      fontSize: 14,
+                    ),
                   ),
-                ),
+                ],
                 const SizedBox(height: 12),
                 Expanded(
                   child: dayEntries.isEmpty
@@ -442,7 +454,10 @@ class _MobileCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final dots = entries.take(3).map((e) => calendarColor(e, now)).toList();
+    final dots = entries
+        .take(3)
+        .map((e) => calendarColor(context, e, now))
+        .toList();
     return InkWell(
       onTap: onTap,
       borderRadius: AppRadius.circular(10),
@@ -603,7 +618,7 @@ class _WideCell extends StatelessWidget {
                                 height: 14,
                                 margin: const EdgeInsets.only(right: 5),
                                 decoration: BoxDecoration(
-                                  color: calendarColor(e, now),
+                                  color: calendarColor(context, e, now),
                                   borderRadius: AppRadius.circular(2),
                                 ),
                               ),

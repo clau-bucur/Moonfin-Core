@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:server_core/server_core.dart' hide ImageType;
 
@@ -8,11 +7,10 @@ import '../../../preference/preference_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../widgets/settings/settings_section_header.dart';
 import '../../../preference/user_preferences.dart';
-import '../../../util/focus/dpad_keys.dart';
 import '../../widgets/adaptive/adaptive_list_section.dart';
-import '../../widgets/overlay_sheet.dart';
 import '../../widgets/settings/clean_settings_typography.dart';
 import '../../widgets/settings/preference_tiles.dart';
+import '../../widgets/settings/settings_preview_scope.dart';
 import '../../../util/signed_in_server_features.dart';
 import 'settings_app_bar.dart';
 import '../../widgets/focus/request_initial_focus.dart';
@@ -209,27 +207,45 @@ class _HomeRowsImageTypeScreenState extends State<HomeRowsImageTypeScreen> {
                   ),
                 ),
                 for (final section in enabledSections)
-                  TvFocusHighlight(
-                    builder: (_, _) => ListTile(
-                      focusColor: Colors.transparent,
-                      hoverColor: Colors.transparent,
-                      leading: const Icon(Icons.image_outlined),
-                      title: Text(_sectionLabel(section.type, l10n)),
-                      subtitle: Text(
-                        _imageTypeLabel(
-                          _prefs.get(
+                  SettingsPreviewReporter(
+                    describe: () => SettingsPreviewEntry(
+                      title: _sectionLabel(section.type, l10n),
+                      prefKey: UserPreferences.homeRowImageType(
+                        section.type,
+                      ).key,
+                      options: [
+                        for (final type in ImageType.values)
+                          _imageTypeLabel(type, l10n),
+                      ],
+                      currentIndex: () => _prefs
+                          .get(UserPreferences.homeRowImageType(section.type))
+                          .index,
+                    ),
+                    child: TvFocusHighlight(
+                      builder: (_, _) => ListTile(
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        leading: const Icon(Icons.image_outlined),
+                        title: Text(_sectionLabel(section.type, l10n)),
+                        subtitle: Text(
+                          _imageTypeLabel(
+                            _prefs.get(
+                              UserPreferences.homeRowImageType(section.type),
+                            ),
+                            l10n,
+                          ),
+                        ),
+                        onTap: () => _showImageTypePicker(
+                          context,
+                          current: _prefs.get(
                             UserPreferences.homeRowImageType(section.type),
                           ),
-                          l10n,
+                          previewKey: UserPreferences.homeRowImageType(
+                            section.type,
+                          ).key,
+                          onSelected: (value) =>
+                              _setPerRowImageType(section.type, value),
                         ),
-                      ),
-                      onTap: () => _showImageTypePicker(
-                        context,
-                        current: _prefs.get(
-                          UserPreferences.homeRowImageType(section.type),
-                        ),
-                        onSelected: (value) =>
-                            _setPerRowImageType(section.type, value),
                       ),
                     ),
                   ),
@@ -244,58 +260,26 @@ class _HomeRowsImageTypeScreenState extends State<HomeRowsImageTypeScreen> {
   Future<void> _showImageTypePicker(
     BuildContext context, {
     required ImageType current,
+    required String previewKey,
     required Future<void> Function(ImageType value) onSelected,
   }) async {
     if (_pickerOpen) return;
     _pickerOpen = true;
     final l10n = AppLocalizations.of(context);
-    final values = ImageType.values.toList();
-    final selectedIndex = values.indexOf(current);
-    final autofocusIndex = selectedIndex >= 0 ? selectedIndex : 0;
+    final preview = SettingsPreviewScope.maybeOf(context);
     try {
-      final result = await showFocusRestoringDialog<ImageType>(
-        context: context,
-        useRootNavigator: false,
-        builder: (ctx) {
-          final closeOnce = createDialogBackCloseHandler(ctx);
-          var picked = false;
-          return Focus(
-            canRequestFocus: false,
-            skipTraversal: true,
-            onKeyEvent: (_, event) {
-              if (!event.logicalKey.isBackKey) return KeyEventResult.ignored;
-              if (event is KeyDownEvent || event is KeyUpEvent) {
-                closeOnce();
-                return KeyEventResult.handled;
-              }
-              return KeyEventResult.ignored;
-            },
-            child: FocusScope(
-              autofocus: true,
-              child: SimpleDialog(
-                title: Text(l10n.imageType),
-                children: values.asMap().entries.map((entry) {
-                  final i = entry.key;
-                  final v = entry.value;
-                  final selected = v == current;
-                  return TvFocusHighlight(
-                    builder: (_, _) => ListTile(
-                      autofocus: i == autofocusIndex,
-                      title: Text(_imageTypeLabel(v, l10n)),
-                      trailing: selected ? const Icon(Icons.check) : null,
-                      onTap: () {
-                        if (picked) return;
-                        picked = true;
-                        Navigator.pop(ctx, v);
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          );
-        },
+      final result = await showSettingsPicker<ImageType>(
+        context,
+        title: l10n.imageType,
+        values: ImageType.values,
+        current: current,
+        labelOf: (v) => _imageTypeLabel(v, l10n),
+        onTry: preview == null
+            ? null
+            : (value, index) =>
+                  preview.tryValue(previewKey, value, index: index),
       );
+      preview?.clearTry(previewKey);
       if (result != null && result != current) {
         await onSelected(result);
       }

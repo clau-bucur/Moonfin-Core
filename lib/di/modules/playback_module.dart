@@ -41,6 +41,7 @@ import '../../preference/preference_constants.dart';
 import '../../preference/user_preferences.dart';
 import '../../syncplay/syncplay_manager.dart';
 import '../../watch_party/silo_watch_party_manager.dart';
+import '../../watch_party/watch_party_rooms_service.dart';
 import '../../util/platform_detection.dart';
 import '../../util/video_app_profile.dart';
 import '../../util/episode_playability.dart';
@@ -799,6 +800,13 @@ void registerPlaybackModule() {
   _getIt.registerLazySingleton<SiloWatchPartyManager>(
     () => SiloWatchPartyManager(_getIt<PlaybackManager>()),
   );
+  _getIt.registerLazySingleton<WatchPartyRoomsService>(
+    () => WatchPartyRoomsService(
+      _getIt<SiloWatchPartyManager>(),
+      _getIt<UserPreferences>(),
+      _getIt<SyncPlayManager>(),
+    ),
+  );
 
   _getIt.registerLazySingleton<AudiobookBookmarksService>(
     () => AudiobookBookmarksService(),
@@ -885,7 +893,7 @@ void setActiveStreamResolver(MediaServerClient client) {
   _currentActiveResolverClient = client;
 }
 
-void _onItemStopped(dynamic item) {
+void _onItemStopped(dynamic item, StreamResolutionResult resolution, Duration position) {
   if (item is! AggregatedItem) return;
   // Plex sends no user data events, so the new resume point and watched state
   // have to be asked for. Plex items don't name their server, so one without
@@ -926,7 +934,7 @@ class _RefreshingPlexPlaySessionService extends PlexPlaySessionService {
       await super.onPlaybackStop(item, resolution, position,
         releaseLiveStream: releaseLiveStream);
     } finally {
-      _onItemStopped(item);
+      _onItemStopped(item, resolution, position);
     }
   }
 }

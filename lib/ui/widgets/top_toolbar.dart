@@ -1152,7 +1152,7 @@ class _TopToolbarState extends State<TopToolbar> with RouteAware {
                     key: const ValueKey('toolbar_syncplay'),
                     forceExpanded: alwaysExpanded,
                     icon: Icons.groups_rounded,
-                    label: l10n.syncPlay,
+                    label: l10n.watchParties,
                     baseColor: nextNavColor(),
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(

@@ -42,6 +42,9 @@ class SkipSegmentOverlay extends StatefulWidget {
   /// Distance from the right edge. Cinema Mode adjusts this for touch safe areas.
   final double rightInset;
 
+  /// The countdown to draw in place of the saved one, for the settings preview.
+  final MediaSegmentCountdown? countdown;
+
   const SkipSegmentOverlay({
     super.key,
     required this.segment,
@@ -56,6 +59,7 @@ class SkipSegmentOverlay extends StatefulWidget {
     this.nextItem,
     this.bottomInset = _fallbackBottomInset,
     this.rightInset = 24,
+    this.countdown,
   });
 
   @override
@@ -132,7 +136,7 @@ class _SkipSegmentOverlayState extends State<SkipSegmentOverlay> {
         rightInset: widget.rightInset,
       );
     }
-    final mediaSegmentCountdown = prefs.get(
+    final mediaSegmentCountdown = widget.countdown ?? prefs.get(
       UserPreferences.mediaSegmentCountdown,
     );
     final showProgressBar =

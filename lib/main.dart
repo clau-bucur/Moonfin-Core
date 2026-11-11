@@ -32,6 +32,7 @@ import 'playback/device_capability_cache.dart';
 import 'playback/display_hdr_probe.dart';
 import 'playback/media_browse_service.dart';
 import 'playback/playback_lifecycle_handler.dart';
+import 'playback/subtitle_fonts.dart';
 import 'platform/web_runtime_config.dart';
 import 'preference/preference_constants.dart';
 import 'preference/user_preferences.dart';
@@ -909,6 +910,7 @@ Future<void> _initDeferredStartupServices(UserPreferences prefs) async {
 
   await _detectAndApplyAudioCapabilities(prefs);
 
+  unawaited(SubtitleFonts.instance.follow(prefs));
 
   // Audio session ownership differs per platform:
   // - Android: MoonfinAudioHandler acquires audio focus per playback, and skips

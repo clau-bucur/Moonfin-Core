@@ -6949,7 +6949,7 @@ abstract class AppLocalizations {
   /// Hint under the SyncPlay and Watch with group buttons in the button settings, which only appear once the user has joined a group
   ///
   /// In en, this message translates to:
-  /// **'Only shows while you\'re in a SyncPlay group'**
+  /// **'Only shows while you\'re in a watch party'**
   String get buttonShownInSyncPlayGroup;
 
   /// Player button that locks the screen orientation
@@ -20923,7 +20923,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSyncplaySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Synchronization logic for group sessions'**
+  /// **'Watch with friends on this server, everyone in step'**
   String get settingsSyncplaySubtitle;
 
   /// No description provided for @settingsSkipIntrosAndOutros.
@@ -21265,85 +21265,85 @@ abstract class AppLocalizations {
   /// No description provided for @settingsOpenGroups.
   ///
   /// In en, this message translates to:
-  /// **'Open Groups'**
+  /// **'Open Watch Parties'**
   String get settingsOpenGroups;
 
   /// No description provided for @settingsOpenGroupsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Create, join, or manage SyncPlay groups'**
+  /// **'Start one or join one in progress'**
   String get settingsOpenGroupsSubtitle;
 
   /// No description provided for @settingsSyncplayEnabled.
   ///
   /// In en, this message translates to:
-  /// **'SyncPlay Enabled'**
+  /// **'Watch Parties'**
   String get settingsSyncplayEnabled;
 
   /// No description provided for @settingsSyncplayEnabledSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enable group watching features'**
+  /// **'Watch with friends on this server, everyone in step'**
   String get settingsSyncplayEnabledSubtitle;
 
   /// No description provided for @settingsSyncplayButton.
   ///
   /// In en, this message translates to:
-  /// **'SyncPlay Button'**
+  /// **'Watch Parties button'**
   String get settingsSyncplayButton;
 
   /// No description provided for @settingsSyncplayButtonSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Show the SyncPlay button on the navigation bar'**
+  /// **'Show the Watch Parties button on the navigation bar'**
   String get settingsSyncplayButtonSubtitle;
 
   /// No description provided for @settingsSyncplayAdvancedCorrection.
   ///
   /// In en, this message translates to:
-  /// **'Advanced Correction'**
+  /// **'Advanced correction'**
   String get settingsSyncplayAdvancedCorrection;
 
   /// No description provided for @settingsSyncplayAdvancedCorrectionSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enable fine-grained sync logic'**
+  /// **'Delays and extra offset'**
   String get settingsSyncplayAdvancedCorrectionSubtitle;
 
   /// No description provided for @settingsSyncplaySyncCorrection.
   ///
   /// In en, this message translates to:
-  /// **'Sync Correction'**
+  /// **'Sync correction'**
   String get settingsSyncplaySyncCorrection;
 
   /// No description provided for @settingsSyncplaySyncCorrectionSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Automatically adjust playback to stay in sync'**
+  /// **'Keep this device in step with the room'**
   String get settingsSyncplaySyncCorrectionSubtitle;
 
   /// No description provided for @settingsSyncplaySpeedToSync.
   ///
   /// In en, this message translates to:
-  /// **'Speed to Sync'**
+  /// **'Speed to sync'**
   String get settingsSyncplaySpeedToSync;
 
   /// No description provided for @settingsSyncplaySpeedToSyncSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Use playback speed adjustment to sync'**
+  /// **'Play a little faster or slower to catch up'**
   String get settingsSyncplaySpeedToSyncSubtitle;
 
   /// No description provided for @settingsSyncplaySkipToSync.
   ///
   /// In en, this message translates to:
-  /// **'Skip to Sync'**
+  /// **'Skip to sync'**
   String get settingsSyncplaySkipToSync;
 
   /// No description provided for @settingsSyncplaySkipToSyncSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Use seeking to sync'**
+  /// **'Jump ahead when it\'s too far off'**
   String get settingsSyncplaySkipToSyncSubtitle;
 
   /// No description provided for @settingsSyncplayMinimumSpeedDelay.
@@ -22987,7 +22987,7 @@ abstract class AppLocalizations {
   /// Button that opens a new Watch Party room
   ///
   /// In en, this message translates to:
-  /// **'Start a Watch Party'**
+  /// **'Start a watch party'**
   String get watchPartyStart;
 
   /// How a Watch Party host picks what to watch
@@ -23071,7 +23071,7 @@ abstract class AppLocalizations {
   /// Host button that closes the Watch Party room for everyone
   ///
   /// In en, this message translates to:
-  /// **'End Watch Party'**
+  /// **'End for everyone'**
   String get watchPartyEnd;
 
   /// Shown when the Watch Party room was closed
@@ -27662,7 +27662,7 @@ abstract class AppLocalizations {
   /// Subtitle for the Playback settings root entry
   ///
   /// In en, this message translates to:
-  /// **'Player, quality, audio, subtitles, skipping, and SyncPlay'**
+  /// **'Player, quality, audio, subtitles, skipping, and watch parties'**
   String get settingsPlaybackSubtitle;
 
   /// Subtitle for the Storage & Downloads settings root entry
@@ -27740,7 +27740,7 @@ abstract class AppLocalizations {
   /// Section header on the Playback settings screen for SyncPlay
   ///
   /// In en, this message translates to:
-  /// **'Watch Together'**
+  /// **'Watch Parties'**
   String get settingsWatchTogetherSection;
 
   /// Section header on the Playback settings screen
@@ -29774,6 +29774,1676 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Canceled'**
   String get autoplayCanceled;
+
+  /// Role label for an episode director
+  ///
+  /// In en, this message translates to:
+  /// **'Episode Director'**
+  String get episodeDirector;
+
+  /// Role label formatting an episode director with an existing role description
+  ///
+  /// In en, this message translates to:
+  /// **'{role} (Episode Director)'**
+  String episodeDirectorWithRole(String role);
+
+  /// Role label for an episode writer
+  ///
+  /// In en, this message translates to:
+  /// **'Episode Writer'**
+  String get episodeWriter;
+
+  /// Role label formatting an episode writer with an existing role description
+  ///
+  /// In en, this message translates to:
+  /// **'{role} (Episode Writer)'**
+  String episodeWriterWithRole(String role);
+
+  /// Role label for a guest star
+  ///
+  /// In en, this message translates to:
+  /// **'Guest Star'**
+  String get guestStar;
+
+  /// Role label formatting a character role as a guest star
+  ///
+  /// In en, this message translates to:
+  /// **'{role} (Guest Star)'**
+  String guestStarWithRole(String role);
+
+  /// Setting that shows the seasonal row outside the holiday dates
+  ///
+  /// In en, this message translates to:
+  /// **'Show All Year'**
+  String get seasonalRowAllYear;
+
+  /// Explains the Show All Year setting for the seasonal row
+  ///
+  /// In en, this message translates to:
+  /// **'Show a holiday row outside the holiday dates too, a different ticked holiday each day.'**
+  String get seasonalRowAllYearDescription;
+
+  /// Screensaver setting that lets the screensaver start while music or an audiobook plays
+  ///
+  /// In en, this message translates to:
+  /// **'Show During Music and Audiobooks'**
+  String get screensaverDuringAudio;
+
+  /// Description under the Show During Music and Audiobooks screensaver setting
+  ///
+  /// In en, this message translates to:
+  /// **'Let the screensaver start while audio plays, so cover art doesn\'t sit on screen for hours.'**
+  String get screensaverDuringAudioDescription;
+
+  /// TV setting for how long without a button press before the TV's own screensaver and sleep timer take over
+  ///
+  /// In en, this message translates to:
+  /// **'Let TV Sleep After'**
+  String get sleepAfterIdle;
+
+  /// Description under the Let TV Sleep After setting on Android TV, where the app closes
+  ///
+  /// In en, this message translates to:
+  /// **'Close Moonfin after this long without a button press so your TV\'s own screensaver and sleep timer can take over. Anything paused is stopped first, so it keeps its resume point.'**
+  String get sleepAfterIdleDescriptionAndroid;
+
+  /// Description under the Let TV Sleep After setting on Apple TV, where the app stays open
+  ///
+  /// In en, this message translates to:
+  /// **'After this long without a button press, hand the screen back to your Apple TV\'s own screensaver and sleep setting. Moonfin stays open, so you pick up right where you left off.'**
+  String get sleepAfterIdleDescriptionAppleTv;
+
+  /// Label on the Seerr download bar when the download has finished and Radarr/Sonarr has not imported it into the library yet
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded, waiting for import'**
+  String get seerrWaitingForImport;
+
+  /// Label on the Seerr download bar when the download is not making progress, for example a torrent with no seeders
+  ///
+  /// In en, this message translates to:
+  /// **'Stalled'**
+  String get seerrDownloadStalled;
+
+  /// Label on the Seerr download bar when the download client reports the download as failed
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed'**
+  String get seerrDownloadFailed;
+
+  /// Label on the Seerr download bar when the download finished but Radarr/Sonarr refuses to import it, for example because the release contains an executable
+  ///
+  /// In en, this message translates to:
+  /// **'Import blocked'**
+  String get seerrImportBlocked;
+
+  /// Shown where the Seerr download bar would be, when a request was approved and Radarr has the released movie but has not found a release to download yet
+  ///
+  /// In en, this message translates to:
+  /// **'Not found yet'**
+  String get seerrNotFoundYet;
+
+  /// Admin-only button on a Seerr title's detail screen, and the title and confirm button of its dialog. It removes a stuck download, blocks that release, and has Radarr/Sonarr search for another one
+  ///
+  /// In en, this message translates to:
+  /// **'Get a different release'**
+  String get seerrGetDifferentRelease;
+
+  /// Body of the confirm dialog for Get a different release
+  ///
+  /// In en, this message translates to:
+  /// **'{service} will remove {release} from the download client, block it so it isn\'t grabbed again, and search for another release.'**
+  String seerrGetDifferentReleaseConfirm(String service, String release);
+
+  /// Short confirmation after Get a different release removed the stuck download
+  ///
+  /// In en, this message translates to:
+  /// **'Removed. {service} is searching for another release.'**
+  String seerrGetDifferentReleaseDone(String service);
+
+  /// Error shown when Get a different release could not remove the stuck download
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t remove the download'**
+  String get seerrGetDifferentReleaseFailed;
+
+  /// Subtitle of the Repeat tile on the SyncPlay screen
+  ///
+  /// In en, this message translates to:
+  /// **'Replay one item or the whole queue'**
+  String get syncPlayRepeatSubtitle;
+
+  /// Subtitle of the Shuffle tile on the SyncPlay screen
+  ///
+  /// In en, this message translates to:
+  /// **'Play the queue in order or shuffled'**
+  String get syncPlayShuffleSubtitle;
+
+  /// Small label on the signed-in user's own chip in the SyncPlay participant list
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get syncPlayParticipantYou;
+
+  /// Second line under the group name on the SyncPlay screen: the participant count, then what is playing or that nothing is queued
+  ///
+  /// In en, this message translates to:
+  /// **'{participants} · {detail}'**
+  String syncPlayGroupSubtitle(String participants, String detail);
+
+  /// Fills {detail} in syncPlayGroupSubtitle when the group queue is empty, e.g. '3 participants · nothing queued yet'
+  ///
+  /// In en, this message translates to:
+  /// **'nothing queued yet'**
+  String get syncPlayNothingQueued;
+
+  /// Hint next to the participant chips on the SyncPlay screen, telling the user how others join the group
+  ///
+  /// In en, this message translates to:
+  /// **'Others can join from their SyncPlay screen while this group exists.'**
+  String get syncPlayOthersCanJoinHint;
+
+  /// Subtitle under 'Create a new group' on the SyncPlay screen
+  ///
+  /// In en, this message translates to:
+  /// **'Watch together with everyone who joins'**
+  String get syncPlayCreateGroupSubtitle;
+
+  /// Heading of the SyncPlay available groups list with how many there are
+  ///
+  /// In en, this message translates to:
+  /// **'Available groups · {count}'**
+  String syncPlayAvailableGroupsCount(int count);
+
+  /// Second line of the empty state in the SyncPlay available groups list
+  ///
+  /// In en, this message translates to:
+  /// **'Groups other people create on this server will show up here.'**
+  String get syncPlayNoGroupsAvailableHint;
+
+  /// Note with an info icon under the list of available groups on the SyncPlay screen
+  ///
+  /// In en, this message translates to:
+  /// **'Joining a group may replace your current playback queue.'**
+  String get syncPlayJoinReplacesQueueNote;
+
+  /// Shown in the PIN dialog when a link asks to switch to another user while Kids Mode is on. {name} is the user being switched to
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the Kids Mode PIN to switch to {name}'**
+  String kidsModePinToSwitchUser(String name);
+
+  /// No description provided for @settingsDateFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Format'**
+  String get settingsDateFormat;
+
+  /// No description provided for @settingsDateFormatDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose between month-day, day-month, or locale default for calendar and release dates'**
+  String get settingsDateFormatDescription;
+
+  /// No description provided for @dateFormatSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Locale Default'**
+  String get dateFormatSystem;
+
+  /// No description provided for @dateFormatMonthDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Month / Day (Nov 10)'**
+  String get dateFormatMonthDay;
+
+  /// No description provided for @dateFormatDayMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Day / Month (10 Nov)'**
+  String get dateFormatDayMonth;
+
+  /// Playback setting for how long the player controls stay on screen after the last input
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Controls After'**
+  String get settingsHideControlsAfter;
+
+  /// Description under the Hide Controls After playback setting
+  ///
+  /// In en, this message translates to:
+  /// **'How long the player controls stay on screen after your last button press, tap or mouse move.'**
+  String get settingsHideControlsAfterDescription;
+
+  /// Playback setting for how much the player controls dim while HDR video plays
+  ///
+  /// In en, this message translates to:
+  /// **'Dim Controls in HDR'**
+  String get settingsHdrControlsDimming;
+
+  /// Description under the Dim Controls in HDR playback setting
+  ///
+  /// In en, this message translates to:
+  /// **'White looks far brighter next to HDR video, so the player controls dim by this much while it plays.'**
+  String get settingsHdrControlsDimmingDescription;
+
+  /// Note under the Watch Party resume button when it resumes from the host's own progress
+  ///
+  /// In en, this message translates to:
+  /// **'Where you left off. Everyone starts from there.'**
+  String get watchPartyResumeYours;
+
+  /// Name of the feature: the settings page, the screen with the room list and the Home row
+  ///
+  /// In en, this message translates to:
+  /// **'Watch Parties'**
+  String get watchParties;
+
+  /// Setting on Jellyfin that picks what kind of party the user starts: a Moonbase Watch Party or a SyncPlay group
+  ///
+  /// In en, this message translates to:
+  /// **'Start parties with'**
+  String get watchPartyStartWith;
+
+  /// Line under the Watch Party choice of the Start parties with setting
+  ///
+  /// In en, this message translates to:
+  /// **'Chat, reactions and voting. Runs on Moonbase.'**
+  String get watchPartyServiceMoonbaseHint;
+
+  /// Line under the SyncPlay choice of the Start parties with setting
+  ///
+  /// In en, this message translates to:
+  /// **'Jellyfin\'s own. Friends on other Jellyfin apps can join.'**
+  String get watchPartyServiceSyncPlayHint;
+
+  /// Note under the Start parties with setting
+  ///
+  /// In en, this message translates to:
+  /// **'You can join rooms of both kinds. This only picks what you start.'**
+  String get watchPartyServiceNote;
+
+  /// Section heading on the Watch Parties settings page
+  ///
+  /// In en, this message translates to:
+  /// **'During a party'**
+  String get watchPartyDuringParty;
+
+  /// Watch Parties setting: show new chat messages over the video for a few seconds
+  ///
+  /// In en, this message translates to:
+  /// **'Show chat over the video'**
+  String get watchPartyChatOverlay;
+
+  /// Line under the Show chat over the video setting
+  ///
+  /// In en, this message translates to:
+  /// **'New messages show for a few seconds'**
+  String get watchPartyChatOverlaySubtitle;
+
+  /// Watch Parties setting: tell the user when someone on the server starts a party
+  ///
+  /// In en, this message translates to:
+  /// **'Party alerts'**
+  String get watchPartyAlerts;
+
+  /// Line under the Party alerts setting
+  ///
+  /// In en, this message translates to:
+  /// **'Tell me when someone on this server starts one'**
+  String get watchPartyAlertsSubtitle;
+
+  /// TV button on the Watch Parties screen that opens the room code field
+  ///
+  /// In en, this message translates to:
+  /// **'Join with a code'**
+  String get watchPartyJoinWithCode;
+
+  /// Heading of the list of rooms on the Watch Parties screen
+  ///
+  /// In en, this message translates to:
+  /// **'On this server'**
+  String get watchPartyOnThisServer;
+
+  /// TV heading of the Watch Parties screen: how many rooms the user can join
+  ///
+  /// In en, this message translates to:
+  /// **'{count} on this server'**
+  String watchPartyCountOnServer(int count);
+
+  /// Note under the room list on the Watch Parties screen
+  ///
+  /// In en, this message translates to:
+  /// **'You need access to the item to join. A room closes when its last person leaves.'**
+  String get watchPartyRoomsHint;
+
+  /// Empty room list on the Watch Parties screen
+  ///
+  /// In en, this message translates to:
+  /// **'Parties you can watch show up here. Got a code from someone? Pick Join with a code.'**
+  String get watchPartyRoomsEmpty;
+
+  /// Hint under the room code field on the Watch Parties screen
+  ///
+  /// In en, this message translates to:
+  /// **'Pasting an invite link here works too. On a phone, the link opens Moonfin straight into the party.'**
+  String get watchPartyPasteHint;
+
+  /// How many people are in a room, on room cards
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} watching} other{{count} watching}}'**
+  String watchPartyWatchingCount(int count);
+
+  /// Who hosts a room, on room cards and in the player, like "Maya's party"
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s party'**
+  String watchPartyHostsParty(String name);
+
+  /// Room card tag: every member can play, pause and skip
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone controls'**
+  String get watchPartyEveryoneControlsShort;
+
+  /// Room card line: the lobby is voting on what to watch
+  ///
+  /// In en, this message translates to:
+  /// **'Voting on what to watch'**
+  String get watchPartyVotingNow;
+
+  /// Title when the server has no Moonbase plugin to host watch parties
+  ///
+  /// In en, this message translates to:
+  /// **'Watch Parties need Moonbase on this server'**
+  String get watchPartyNeedsMoonbase;
+
+  /// Body under the Watch Parties need Moonbase title
+  ///
+  /// In en, this message translates to:
+  /// **'Ask whoever runs the server to install the Moonbase plugin. On Jellyfin, SyncPlay still works without it.'**
+  String get watchPartyNeedsMoonbaseHint;
+
+  /// Join error: wrong room PIN
+  ///
+  /// In en, this message translates to:
+  /// **'That PIN didn\'t work. Try again.'**
+  String get watchPartyWrongPin;
+
+  /// Join error: too many wrong PINs
+  ///
+  /// In en, this message translates to:
+  /// **'Too many tries. Wait a minute.'**
+  String get watchPartyTooManyTries;
+
+  /// Join error: the room has no space left
+  ///
+  /// In en, this message translates to:
+  /// **'This party is full.'**
+  String get watchPartyFull;
+
+  /// Join error: no room with that code
+  ///
+  /// In en, this message translates to:
+  /// **'No room has that code.'**
+  String get watchPartyNoSuchCode;
+
+  /// Join error, and a notice in the room, when the user cannot play the room's item
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have access to what they\'re watching.'**
+  String get watchPartyNoAccess;
+
+  /// Shown after the host removed this member
+  ///
+  /// In en, this message translates to:
+  /// **'The host removed you from the party.'**
+  String get watchPartyRemoved;
+
+  /// Title of the lobby and party controls
+  ///
+  /// In en, this message translates to:
+  /// **'Your watch party'**
+  String get watchPartyYours;
+
+  /// Hint under Copy invite link in the lobby
+  ///
+  /// In en, this message translates to:
+  /// **'Paste it in any chat. It opens a page on this server with an Open in Moonfin button.'**
+  String get watchPartyInviteHint;
+
+  /// TV lobby heading over the invite QR code
+  ///
+  /// In en, this message translates to:
+  /// **'Send the invite'**
+  String get watchPartySendInvite;
+
+  /// TV lobby line next to the invite QR code
+  ///
+  /// In en, this message translates to:
+  /// **'Scan with your phone to get the invite link, then send it from there. Or just share the code.'**
+  String get watchPartyScanInvite;
+
+  /// Lobby note on how a party starts
+  ///
+  /// In en, this message translates to:
+  /// **'Play waits for everyone\'s player, 10 seconds at most, then counts down 3, 2, 1.'**
+  String get watchPartyStartsTogether;
+
+  /// Member status in a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'In sync'**
+  String get watchPartyStatusInSync;
+
+  /// Member status in a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'Catching up'**
+  String get watchPartyStatusCatchingUp;
+
+  /// Member status in a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'Buffering'**
+  String get watchPartyStatusBuffering;
+
+  /// Member status in a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'Not watching'**
+  String get watchPartyStatusNotWatching;
+
+  /// Member status in a watch party lobby
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get watchPartyStatusReady;
+
+  /// Member status in a watch party lobby
+  ///
+  /// In en, this message translates to:
+  /// **'Joining'**
+  String get watchPartyStatusJoining;
+
+  /// Tag on the host in a watch party's people list
+  ///
+  /// In en, this message translates to:
+  /// **'Host'**
+  String get watchPartyHost;
+
+  /// Shown while a party waits for one member's player to load
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for {name}\'s player'**
+  String watchPartyWaitingFor(String name);
+
+  /// Shown while a party waits for several members' players to load
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Waiting for {count} player} other{Waiting for {count} players}}'**
+  String watchPartyWaitingForCount(int count);
+
+  /// Countdown until the party starts without the players still loading
+  ///
+  /// In en, this message translates to:
+  /// **'Starting anyway in {seconds} s'**
+  String watchPartyStartingAnyway(int seconds);
+
+  /// Under the 3, 2, 1 countdown when a party starts
+  ///
+  /// In en, this message translates to:
+  /// **'Starting together'**
+  String get watchPartyStartingTogether;
+
+  /// Toast in a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'{name} paused'**
+  String watchPartyToastPaused(String name);
+
+  /// Toast in a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'{name} resumed'**
+  String watchPartyToastResumed(String name);
+
+  /// Toast in a watch party, the time like 1:14:02
+  ///
+  /// In en, this message translates to:
+  /// **'{name} skipped to {time}'**
+  String watchPartyToastSkipped(String name, String time);
+
+  /// Toast and chat line in a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'{name} joined'**
+  String watchPartyToastJoined(String name);
+
+  /// Toast and chat line in a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'{name} left'**
+  String watchPartyToastLeft(String name);
+
+  /// Toast and chat line when the host picks another item
+  ///
+  /// In en, this message translates to:
+  /// **'{name} switched to {title}'**
+  String watchPartyToastSwitched(String name, String title);
+
+  /// Toast in a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re the host now'**
+  String get watchPartyToastYouAreHost;
+
+  /// Toast in a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is the host now'**
+  String watchPartyToastNewHost(String name);
+
+  /// Toast when the host lets everyone control playback
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone can control playback now'**
+  String get watchPartyToastEveryoneControls;
+
+  /// Toast when the host takes playback control back
+  ///
+  /// In en, this message translates to:
+  /// **'Only the host controls playback now'**
+  String get watchPartyToastHostControls;
+
+  /// Toast when a Watch Party guest presses play, pause or skip while only the host may
+  ///
+  /// In en, this message translates to:
+  /// **'Only the host can control playback.'**
+  String get watchPartyOnlyHostControls;
+
+  /// Toast when the connection to the room drops
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting to the party...'**
+  String get watchPartyToastReconnecting;
+
+  /// Toast when the connection to the room is back
+  ///
+  /// In en, this message translates to:
+  /// **'Back in the party'**
+  String get watchPartyToastReconnected;
+
+  /// Toast when the host closes the room
+  ///
+  /// In en, this message translates to:
+  /// **'{name} ended the party'**
+  String watchPartyToastEnded(String name);
+
+  /// Tab and button for a watch party's chat
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get watchPartyChat;
+
+  /// Hint in the watch party chat field
+  ///
+  /// In en, this message translates to:
+  /// **'Send to the party'**
+  String get watchPartySendToParty;
+
+  /// TV hint on the watch party quick bar
+  ///
+  /// In en, this message translates to:
+  /// **'Back to close'**
+  String get watchPartyBackToClose;
+
+  /// TV quick bar button that opens the keyboard to type a chat message
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get watchPartyType;
+
+  /// TV quick reply in a watch party chat
+  ///
+  /// In en, this message translates to:
+  /// **'Haha'**
+  String get watchPartyReplyHaha;
+
+  /// TV quick reply in a watch party chat
+  ///
+  /// In en, this message translates to:
+  /// **'No way'**
+  String get watchPartyReplyNoWay;
+
+  /// TV quick reply in a watch party chat
+  ///
+  /// In en, this message translates to:
+  /// **'Pause please'**
+  String get watchPartyReplyPausePlease;
+
+  /// TV quick reply in a watch party chat, short for be right back
+  ///
+  /// In en, this message translates to:
+  /// **'Brb'**
+  String get watchPartyReplyBrb;
+
+  /// TV quick reply in a watch party chat
+  ///
+  /// In en, this message translates to:
+  /// **'Again!'**
+  String get watchPartyReplyAgain;
+
+  /// Name of a watch party reaction
+  ///
+  /// In en, this message translates to:
+  /// **'Love'**
+  String get watchPartyReactionLove;
+
+  /// Name of a watch party reaction
+  ///
+  /// In en, this message translates to:
+  /// **'Haha'**
+  String get watchPartyReactionHaha;
+
+  /// Name of a watch party reaction
+  ///
+  /// In en, this message translates to:
+  /// **'Wow'**
+  String get watchPartyReactionWow;
+
+  /// Name of a watch party reaction
+  ///
+  /// In en, this message translates to:
+  /// **'Sad'**
+  String get watchPartyReactionSad;
+
+  /// Name of a watch party reaction
+  ///
+  /// In en, this message translates to:
+  /// **'Fire'**
+  String get watchPartyReactionFire;
+
+  /// Name of a watch party reaction
+  ///
+  /// In en, this message translates to:
+  /// **'Popcorn'**
+  String get watchPartyReactionPopcorn;
+
+  /// Host action on a member of the watch party
+  ///
+  /// In en, this message translates to:
+  /// **'Make host'**
+  String get watchPartyMakeHost;
+
+  /// Host setting of a watch party
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone can control playback'**
+  String get watchPartyEveryoneControls;
+
+  /// Line under Everyone can control playback
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone can play, pause and skip'**
+  String get watchPartyEveryoneControlsHint;
+
+  /// Host setting of a watch party, and the title of the PIN dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Room PIN'**
+  String get watchPartyRoomPin;
+
+  /// Line under Room PIN
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for a PIN before anyone joins'**
+  String get watchPartyRoomPinHint;
+
+  /// Hint in the room PIN field
+  ///
+  /// In en, this message translates to:
+  /// **'4 to 8 digits'**
+  String get watchPartyPinDigits;
+
+  /// Button that leaves the watch party
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
+  String get watchPartyLeave;
+
+  /// Host button that leaves, naming who takes over
+  ///
+  /// In en, this message translates to:
+  /// **'Leave · {name} hosts'**
+  String watchPartyLeaveHandsOver(String name);
+
+  /// Party alert title
+  ///
+  /// In en, this message translates to:
+  /// **'{name} started a watch party'**
+  String watchPartyStartedBy(String name);
+
+  /// Party alert body
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{title} · {count} in the lobby} other{{title} · {count} in the lobby}}'**
+  String watchPartyInLobbyCount(String title, int count);
+
+  /// Line on the TV party alert banner
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s first in Watch Parties on Home'**
+  String get watchPartyFirstOnHome;
+
+  /// Dialog when a party link names a server the app does not have
+  ///
+  /// In en, this message translates to:
+  /// **'This invite is for a server you have not added yet, {address}. Add it and sign in to join.'**
+  String watchPartyAddServerQuestion(String address);
+
+  /// Toggle that draws subtitles in a bold weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Bold Text'**
+  String get subtitleBold;
+
+  /// Setting for how thick the outline around subtitle text is.
+  ///
+  /// In en, this message translates to:
+  /// **'Text Stroke Width'**
+  String get subtitleStrokeWidth;
+
+  /// Setting for which font subtitles are drawn in.
+  ///
+  /// In en, this message translates to:
+  /// **'Font'**
+  String get subtitleFont;
+
+  /// Explains that subtitle fonts are not built in and are downloaded when chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Fonts are downloaded from Google Fonts the first time you pick them'**
+  String get subtitleFontDescription;
+
+  /// Shown when a subtitle font could not be downloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t download {font}'**
+  String subtitleFontDownloadFailed(String font);
+
+  /// Toggle for a drop shadow behind subtitle text.
+  ///
+  /// In en, this message translates to:
+  /// **'Text Shadow'**
+  String get subtitleShadow;
+
+  /// How dark the subtitle drop shadow is.
+  ///
+  /// In en, this message translates to:
+  /// **'Shadow Intensity'**
+  String get subtitleShadowIntensity;
+
+  /// How far the subtitle drop shadow sits from the text.
+  ///
+  /// In en, this message translates to:
+  /// **'Shadow Offset'**
+  String get subtitleShadowOffset;
+
+  /// How soft the edge of the subtitle drop shadow is.
+  ///
+  /// In en, this message translates to:
+  /// **'Shadow Blur'**
+  String get subtitleShadowBlur;
+
+  /// Setting to determine book series based on folders instead of item metadata
+  ///
+  /// In en, this message translates to:
+  /// **'Treat book folders as series'**
+  String get bookFoldersAsSeries;
+
+  /// Explains the setting to determine book series based on folders instead of item metadata
+  ///
+  /// In en, this message translates to:
+  /// **'Treat folders containing books as series instead of relying on the individual books\' metadata'**
+  String get bookFoldersAsSeriesDescription;
+
+  /// Remove-watched-downloads option: ask whether to delete a download once it is played to the end
+  ///
+  /// In en, this message translates to:
+  /// **'Ask me'**
+  String get removeWatchedAsk;
+
+  /// Title of the dialog shown after a downloaded episode or movie is played to the end
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this download?'**
+  String get deleteFinishedDownloadTitle;
+
+  /// Body of the dialog shown after a downloaded episode or movie is played to the end
+  ///
+  /// In en, this message translates to:
+  /// **'You finished {title}. Delete its download to free up space, or keep it and stop asking.'**
+  String deleteFinishedDownloadMessage(String title);
+
+  /// Button that closes a question without answering it, so it can be asked again later
+  ///
+  /// In en, this message translates to:
+  /// **'Not Now'**
+  String get notNow;
+
+  /// Section header on the Quality & Decoding settings screen
+  ///
+  /// In en, this message translates to:
+  /// **'Decoding & Rendering'**
+  String get settingsDecodingAndRenderingSection;
+
+  /// Section header on the Audio settings screen for the default audio track choices
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Stream'**
+  String get settingsAudioStreamSection;
+
+  /// Section header on the Audio settings screen for the passthrough mode
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Output'**
+  String get settingsAudioOutputSection;
+
+  /// Section header on the Audio settings screen for the per-codec passthrough switches
+  ///
+  /// In en, this message translates to:
+  /// **'Passthrough Settings'**
+  String get settingsPassthroughSettingsSection;
+
+  /// Section header on the IMDb Lists settings screen over the IMDb row switches
+  ///
+  /// In en, this message translates to:
+  /// **'IMDb Lists'**
+  String get settingsImdbListsSection;
+
+  /// Section header on the TMDB Lists settings screen over the TMDB row switches
+  ///
+  /// In en, this message translates to:
+  /// **'TMDB Lists'**
+  String get settingsTmdbListsSection;
+
+  /// Section header on the Seerr Lists settings screen for the Seerr rows shown on the home page
+  ///
+  /// In en, this message translates to:
+  /// **'Seerr Home Page Rows'**
+  String get settingsSeerrHomePageRowsSection;
+
+  /// Section header on the Custom Rows settings screen over the rows the user already saved
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Custom Home Rows'**
+  String get settingsSavedCustomHomeRowsSection;
+
+  /// Section header on the Home Sections settings screen for the Rewatch row
+  ///
+  /// In en, this message translates to:
+  /// **'Rewatch'**
+  String get settingsRewatchSection;
+
+  /// Section header in the Favorites display options for choosing between Home and Library view
+  ///
+  /// In en, this message translates to:
+  /// **'Switch View'**
+  String get favoritesSwitchViewSection;
+
+  /// Checkbox in the Silo profile PIN dialog. Ticked, the PIN isn't asked for again on this device; unticked, it is asked for each time the app starts or this profile is switched to
+  ///
+  /// In en, this message translates to:
+  /// **'Remember PIN on this device'**
+  String get siloPinRemember;
+
+  /// Notice over the dimmed Settings live preview while an audio Row Options setting has focus, Display Audio Rows is on, and none of the audio sections is turned on in Settings > Appearance > Home Screen > Rows, so Home doesn't change. It says where on the Rows screen the turned-off audio rows are
+  ///
+  /// In en, this message translates to:
+  /// **'Albums, Artists and Audio Playlists are all turned off. To show one, go to Rows, open {group} under {disabled}, and turn it on.'**
+  String settingsPreviewAudioRowsOffInHomeRows(String group, String disabled);
+
+  /// Notice over the dimmed Settings live preview while an audio Row Options setting has focus, Display Audio Rows is off, and none of the audio sections is turned on in Settings > Appearance > Home Screen > Rows. The Rows screen only lists the audio rows once the switch is on, so it gives the steps in that order
+  ///
+  /// In en, this message translates to:
+  /// **'To see Albums, Artists or Audio Playlists on Home, first turn on {setting}. Then go to Rows, open {group} under {disabled}, and turn one on.'**
+  String settingsPreviewAudioRowsOffInHomeRowsSwitchOff(
+    String setting,
+    String group,
+    String disabled,
+  );
+
+  /// Notice over the dimmed Settings live preview while a Collections Row Options setting has focus, Display Collections Rows is on, and the Collections section is turned off in Settings > Appearance > Home Screen > Rows, so Home doesn't change. It says where on the Rows screen the turned-off row is
+  ///
+  /// In en, this message translates to:
+  /// **'The Collections row is turned off. To show it, go to Rows, open {group} under {disabled}, and turn it on.'**
+  String settingsPreviewCollectionsOffInHomeRows(String group, String disabled);
+
+  /// Notice over the dimmed Settings live preview while a Collections Row Options setting has focus, Display Collections Rows is off, and the Collections section is turned off in Settings > Appearance > Home Screen > Rows. The Rows screen only lists the Collections row once the switch is on, so it gives the steps in that order
+  ///
+  /// In en, this message translates to:
+  /// **'To see the Collections row on Home, first turn on {setting}. Then go to Rows, open {group} under {disabled}, and turn it on.'**
+  String settingsPreviewCollectionsOffInHomeRowsSwitchOff(
+    String setting,
+    String group,
+    String disabled,
+  );
+
+  /// Notice over the dimmed Settings live preview while a Row Options setting has focus whose rows Kids Mode hides from Home, so Home doesn't change
+  ///
+  /// In en, this message translates to:
+  /// **'Kids Mode keeps these rows off Home, so these settings don\'t change it.'**
+  String get settingsPreviewRowsOffInKidsMode;
+
+  /// Status line under the Settings live preview, in place of 'Shows on the Home preview', for a Row Options setting whose rows are all turned off in Settings > Appearance > Home Screen > Rows while the setting's Display switch is on
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on a row in Rows, under {disabled}'**
+  String settingsPreviewNeedsRowInRows(String disabled);
+
+  /// Status line under the Settings live preview, in place of 'Shows on the Home preview', for a Row Options setting whose rows are all turned off in Settings > Appearance > Home Screen > Rows while the setting's Display switch is off. The Rows screen only lists those rows once the switch is on
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on {setting}, then turn on a row in Rows'**
+  String settingsPreviewNeedsSwitchAndRow(String setting);
+
+  /// Status line under the Settings live preview, in place of 'Shows on the Home preview', for a Row Options setting whose rows Kids Mode hides from Home
+  ///
+  /// In en, this message translates to:
+  /// **'Kids Mode keeps this off Home'**
+  String get settingsPreviewKeptOffByKidsMode;
+
+  /// Note over the Settings live preview while an audio Row Options setting has focus and there are no albums, artists or audio playlists to show, so Home shows no audio rows
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s no music to show, so Home leaves these rows out.'**
+  String get settingsPreviewAudioRowsEmpty;
+
+  /// Note over the Settings live preview while a Favorites, Genres, Playlists or Studios Row Options setting has focus and those rows have nothing to show, so Home leaves them out
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s nothing to show in these rows, so Home leaves them out.'**
+  String get settingsPreviewRowsEmpty;
+
+  /// Note over the Settings live preview while a Collections Row Options setting has focus and there are no collections to show, so Home shows no Collections row
+  ///
+  /// In en, this message translates to:
+  /// **'There are no collections to show, so Home leaves this row out.'**
+  String get settingsPreviewCollectionsEmpty;
+
+  /// Note over the Settings live preview while the Show Individual Episodes setting in Row Options has focus, explaining that it doesn't change the Collections row the preview shows
+  ///
+  /// In en, this message translates to:
+  /// **'This only changes rows for a single collection added in Rows. The Collections row looks the same.'**
+  String get settingsPreviewShowEpisodesNote;
+
+  /// Name of the hidden arcade in Settings > About. A product name, keep it short
+  ///
+  /// In en, this message translates to:
+  /// **'After Hours'**
+  String get afterHoursTitle;
+
+  /// Toast when the seventh press on the Version row opens the hidden arcade
+  ///
+  /// In en, this message translates to:
+  /// **'After Hours unlocked'**
+  String get afterHoursUnlocked;
+
+  /// Toast counting down the remote presses on the Version row left before the hidden arcade opens
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 more press} other{{count} more presses}}'**
+  String afterHoursPressesLeft(int count);
+
+  /// Toast counting down the taps on the Version row left before the hidden arcade opens
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 more tap} other{{count} more taps}}'**
+  String afterHoursTapsLeft(int count);
+
+  /// Button that starts playing a game in the arcade. Play as in playing a game, not playing media
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get afterHoursPlay;
+
+  /// Title of the screen and the card that show the top 3 scores for every arcade game
+  ///
+  /// In en, this message translates to:
+  /// **'Leaderboards'**
+  String get afterHoursLeaderboards;
+
+  /// Heading over the three best scores in an arcade game
+  ///
+  /// In en, this message translates to:
+  /// **'Top 3'**
+  String get afterHoursTop3;
+
+  /// Note saying the arcade scores shown come from the named server
+  ///
+  /// In en, this message translates to:
+  /// **'Scores from {server}'**
+  String afterHoursScoresFrom(String server);
+
+  /// Note saying the arcade scores shown are the ones kept on this device, because the server has none
+  ///
+  /// In en, this message translates to:
+  /// **'Scores on this device'**
+  String get afterHoursScoresOnDevice;
+
+  /// Shown when a run in an arcade game ends
+  ///
+  /// In en, this message translates to:
+  /// **'Game over'**
+  String get afterHoursGameOver;
+
+  /// Shown when a finished arcade run places in the top 3, with its place
+  ///
+  /// In en, this message translates to:
+  /// **'New #{rank} on the board'**
+  String afterHoursNewRank(int rank);
+
+  /// Button that starts a new run of the same arcade game
+  ///
+  /// In en, this message translates to:
+  /// **'Play again'**
+  String get afterHoursPlayAgain;
+
+  /// Button that leaves a finished game for the arcade menu
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the arcade'**
+  String get afterHoursBackToArcade;
+
+  /// Short button on a phone that leaves a finished game for the arcade menu
+  ///
+  /// In en, this message translates to:
+  /// **'Arcade'**
+  String get afterHoursArcade;
+
+  /// Note under the Play button on a phone: the screen rotates to landscape during the game
+  ///
+  /// In en, this message translates to:
+  /// **'Turns to landscape while you play'**
+  String get afterHoursLandscapeNote;
+
+  /// Label before the touchscreen controls of an arcade game
+  ///
+  /// In en, this message translates to:
+  /// **'Touch'**
+  String get afterHoursTouch;
+
+  /// Short tag on the leaderboard row the player just set. Keep it very short
+  ///
+  /// In en, this message translates to:
+  /// **'NEW'**
+  String get afterHoursNewTag;
+
+  /// Shown in place of a leaderboard nobody has played yet
+  ///
+  /// In en, this message translates to:
+  /// **'No scores yet'**
+  String get afterHoursNoScores;
+
+  /// Flashes in the Case Stack arcade game when a case lands exactly on the one below
+  ///
+  /// In en, this message translates to:
+  /// **'PERFECT'**
+  String get afterHoursPerfect;
+
+  /// Flashes in the Case Stack arcade game on every third perfect landing in a row, which widens the stack. A box set of discs
+  ///
+  /// In en, this message translates to:
+  /// **'BOX SET'**
+  String get afterHoursBoxSet;
+
+  /// Name of an After Hours arcade game, the easter egg in Settings > About. A pun on video buffering
+  ///
+  /// In en, this message translates to:
+  /// **'Buffer Run'**
+  String get afterHoursBufferRun;
+
+  /// Kind of game Buffer Run is
+  ///
+  /// In en, this message translates to:
+  /// **'Endless runner with a gravity flip'**
+  String get afterHoursBufferRunGenre;
+
+  /// Two sentence description of the Buffer Run arcade game. The runner is the running figure of the app's loading animation
+  ///
+  /// In en, this message translates to:
+  /// **'The runner from the loading screen finally gets somewhere to go. Double jump and gravity flips it onto the ceiling.'**
+  String get afterHoursBufferRunPitch;
+
+  /// Remote controls of the Buffer Run arcade game. Flip means turning gravity over onto the ceiling. Keep under about 90 characters, it also shows as one line on the How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'OK jumps, again mid-air to flip sides. Down slides. On the ceiling Up and Down swap.'**
+  String get afterHoursBufferRunRemote;
+
+  /// Touchscreen controls of the Buffer Run arcade game. Keep under about 90 characters, it also shows as one line on the How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to jump, and tap again in the air to flip. Swipe toward the side you\'re running on to slide.'**
+  String get afterHoursBufferRunTouch;
+
+  /// Name of an After Hours arcade game, the easter egg in Settings > About. Named after the playback control
+  ///
+  /// In en, this message translates to:
+  /// **'Fast Forward'**
+  String get afterHoursFastForward;
+
+  /// Kind of game Fast Forward is
+  ///
+  /// In en, this message translates to:
+  /// **'Three-lane runner'**
+  String get afterHoursFastForwardGenre;
+
+  /// Two sentence description of the Fast Forward arcade game, set in a cinema lobby
+  ///
+  /// In en, this message translates to:
+  /// **'A sprint down three lobby aisles. Hop the low stuff, and remember the popcorn carts don\'t move for anyone.'**
+  String get afterHoursFastForwardPitch;
+
+  /// Remote controls of the Fast Forward arcade game. Keep under about 90 characters, it also shows as one line on the How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Up and Down change lanes. OK jumps.'**
+  String get afterHoursFastForwardRemote;
+
+  /// Touchscreen controls of the Fast Forward arcade game. Keep under about 90 characters, it also shows as one line on the How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe up or down to change lanes. Tap to jump.'**
+  String get afterHoursFastForwardTouch;
+
+  /// Name of an After Hours arcade game, the easter egg in Settings > About, where you steer an HDMI cable
+  ///
+  /// In en, this message translates to:
+  /// **'Cable Crawl'**
+  String get afterHoursCableCrawl;
+
+  /// Kind of game Cable Crawl is, a snake-like game on a grid
+  ///
+  /// In en, this message translates to:
+  /// **'Grid crawler'**
+  String get afterHoursCableCrawlGenre;
+
+  /// Two sentence description of the Cable Crawl arcade game. A bar is one bar of signal strength
+  ///
+  /// In en, this message translates to:
+  /// **'Steer an HDMI cable around the back of the TV cabinet and plug into signal. Every bar makes it longer.'**
+  String get afterHoursCableCrawlPitch;
+
+  /// Remote controls of the Cable Crawl arcade game. Keep under about 90 characters, it also shows as one line on the How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Arrows turn. The cable never stops.'**
+  String get afterHoursCableCrawlRemote;
+
+  /// Touchscreen controls of the Cable Crawl arcade game. Keep under about 90 characters, it also shows as one line on the How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe to turn.'**
+  String get afterHoursCableCrawlTouch;
+
+  /// Name of an After Hours arcade game, the easter egg in Settings > About, where you stack Blu-ray cases
+  ///
+  /// In en, this message translates to:
+  /// **'Case Stack'**
+  String get afterHoursCaseStack;
+
+  /// Kind of game Case Stack is
+  ///
+  /// In en, this message translates to:
+  /// **'One-button stacker'**
+  String get afterHoursCaseStackGenre;
+
+  /// Two sentence description of the Case Stack arcade game
+  ///
+  /// In en, this message translates to:
+  /// **'Build a shelf-high tower of Blu-ray cases, each one a title from your own library. Whatever hangs over the edge gets trimmed off, so land them dead on.'**
+  String get afterHoursCaseStackPitch;
+
+  /// Remote controls of the Case Stack arcade game. Keep under about 90 characters, it also shows as one line on the How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'OK drops the case.'**
+  String get afterHoursCaseStackRemote;
+
+  /// Touchscreen controls of the Case Stack arcade game. Keep under about 90 characters, it also shows as one line on the How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Tap anywhere to drop.'**
+  String get afterHoursCaseStackTouch;
+
+  /// Name of an After Hours arcade game, the easter egg in Settings > About, where you clear video compression artifacts
+  ///
+  /// In en, this message translates to:
+  /// **'Pixel Purge'**
+  String get afterHoursPixelPurge;
+
+  /// Kind of game Pixel Purge is, a brick breaker with a paddle
+  ///
+  /// In en, this message translates to:
+  /// **'Paddle breaker'**
+  String get afterHoursPixelPurgeGenre;
+
+  /// Two sentence description of the Pixel Purge arcade game. The ball is a play button and the paddle is the seek bar
+  ///
+  /// In en, this message translates to:
+  /// **'A bad encode left the picture full of blocky artifacts, and they creep down a little every second. Bounce the play button off the seek bar to clear them before they reach it.'**
+  String get afterHoursPixelPurgePitch;
+
+  /// Remote controls of the Pixel Purge arcade game. The scrubber is the seek bar used as the paddle. Keep under about 90 characters, it also shows as one line on the How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Left and Right slide the scrubber. The ball launches on its own.'**
+  String get afterHoursPixelPurgeRemote;
+
+  /// Touchscreen controls of the Pixel Purge arcade game. Keep under about 90 characters, it also shows as one line on the How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to slide the scrubber.'**
+  String get afterHoursPixelPurgeTouch;
+
+  /// Title of the card that explains an arcade game's controls, enemies, obstacles and powerups, and the button that opens it
+  ///
+  /// In en, this message translates to:
+  /// **'How to play'**
+  String get afterHoursHowToPlay;
+
+  /// Button on the How to play card that starts the game. Start as in begin playing
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get afterHoursStart;
+
+  /// Button on the How to play card opened from the pause menu, which returns to the paused game
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the game'**
+  String get afterHoursBackToGame;
+
+  /// Heading over the enemies on an arcade game's How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Enemies'**
+  String get afterHoursEnemies;
+
+  /// Heading over the obstacles on an arcade game's How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Obstacles'**
+  String get afterHoursObstacles;
+
+  /// Heading over the powerups on an arcade game's How to play card
+  ///
+  /// In en, this message translates to:
+  /// **'Powerups'**
+  String get afterHoursPowerups;
+
+  /// What a shield powerup does in an arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'A shield that takes one hit.'**
+  String get afterHoursCastShieldLine;
+
+  /// What a collectible is worth in an arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'25 points a piece.'**
+  String get afterHoursCastPointsLine;
+
+  /// Name of an enemy in the Buffer Run arcade game, shown on its How to play card. A bat named after video lag. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Lag Bat'**
+  String get afterHoursCastLagBat;
+
+  /// What the Lag Bat does in the Buffer Run arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Swoops in at head height. Slide under it.'**
+  String get afterHoursCastLagBatLine;
+
+  /// Name of an enemy in the Buffer Run arcade game, shown on its How to play card. A gremlin made of TV static. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Static Gremlin'**
+  String get afterHoursCastGremlin;
+
+  /// What the Static Gremlin does in the Buffer Run arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Hops along the floor or the ceiling toward you. Jump it.'**
+  String get afterHoursCastGremlinLine;
+
+  /// Name of an obstacle in the Buffer Run arcade game, shown on its How to play card. A coiled cable on the floor. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Cable Coil'**
+  String get afterHoursCastCable;
+
+  /// What the Cable Coil does in the Buffer Run arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Low on the floor or the ceiling. Jump it.'**
+  String get afterHoursCastCableLine;
+
+  /// Name of an obstacle in the Buffer Run arcade game, shown on its How to play card. A sign showing a buffering spinner. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Buffering Banner'**
+  String get afterHoursCastBanner;
+
+  /// What the Buffering Banner does in the Buffer Run arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Slide under the sign. Its pole is a wall on the other side.'**
+  String get afterHoursCastBannerLine;
+
+  /// Name of a powerup in the Buffer Run arcade game, shown on its How to play card, named after the Skip Intro button. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Skip Intro'**
+  String get afterHoursCastSkipIntro;
+
+  /// What the Skip Intro powerup does in the Buffer Run arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Three seconds of dash that smashes anything.'**
+  String get afterHoursCastSkipIntroLine;
+
+  /// Name of a collectible in the Buffer Run arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Popcorn'**
+  String get afterHoursCastPopcorn;
+
+  /// Name of an enemy in the Fast Forward arcade game, shown on its How to play card. A film reel rolling loose. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Loose Reel'**
+  String get afterHoursCastRollingReel;
+
+  /// What the Loose Reel does in the Fast Forward arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Rolls down your lane faster than you run. Jump it.'**
+  String get afterHoursCastRollingReelLine;
+
+  /// Name of an enemy in the Fast Forward arcade game, shown on its How to play card. A cinema usher. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Usher'**
+  String get afterHoursCastUsher;
+
+  /// What the Usher does in the Fast Forward arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Walks toward you and changes lanes once.'**
+  String get afterHoursCastUsherLine;
+
+  /// Name of an obstacle in the Fast Forward arcade game, shown on its How to play card. The rope barrier at a cinema. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Velvet Rope'**
+  String get afterHoursCastVelvetRope;
+
+  /// What the Velvet Rope does in the Fast Forward arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Low. Jump it or change lanes.'**
+  String get afterHoursCastVelvetRopeLine;
+
+  /// Name of an obstacle in the Fast Forward arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Popcorn Cart'**
+  String get afterHoursCastPopcornCart;
+
+  /// What the Popcorn Cart does in the Fast Forward arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Too tall to jump. Change lanes.'**
+  String get afterHoursCastPopcornCartLine;
+
+  /// Name of a powerup in the Fast Forward arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Front Row Pass'**
+  String get afterHoursCastFrontRowPass;
+
+  /// Name of a powerup in the Fast Forward arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Magnet'**
+  String get afterHoursCastMagnet;
+
+  /// What the Magnet does in the Fast Forward arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Pulls in tickets from every lane for eight seconds.'**
+  String get afterHoursCastMagnetLine;
+
+  /// Name of a collectible cinema ticket in the Fast Forward arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket'**
+  String get afterHoursCastTicket;
+
+  /// Name of an enemy in the Cable Crawl arcade game, shown on its How to play card. A bug causing signal interference. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Interference Bug'**
+  String get afterHoursCastBug;
+
+  /// What the Interference Bug does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Wanders at random.'**
+  String get afterHoursCastBugLine;
+
+  /// Name of an enemy in the Cable Crawl arcade game, shown on its How to play card. A tangle of cable. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Tangle'**
+  String get afterHoursCastTangle;
+
+  /// What the Tangle does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Slowly chases your plug.'**
+  String get afterHoursCastTangleLine;
+
+  /// Name of an obstacle in the Cable Crawl arcade game, shown on its How to play card. A cell of TV static. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Static'**
+  String get afterHoursCastStatic;
+
+  /// What the Static block does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'A dead cell. One appears every third signal.'**
+  String get afterHoursCastStaticLine;
+
+  /// Name of an obstacle in the Cable Crawl arcade game, shown on its How to play card. A power supply brick. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Power Brick'**
+  String get afterHoursCastBrick;
+
+  /// What the Power Brick does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'A 2 by 2 block every fifth signal.'**
+  String get afterHoursCastBrickLine;
+
+  /// Name of a powerup in the Cable Crawl arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Ghost'**
+  String get afterHoursCastGhost;
+
+  /// What the Ghost powerup does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Five seconds of passing through everything but the edge.'**
+  String get afterHoursCastGhostLine;
+
+  /// Name of a powerup in the Cable Crawl arcade game, shown on its How to play card. A cut with scissors. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Snip'**
+  String get afterHoursCastSnip;
+
+  /// What the Snip powerup does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Cuts the cable in half for bonus points.'**
+  String get afterHoursCastSnipLine;
+
+  /// Name of the pickup in the Cable Crawl arcade game, bars of signal strength, shown on its How to play card. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Signal'**
+  String get afterHoursCastSignal;
+
+  /// What the Signal pickup does in the Cable Crawl arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Points, and two more segments.'**
+  String get afterHoursCastSignalLine;
+
+  /// Name of an enemy in the Case Stack arcade game, shown on its How to play card. A cat on the shelf. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Shelf Cat'**
+  String get afterHoursCastShelfCat;
+
+  /// What the Shelf Cat does in the Case Stack arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Bats a case as it comes in, so that one slides faster.'**
+  String get afterHoursCastShelfCatLine;
+
+  /// Name of an obstacle in the Case Stack arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Blu-ray Case'**
+  String get afterHoursCastBluCase;
+
+  /// What the Blu-ray Case does in the Case Stack arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'A title from your library. The overhang gets trimmed off.'**
+  String get afterHoursCastBluCaseLine;
+
+  /// Name of an obstacle in the Case Stack arcade game, shown on its How to play card. A metal disc case. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Steelbook'**
+  String get afterHoursCastSteelbook;
+
+  /// What the Steelbook does in the Case Stack arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Every tenth case. Slides much faster.'**
+  String get afterHoursCastSteelbookLine;
+
+  /// Name of a powerup in the Case Stack arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect Drop'**
+  String get afterHoursCastPerfect;
+
+  /// What the Perfect Drop does in the Case Stack arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Land it dead on and the stack grows a little wider.'**
+  String get afterHoursCastPerfectLine;
+
+  /// Name of a powerup in the Case Stack arcade game, shown on its How to play card. A box set of discs. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Box Set'**
+  String get afterHoursCastBoxSet;
+
+  /// What the Box Set does in the Case Stack arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Three perfect drops in a row grow it a lot wider.'**
+  String get afterHoursCastBoxSetLine;
+
+  /// Name of an enemy in the Pixel Purge arcade game, shown on its How to play card. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Dead Pixel'**
+  String get afterHoursCastDeadPixel;
+
+  /// What the Dead Pixel does in the Pixel Purge arcade game, one line on its How to play card. The scrubber is the seek bar used as the paddle. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Falls from cleared blocks. Catching it shrinks the scrubber.'**
+  String get afterHoursCastDeadPixelLine;
+
+  /// Name of an obstacle in the Pixel Purge arcade game, shown on its How to play card. A blocky video compression artifact. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Macroblock'**
+  String get afterHoursCastMacroblock;
+
+  /// What the Macroblock does in the Pixel Purge arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'One hit clears it.'**
+  String get afterHoursCastMacroblockLine;
+
+  /// Name of an obstacle in the Pixel Purge arcade game, shown on its How to play card. A video keyframe. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Keyframe'**
+  String get afterHoursCastKeyframe;
+
+  /// What the Keyframe does in the Pixel Purge arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Takes three hits and drops a powerup.'**
+  String get afterHoursCastKeyframeLine;
+
+  /// What the HDR powerup does in the Pixel Purge arcade game, one line on its How to play card. The scrubber is the seek bar used as the paddle. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'A scrubber twice as wide for eight seconds.'**
+  String get afterHoursCastHdrLine;
+
+  /// Name of a powerup in the Pixel Purge arcade game, shown on its How to play card. A safety net named after video buffering. Keep it short, it shows as a heading in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'Buffer'**
+  String get afterHoursCastBufferNet;
+
+  /// What the Buffer powerup does in the Pixel Purge arcade game, one line on its How to play card. Keep under about 60 characters, it shows in a small column
+  ///
+  /// In en, this message translates to:
+  /// **'A net under the scrubber that saves one miss.'**
+  String get afterHoursCastBufferNetLine;
+
+  /// Short touchscreen controls of the Buffer Run arcade game on its How to play card. Flip means turning gravity over onto the ceiling. Keep under about 90 characters, it shows as one line
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to jump, again mid-air to flip sides. Swipe toward your side to slide.'**
+  String get afterHoursBufferRunCardTouch;
+
+  /// Short remote controls of the Pixel Purge arcade game on its How to play card. The scrubber is the seek bar used as the paddle. Keep under about 90 characters, it shows as one line
+  ///
+  /// In en, this message translates to:
+  /// **'Left and Right slide the scrubber.'**
+  String get afterHoursPixelPurgeCardRemote;
 }
 
 class _AppLocalizationsDelegate

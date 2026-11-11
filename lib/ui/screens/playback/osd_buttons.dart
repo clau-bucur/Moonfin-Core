@@ -76,7 +76,7 @@ enum OsdButton {
 
   String label(AppLocalizations l10n) => switch (this) {
     OsdButton.restart => l10n.restart,
-    OsdButton.syncPlay => l10n.syncPlay,
+    OsdButton.syncPlay => l10n.watchParties,
     OsdButton.favorite => l10n.favorite,
     OsdButton.speed => l10n.playerTooltipPlaybackSpeed,
     OsdButton.chapters => l10n.chapters,
