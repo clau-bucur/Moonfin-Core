@@ -45,8 +45,10 @@ class _FakeUserViewsRepository extends ChangeNotifier
 
 class _FakePluginSyncService extends ChangeNotifier
     implements PluginSyncService {
+  bool offersSeerr = false;
+
   @override
-  bool get seerrAvailable => false;
+  bool get seerrAvailable => offersSeerr;
 
   @override
   bool get calendarAvailable => false;
@@ -242,6 +244,38 @@ void main() {
     NavigationLayout.chromeFocusRoots.clear();
     await GetIt.instance.reset();
   });
+
+  for (final toolbar in [true, false]) {
+    testWidgets(
+      'TV Seerr navigation honors availability and visibility (toolbar=$toolbar)',
+      (tester) async {
+        PlatformDetection.setTvMode(true);
+        addTearDown(() => PlatformDetection.setTvMode(false));
+        final sync =
+            GetIt.instance<PluginSyncService>() as _FakePluginSyncService;
+        sync.offersSeerr = true;
+        final prefs = GetIt.instance<UserPreferences>();
+        await prefs.set(UserPreferences.showSeerrButton, true);
+        await tester.pumpWidget(
+          _host(toolbar ? const TopToolbar() : const LeftSidebar()),
+        );
+        await tester.pumpAndSettle();
+        final button = find.byKey(
+          ValueKey(toolbar ? 'toolbar_seerr' : 'sidebar-seerr'),
+        );
+        expect(button, findsOneWidget);
+        await prefs.set(UserPreferences.showSeerrButton, false);
+        await tester.pumpAndSettle();
+        expect(button, findsNothing);
+        await prefs.set(UserPreferences.showSeerrButton, true);
+        sync.offersSeerr = false;
+        sync.notifyListeners();
+        await tester.pumpAndSettle();
+        expect(button, findsNothing);
+        await tester.pumpWidget(_host(const SizedBox()));
+      },
+    );
+  }
 
   testWidgets('sidebar registers its focus root only while mounted', (
     tester,

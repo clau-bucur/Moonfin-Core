@@ -68,7 +68,7 @@ class _ServicesScreenState extends State<_ServicesScreen> {
     final seerrLabel = GetIt.instance<SeerrPreferences>().labelOrDefault(
       l10n.seerr,
     );
-    final seerrShown = !VideoAppProfile.enabled && seerrOnAnySignedInServer();
+    final seerrShown = seerrOnAnySignedInServer();
     final calendarShown = GetIt.instance<PluginSyncService>().calendarAvailable;
     return ListView(
       children: [

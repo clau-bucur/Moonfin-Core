@@ -46,6 +46,13 @@ jobs:
           test/playback/restart_video_test.dart
           test/playback/osd_buttons_test.dart
           test/viewmodels/item_detail_episode_ordering_test.dart
+          test/ui/navigation/seerr_routes_test.dart
+          test/viewmodels/search_view_model_smart_test.dart
+      - name: Check TV Seerr navigation
+        run: >-
+          flutter test --no-pub --concurrency=1
+          test/ui/widgets/navigation_chrome_registration_test.dart
+          --plain-name 'TV Seerr navigation'
       - uses: actions/upload-artifact@v6
         with:
           name: android-tv-video

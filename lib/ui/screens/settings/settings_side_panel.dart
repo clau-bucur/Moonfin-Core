@@ -175,10 +175,10 @@ bool get _showThemeEditorEntry =>
 bool get _integrationsOffered =>
     (GetIt.instance.isRegistered<PluginSyncService>() &&
         GetIt.instance<PluginSyncService>().calendarAvailable) ||
+    seerrOnAnySignedInServer() ||
     (!VideoAppProfile.enabled &&
-        (seerrOnAnySignedInServer() ||
-            (GetIt.instance.isRegistered<AchievementsService>() &&
-                GetIt.instance<AchievementsService>().available)));
+        GetIt.instance.isRegistered<AchievementsService>() &&
+        GetIt.instance<AchievementsService>().available);
 
 Uri _resolveThemeEditorUri() {
   final base = Uri.base;

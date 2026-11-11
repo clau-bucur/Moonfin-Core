@@ -473,7 +473,6 @@ class SearchViewModel extends ChangeNotifier {
   }
 
   Future<List<SeerrDiscoverItem>> _fetchSeerrResults(String query) async {
-    if (VideoAppProfile.enabled) return const [];
     if (_scopedParentId != null) return const [];
     if (query.trim().toLowerCase().startsWith('studio:')) return const [];
     final repo = _seerrRepository;

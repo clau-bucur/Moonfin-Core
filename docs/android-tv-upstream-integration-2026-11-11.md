@@ -1,5 +1,10 @@
 # Android TV upstream integration - 2026-11-11
 
+Follow-up: Seerr was restored after this deployment at the user's request and
+is now a required TV feature. The Seerr exclusions recorded below describe the
+earlier build and are superseded by [the restoration record](android-tv-seerr-restoration.md)
+and [branch requirements](../AGENTS.md).
+
 This sync integrates 194 upstream commits after
 `f4f2899451a7e26e45d935cf4d5648235d8f9149`, through
 `d31a38f8bd8cd9c1b15f6a4e6a1831187fc53b7f`. It retains real upstream merge

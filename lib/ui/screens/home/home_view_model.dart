@@ -38,7 +38,6 @@ import '../../../data/services/seerr/seerr_api_models.dart';
 import '../../../data/services/seerr/seerr_discover_sliders.dart';
 import '../../../data/utils/bounded_concurrency.dart';
 import '../../../util/calendar_days.dart';
-import '../../../util/video_app_profile.dart';
 import '../../../util/date_format_util.dart';
 import '../../../util/game_library.dart';
 import '../../../util/server_url.dart';
@@ -3463,8 +3462,6 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<List<HomeRow>> _loadMdblistWatchingNowRow(AppLocalizations l10n) async {
-    // These external titles open Seerr request routes, which this profile omits.
-    if (VideoAppProfile.enabled) return const [];
     try {
       if (!GetIt.instance.isRegistered<MdbListRepository>()) return const [];
       final repo = GetIt.instance<MdbListRepository>();

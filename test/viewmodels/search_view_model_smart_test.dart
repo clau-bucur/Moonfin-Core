@@ -6,6 +6,8 @@ import 'package:get_it/get_it.dart';
 import 'package:jellyfin_preference/jellyfin_preference.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:moonfin/data/repositories/search_repository.dart';
+import 'package:moonfin/data/repositories/seerr_repository.dart';
+import 'package:moonfin/data/services/seerr/seerr_api_models.dart';
 import 'package:moonfin/data/services/plugin_sync_service.dart';
 import 'package:moonfin/data/viewmodels/search_view_model.dart';
 import 'package:moonfin/preference/user_preferences.dart';
@@ -17,6 +19,8 @@ class _MockClient extends Mock implements MediaServerClient {}
 class _MockItemsApi extends Mock implements ItemsApi {}
 
 class _MockPluginSync extends Mock implements PluginSyncService {}
+
+class _MockSeerr extends Mock implements SeerrRepository {}
 
 Map<String, dynamic> _answer(List<String> itemIds) => {
   'Ready': true,
@@ -68,32 +72,36 @@ void main() {
     });
 
     test('maps a Plex answer through the Plex mappers', () {
-      final results = SmartSearchResults.fromJson({
-        'Ready': true,
-        'Items': [
-          {
-            'ratingKey': '512',
-            'key': '/library/metadata/512',
-            'type': 'movie',
-            'title': 'Cast Away',
-            'year': 2000,
-            'thumb': '/library/metadata/512/thumb/1700000000',
-            'art': '/library/metadata/512/art/1700000000',
-            'summary': 'A man is stranded on an island.',
-            'Genre': [
-              {'tag': 'Drama'},
-            ],
-          },
-          {
-            'type': 'person',
-            'id': 12345,
-            'tag': 'Tom Hanks',
-            'thumb': 'https://metadata-static.plex.tv/people/hanks.jpg',
-          },
-          {'type': 'person', 'id': 678, 'tag': 'Helen Hunt'},
-        ],
-        'Seerr': <Object>[],
-      }, serverId: 'http://plex', plex: true);
+      final results = SmartSearchResults.fromJson(
+        {
+          'Ready': true,
+          'Items': [
+            {
+              'ratingKey': '512',
+              'key': '/library/metadata/512',
+              'type': 'movie',
+              'title': 'Cast Away',
+              'year': 2000,
+              'thumb': '/library/metadata/512/thumb/1700000000',
+              'art': '/library/metadata/512/art/1700000000',
+              'summary': 'A man is stranded on an island.',
+              'Genre': [
+                {'tag': 'Drama'},
+              ],
+            },
+            {
+              'type': 'person',
+              'id': 12345,
+              'tag': 'Tom Hanks',
+              'thumb': 'https://metadata-static.plex.tv/people/hanks.jpg',
+            },
+            {'type': 'person', 'id': 678, 'tag': 'Helen Hunt'},
+          ],
+          'Seerr': <Object>[],
+        },
+        serverId: 'http://plex',
+        plex: true,
+      );
 
       final [movie, hanks, hunt] = results.items;
       expect(movie.id, '512');
@@ -126,13 +134,17 @@ void main() {
     });
 
     test('leaves Seerr titles out when Seerr is not usable', () {
-      final results = SmartSearchResults.fromJson({
-        'Ready': true,
-        'Items': <Object>[],
-        'Seerr': [
-          {'id': 1, 'mediaType': 'movie', 'title': 'Jumanji'},
-        ],
-      }, serverId: 'http://jf', includeSeerr: false);
+      final results = SmartSearchResults.fromJson(
+        {
+          'Ready': true,
+          'Items': <Object>[],
+          'Seerr': [
+            {'id': 1, 'mediaType': 'movie', 'title': 'Jumanji'},
+          ],
+        },
+        serverId: 'http://jf',
+        includeSeerr: false,
+      );
 
       expect(results.isEmpty, isTrue);
     });
@@ -180,9 +192,8 @@ void main() {
 
     Completer<Map<String, dynamic>?> smartFor(String query) {
       final answer = Completer<Map<String, dynamic>?>();
-      when(
-        () => pluginSync.fetchSmartSearch(client, query),
-      ).thenAnswer((_) => answer.future);
+      when(() => pluginSync.fetchSmartSearch(client, query))
+          .thenAnswer((_) => answer.future);
       return answer;
     }
 
@@ -191,6 +202,38 @@ void main() {
       client,
       pluginSync: pluginSync,
     );
+
+    test('TV search includes requestable Seerr titles outside the library', () {
+      fakeAsync((async) {
+        final seerr = _MockSeerr();
+        when(() => seerr.ensureInitialized()).thenAnswer((_) async {});
+        when(() => seerr.isAvailable).thenReturn(true);
+        when(() => seerr.search('Jumanji', limit: any(named: 'limit')))
+            .thenAnswer(
+              (_) async => SeerrDiscoverPage(
+                results: [
+                  SeerrDiscoverItem.fromJson({
+                    'id': 8844,
+                    'mediaType': 'movie',
+                    'title': 'Jumanji',
+                  }),
+                ],
+              ),
+            );
+        final vm = SearchViewModel(
+          SearchRepository(client),
+          client,
+          seerrRepository: seerr,
+        );
+        vm.searchImmediate('Jumanji');
+        async.elapse(const Duration(seconds: 2));
+        expect(vm.state, SearchState.ready);
+        expect(vm.seerrResults.single.id, 8844);
+        verify(() => seerr.search('Jumanji', limit: any(named: 'limit')))
+            .called(1);
+        vm.dispose();
+      });
+    });
 
     test('a slow answer fills in after the normal results are up', () {
       fakeAsync((async) {

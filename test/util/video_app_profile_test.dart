@@ -34,6 +34,12 @@ void main() {
     for (final path in [
       '/home',
       '/search',
+      '/seerr/discover',
+      '/seerr/requests',
+      '/seerr/browse',
+      '/seerr/media/42',
+      '/seerr/person/7',
+      '/seerr/collection/9',
       '/item/123',
       '/library/123',
       '/live-tv/guide',
@@ -48,7 +54,6 @@ void main() {
       '/game/123/456',
       '/game-player/123/456',
       '/admin',
-      '/seerr/discover',
       '/player/audio',
       '/player/book/123',
       '/player/photo/123',
@@ -83,9 +88,15 @@ void main() {
 
   test('audio cannot enter a video queue, while music videos can', () {
     expect(VideoAppProfile.allowsItemType('Audio'), !VideoAppProfile.enabled);
-    expect(VideoAppProfile.allowsItemType('AudioBook'), !VideoAppProfile.enabled);
+    expect(
+      VideoAppProfile.allowsItemType('AudioBook'),
+      !VideoAppProfile.enabled,
+    );
     expect(VideoAppProfile.allowsItemType('MusicVideo'), isTrue);
-    expect(VideoAppProfile.allowsLibrary('mixed', name: 'ROM games'), !VideoAppProfile.enabled);
+    expect(
+      VideoAppProfile.allowsLibrary('mixed', name: 'ROM games'),
+      !VideoAppProfile.enabled,
+    );
     expect(VideoAppProfile.allowsLibrary('movies', name: 'Game films'), isTrue);
   });
 }

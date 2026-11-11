@@ -135,7 +135,7 @@ List<_SettingsSearchEntry> _buildSettingsSearchIndex({
   final playlistsOnAnyServer = playlistsOnAnySignedInServer();
   final moonfinPluginOnAnyServer = moonfinPluginOnAnySignedInServer();
   final seerrOnAnyServer =
-      !VideoAppProfile.enabled && seerrOnAnySignedInServer();
+      seerrOnAnySignedInServer();
   // Retro games come from the Moonfin plugin's game libraries.
   final gamesOnAnyServer =
       !VideoAppProfile.enabled &&

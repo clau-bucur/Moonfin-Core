@@ -3,6 +3,12 @@
 This branch focuses on streamed video browsing and playback on Android TV. The
 regular fork checkout and `main` are kept separate from this worktree.
 
+Seerr is a required feature of this branch. The user explicitly requested its
+restoration after the November 11 deployment; older reports describing its
+exclusion are superseded. Preserve it during every upstream sync (see
+[AGENTS.md](../AGENTS.md)). Server availability, permissions, Kids Mode and the
+viewer's navigation/settings choices still apply.
+
 ## First cleanup
 
 - Media3 is the initial Android backend. mpv is constructed only when selected
@@ -11,10 +17,12 @@ regular fork checkout and `main` are kept separate from this worktree.
 - Startup skips offline catalogue warming, download services, offline reconnect
   sync, downloaded-media recovery, achievement services and AirPlay startup.
 - Video browsing hides music, audiobook, book, photo and game libraries. Search
-  skips their result groups and avoids fetching games and Seerr requests.
-- Deep links to non-video playback, games, readers, administration and Seerr
-  redirect to Home. Server login, profiles, search, details, video, live TV,
-  subtitles, HDR, passthrough, resume and Watch Next remain.
+  skips their result groups and avoids fetching games. Seerr discovery, requests,
+  search, Home rows and availability badges remain supported.
+- Deep links to non-video playback, games, readers and administration redirect
+  to Home. Seerr routes and integration settings remain available. Server login,
+  profiles, search, details, video, live TV, subtitles, HDR, passthrough, resume
+  and Watch Next remain.
 - Automatic previews, theme music and seasonal effects are disabled locally.
   Restricted settings are hidden. Stored preferences are retained, and settings
   sync exports the stored values rather than the experiment's restrictions.
