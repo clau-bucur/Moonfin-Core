@@ -467,7 +467,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get detailScreenStyleStage => 'Stage';
 
   @override
-  String get detailScreenStylePremiere => 'Premiere';
+  String get detailScreenStylePremiere => '첫날';
 
   @override
   String get detailScreenStyleQuickLook => 'Quick Look';
@@ -3832,7 +3832,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get upcomingCalendarsDescription =>
-      'Toggle Upcoming Calendars from Radarr/Sonarr.';
+      'Choose what the Radarr and Sonarr rows show.';
 
   @override
   String get enableRadarrCalendar => 'Enable Radarr\'s Upcoming Calendar';
@@ -14696,7 +14696,7 @@ class AppLocalizationsKo extends AppLocalizations {
       'The poster up front, with play under it and the details beside it.';
 
   @override
-  String get setupStylePremiere => 'Premiere';
+  String get setupStylePremiere => '첫날';
 
   @override
   String get setupDetailPremiereHint =>
@@ -16546,7 +16546,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get calendarSettingsWhatShows => 'What shows';
 
   @override
-  String get calendarSettingsScope => 'Show';
+  String get calendarSettingsScope => '표시';
 
   @override
   String get calendarSettingsScopeDescription =>
@@ -16587,7 +16587,7 @@ class AppLocalizationsKo extends AppLocalizations {
       'Type tells episodes from movies. Status shows what\'s in your library, coming up or missing.';
 
   @override
-  String get calendarSettingsColorByType => 'Type';
+  String get calendarSettingsColorByType => '유형';
 
   @override
   String get calendarSettingsImageType => 'Card image';
@@ -17058,7 +17058,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get watchPartyBackToClose => 'Back to close';
 
   @override
-  String get watchPartyType => 'Type';
+  String get watchPartyType => '유형';
 
   @override
   String get watchPartyReplyHaha => 'Haha';
@@ -17322,7 +17322,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get afterHoursPlay => 'Play';
+  String get afterHoursPlay => '재생';
 
   @override
   String get afterHoursLeaderboards => 'Leaderboards';
@@ -17573,7 +17573,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get afterHoursCastTangleLine => 'Slowly chases your plug.';
 
   @override
-  String get afterHoursCastStatic => 'Static';
+  String get afterHoursCastStatic => '고정';
 
   @override
   String get afterHoursCastStaticLine =>
@@ -17678,4 +17678,24 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get afterHoursPixelPurgeCardRemote =>
       'Left and Right slide the scrubber.';
+
+  @override
+  String get recentlyAddedAndReleased => 'Recently Added and Released';
+
+  @override
+  String get hideWatchedInRecentRows => 'Hide Watched';
+
+  @override
+  String get hideWatchedInRecentRowsDescription =>
+      'Hide watched content from Recently Added and Recently Released home rows.';
+
+  @override
+  String get homeRowsStreamingServices => 'Streaming Services';
+
+  @override
+  String get homeRowsStyleCarousel => 'Carousel';
+
+  @override
+  String get setupRowsCarouselHint =>
+      'Posters with a large details panel underneath.';
 }

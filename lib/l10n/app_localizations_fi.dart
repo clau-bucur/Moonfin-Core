@@ -2957,7 +2957,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get storageManagement => 'Tallennuksen hallinta';
 
   @override
-  String get storageBreakdown => 'Varastoinnin erittely';
+  String get storageBreakdown => 'Tallennustilan Erittely';
 
   @override
   String get downloadedItems => 'Ladatut kohteet';
@@ -3926,11 +3926,10 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get upcomingCalendarsDescription =>
-      'Näytä Radarrin/Sonarrin tulevat kalenterit.';
+      'Valitse, mitä Radarr- ja Sonarr-rivit näyttävät.';
 
   @override
-  String get enableRadarrCalendar =>
-      'Ota Radarrin tulevien tapahtumien kalenteri käyttöön';
+  String get enableRadarrCalendar => 'Enable Radarr\'s Upcoming Calendar';
 
   @override
   String get radarrCalendarShowCinema => 'Näytä tulevat elokuvajulkaisut';
@@ -3950,8 +3949,7 @@ class AppLocalizationsFi extends AppLocalizations {
       'Piilota palvelimella jo olevat elokuvat';
 
   @override
-  String get enableSonarrCalendar =>
-      'Ota Sonarrin tulevien tapahtumien kalenteri käyttöön';
+  String get enableSonarrCalendar => 'Enable Sonarr\'s Upcoming Calendar';
 
   @override
   String get sonarrCalendarShowEpisodeInfo => 'Näytä jakson tiedot';
@@ -4644,10 +4642,10 @@ class AppLocalizationsFi extends AppLocalizations {
       'Lataa vain WiFi yhteyden ollessa kytkettynä';
 
   @override
-  String get storage => 'Varastointi';
+  String get storage => 'Tallennustila';
 
   @override
-  String get storageUsed => 'Säilytys käytetty';
+  String get storageUsed => 'Käytetty tallennustila';
 
   @override
   String get manage => 'Hallitse';
@@ -5495,7 +5493,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get mdblistWatchingNowDescription =>
-      'Näytä, mitä MDBList-käyttäjät katsovat parhaillaan';
+      'Show what MDBList users are currently watching';
 
   @override
   String watchingNowWatchersCount(int count) {
@@ -12166,7 +12164,7 @@ class AppLocalizationsFi extends AppLocalizations {
       'Aloita uusi projekti tai liity jo käynnissä olevaan projektiin';
 
   @override
-  String get settingsSyncplayEnabled => 'Watch Partyt';
+  String get settingsSyncplayEnabled => 'Watch Party';
 
   @override
   String get settingsSyncplayEnabledSubtitle =>
@@ -12177,7 +12175,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get settingsSyncplayButtonSubtitle =>
-      'Näytä Watch Parties painike navigointipalkissa';
+      'Näytä Watch Party painike navigointipalkissa';
 
   @override
   String get settingsSyncplayAdvancedCorrection => 'Edistynyt korjaus';
@@ -17358,35 +17356,35 @@ class AppLocalizationsFi extends AppLocalizations {
       'Kun näytöllä ei ole tapahtunut mitään pitkään aikaan, näyttö palaa Apple TV:n omaan näytönsäästäjään ja lepotilaan. Moonfin pysyy auki, joten voit jatkaa juuri siitä, mihin jäit.';
 
   @override
-  String get seerrWaitingForImport => 'Downloaded, waiting for import';
+  String get seerrWaitingForImport => 'Ladattu, odottaa tuontia';
 
   @override
-  String get seerrDownloadStalled => 'Stalled';
+  String get seerrDownloadStalled => 'Jumissa';
 
   @override
-  String get seerrDownloadFailed => 'Download failed';
+  String get seerrDownloadFailed => 'Lataaminen epäonnistui';
 
   @override
-  String get seerrImportBlocked => 'Import blocked';
+  String get seerrImportBlocked => 'Tuonti estetty';
 
   @override
-  String get seerrNotFoundYet => 'Not found yet';
+  String get seerrNotFoundYet => 'Ei vielä löytynyt';
 
   @override
-  String get seerrGetDifferentRelease => 'Get a different release';
+  String get seerrGetDifferentRelease => 'Hanki eri julkaisu';
 
   @override
   String seerrGetDifferentReleaseConfirm(String service, String release) {
-    return '$service will remove $release from the download client, block it so it isn\'t grabbed again, and search for another release.';
+    return '$service poistaa $release latausohjelmasta, estää sen lataamisen uudelleen ja etsii toisen julkaisun.';
   }
 
   @override
   String seerrGetDifferentReleaseDone(String service) {
-    return 'Removed. $service is searching for another release.';
+    return 'Poistettu. $service etsii toista julkaisua.';
   }
 
   @override
-  String get seerrGetDifferentReleaseFailed => 'Couldn\'t remove the download';
+  String get seerrGetDifferentReleaseFailed => 'Latausta ei voitu poistaa';
 
   @override
   String get syncPlayRepeatSubtitle => 'Toista yksi kohde tai koko jono';
@@ -17429,7 +17427,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String kidsModePinToSwitchUser(String name) {
-    return 'Enter the Kids Mode PIN to switch to $name';
+    return 'Syötä lastentilan PIN-koodi siirtyäksesi $name:iin';
   }
 
   @override
@@ -17468,10 +17466,10 @@ class AppLocalizationsFi extends AppLocalizations {
       'Siitä, mihin jäit. Kaikki aloittavat siitä.';
 
   @override
-  String get watchParties => 'Watch Parties';
+  String get watchParties => 'Watch Party';
 
   @override
-  String get watchPartyStartWith => 'Aloita Watch Partyt';
+  String get watchPartyStartWith => 'Aloita Watch Party';
 
   @override
   String get watchPartyServiceMoonbaseHint =>
@@ -17549,7 +17547,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get watchPartyNeedsMoonbase =>
-      'Watch Partyt tarvitsevat Moonbasen laajennuksen tällä palvelimella';
+      'Watch Party tarvitsee Moonbasen laajennuksen palvelimella';
 
   @override
   String get watchPartyNeedsMoonbaseHint =>
@@ -17577,7 +17575,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get watchPartyRemoved => 'Järjestäjä poisti sinut Watch Party:stä.';
 
   @override
-  String get watchPartyYours => 'Sinun watch partyt';
+  String get watchPartyYours => 'Watch Partysi';
 
   @override
   String get watchPartyInviteHint =>
@@ -17851,41 +17849,42 @@ class AppLocalizationsFi extends AppLocalizations {
   String get notNow => 'Ei nyt';
 
   @override
-  String get settingsDecodingAndRenderingSection => 'Decoding & Rendering';
+  String get settingsDecodingAndRenderingSection => 'Dekoodaus & Renderointi';
 
   @override
-  String get settingsAudioStreamSection => 'Audio Stream';
+  String get settingsAudioStreamSection => 'Audio Striimi';
 
   @override
-  String get settingsAudioOutputSection => 'Audio Output';
+  String get settingsAudioOutputSection => 'Audio Uloslähtö';
 
   @override
-  String get settingsPassthroughSettingsSection => 'Passthrough Settings';
+  String get settingsPassthroughSettingsSection => 'Passthrough asetukset';
 
   @override
-  String get settingsImdbListsSection => 'IMDb Lists';
+  String get settingsImdbListsSection => 'IMDb Listat';
 
   @override
-  String get settingsTmdbListsSection => 'TMDB Lists';
+  String get settingsTmdbListsSection => 'TMDB Listat';
 
   @override
-  String get settingsSeerrHomePageRowsSection => 'Seerr Home Page Rows';
+  String get settingsSeerrHomePageRowsSection => 'Seerr Rivi Kotisivulla';
 
   @override
-  String get settingsSavedCustomHomeRowsSection => 'Saved Custom Home Rows';
+  String get settingsSavedCustomHomeRowsSection =>
+      'Tallennetut mukautetut kotirivit';
 
   @override
-  String get settingsRewatchSection => 'Rewatch';
+  String get settingsRewatchSection => 'Katso uudelleen';
 
   @override
-  String get favoritesSwitchViewSection => 'Switch View';
+  String get favoritesSwitchViewSection => 'Vaihda näkymää';
 
   @override
   String get siloPinRemember => 'Tallenna PIN koodi tähän laitteeseen';
 
   @override
   String settingsPreviewAudioRowsOffInHomeRows(String group, String disabled) {
-    return 'Albums, Artists and Audio Playlists are all turned off. To show one, go to Rows, open $group under $disabled, and turn it on.';
+    return 'Albumit, artistit ja soittolistat on kaikki poistettu käytöstä. Jos haluat näyttää jonkin näistä, siirry kohtaan Rivit, avaa $group kohdasta$disabled ,ja ota se käyttöön.';
   }
 
   @override
@@ -17894,7 +17893,7 @@ class AppLocalizationsFi extends AppLocalizations {
     String group,
     String disabled,
   ) {
-    return 'To see Albums, Artists or Audio Playlists on Home, first turn on $setting. Then go to Rows, open $group under $disabled, and turn one on.';
+    return 'Jos haluat nähdä albumit, artistit tai äänisoittolistat Etusivulla, ota ensin käyttöön $setting Siirry sitten kohtaan Rivit, avaa $group kohdassa $disabled ja ota yksi niistä käyttöön.';
   }
 
   @override
@@ -17902,7 +17901,7 @@ class AppLocalizationsFi extends AppLocalizations {
     String group,
     String disabled,
   ) {
-    return 'The Collections row is turned off. To show it, go to Rows, open $group under $disabled, and turn it on.';
+    return 'Kokoelmat rivi on poistettu käytöstä. Jos haluat tuoda sen näkyviin, siirry kohtaan Rivit, avaa $group kohdassa $disabled ja ota se käyttöön.';
   }
 
   @override
@@ -17911,42 +17910,42 @@ class AppLocalizationsFi extends AppLocalizations {
     String group,
     String disabled,
   ) {
-    return 'To see the Collections row on Home, first turn on $setting. Then go to Rows, open $group under $disabled, and turn it on.';
+    return 'Jos haluat nähdä Kokoelmat-rivin Etusivulla, ota ensin käyttöön $setting. Siirry sitten kohtaan Rivit, avaa $group kohdassa $disabled ja ota se käyttöön.';
   }
 
   @override
   String get settingsPreviewRowsOffInKidsMode =>
-      'Kids Mode keeps these rows off Home, so these settings don\'t change it.';
+      'Kids Mode nämä rivit eivät näy aloitussivulla, joten nämä asetukset eivät vaikuta siihen.';
 
   @override
   String settingsPreviewNeedsRowInRows(String disabled) {
-    return 'Turn on a row in Rows, under $disabled';
+    return 'Valitse rivi kohdassa Rivit, osiossa $disabled';
   }
 
   @override
   String settingsPreviewNeedsSwitchAndRow(String setting) {
-    return 'Turn on $setting, then turn on a row in Rows';
+    return 'Ota $setting käyttöön ja valitse sitten rivi kohdasta Rows';
   }
 
   @override
   String get settingsPreviewKeptOffByKidsMode =>
-      'Kids Mode keeps this off Home';
+      'Kids Mode pitää tämän pois päältä Etusivu';
 
   @override
   String get settingsPreviewAudioRowsEmpty =>
-      'There\'s no music to show, so Home leaves these rows out.';
+      'Musiikkia ei ole näytettävissä, joten Home jättää nämä rivit pois.';
 
   @override
   String get settingsPreviewRowsEmpty =>
-      'There\'s nothing to show in these rows, so Home leaves them out.';
+      'Näissä riveissä ei ole mitään näytettävää, joten Home jättää ne pois.';
 
   @override
   String get settingsPreviewCollectionsEmpty =>
-      'There are no collections to show, so Home leaves this row out.';
+      'Näytettäviä kokoelmia ei ole, joten Home jättää tämän rivin pois.';
 
   @override
   String get settingsPreviewShowEpisodesNote =>
-      'This only changes rows for a single collection added in Rows. The Collections row looks the same.';
+      'Tämä muuttaa vain niiden kokoelmien rivejä, jotka on lisätty Rows-kohtaan. Kokoelma rivi näyttää samalta.';
 
   @override
   String get afterHoursTitle => 'After Hours';
@@ -18338,4 +18337,24 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get afterHoursPixelPurgeCardRemote =>
       'Vasemmalle ja oikealle liu’uta scrubberia.';
+
+  @override
+  String get recentlyAddedAndReleased => 'Äskettäin lisättyjä ja julkaistuja';
+
+  @override
+  String get hideWatchedInRecentRows => 'Piilota katsotut';
+
+  @override
+  String get hideWatchedInRecentRowsDescription =>
+      'Piilota katsotut sisällöt ”Äskettäin lisätty” ja ”Äskettäin julkaistu” -kotiriveiltä.';
+
+  @override
+  String get homeRowsStreamingServices => 'Streaming Services';
+
+  @override
+  String get homeRowsStyleCarousel => 'Carousel';
+
+  @override
+  String get setupRowsCarouselHint =>
+      'Posters with a large details panel underneath.';
 }

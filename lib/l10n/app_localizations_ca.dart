@@ -3945,11 +3945,10 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get upcomingCalendarsDescription =>
-      'Activa o desactiva els calendaris de properes estrenes de Radarr/Sonarr.';
+      'Tria què mostren les files de Radarr i Sonarr.';
 
   @override
-  String get enableRadarrCalendar =>
-      'Activa el calendari de properes estrenes de Radarr';
+  String get enableRadarrCalendar => 'Enable Radarr\'s Upcoming Calendar';
 
   @override
   String get radarrCalendarShowCinema =>
@@ -3972,8 +3971,7 @@ class AppLocalizationsCa extends AppLocalizations {
       'Amaga les pel·lícules que ja són al servidor';
 
   @override
-  String get enableSonarrCalendar =>
-      'Activa el calendari de properes estrenes de Sonarr';
+  String get enableSonarrCalendar => 'Enable Sonarr\'s Upcoming Calendar';
 
   @override
   String get sonarrCalendarShowEpisodeInfo =>
@@ -5527,7 +5525,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get mdblistWatchingNowDescription =>
-      'Mostra què miren ara mateix els usuaris de MDBList';
+      'Show what MDBList users are currently watching';
 
   @override
   String watchingNowWatchersCount(int count) {
@@ -17535,7 +17533,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get seerrDownloadStalled => 'Stalled';
 
   @override
-  String get seerrDownloadFailed => 'Download failed';
+  String get seerrDownloadFailed => 'Ha fallat la baixada';
 
   @override
   String get seerrImportBlocked => 'Import blocked';
@@ -18023,16 +18021,18 @@ class AppLocalizationsCa extends AppLocalizations {
   String get notNow => 'Ara no';
 
   @override
-  String get settingsDecodingAndRenderingSection => 'Decoding & Rendering';
+  String get settingsDecodingAndRenderingSection =>
+      'Descodificació i renderització';
 
   @override
-  String get settingsAudioStreamSection => 'Audio Stream';
+  String get settingsAudioStreamSection => 'Flux d\'àudio';
 
   @override
-  String get settingsAudioOutputSection => 'Audio Output';
+  String get settingsAudioOutputSection => 'Sortida d\'àudio';
 
   @override
-  String get settingsPassthroughSettingsSection => 'Passthrough Settings';
+  String get settingsPassthroughSettingsSection =>
+      'Configuració del passthrough';
 
   @override
   String get settingsImdbListsSection => 'IMDb Lists';
@@ -18047,7 +18047,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get settingsSavedCustomHomeRowsSection => 'Saved Custom Home Rows';
 
   @override
-  String get settingsRewatchSection => 'Rewatch';
+  String get settingsRewatchSection => 'Torna a veure';
 
   @override
   String get favoritesSwitchViewSection => 'Switch View';
@@ -18507,4 +18507,24 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get afterHoursPixelPurgeCardRemote =>
       'Esquerra i Dreta mouen la barra.';
+
+  @override
+  String get recentlyAddedAndReleased => 'Recently Added and Released';
+
+  @override
+  String get hideWatchedInRecentRows => 'Hide Watched';
+
+  @override
+  String get hideWatchedInRecentRowsDescription =>
+      'Hide watched content from Recently Added and Recently Released home rows.';
+
+  @override
+  String get homeRowsStreamingServices => 'Streaming Services';
+
+  @override
+  String get homeRowsStyleCarousel => 'Carousel';
+
+  @override
+  String get setupRowsCarouselHint =>
+      'Posters with a large details panel underneath.';
 }

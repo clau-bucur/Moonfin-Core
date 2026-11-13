@@ -43,6 +43,9 @@ class LockedFocusRow<T> extends StatefulWidget {
 
   /// Exact live widths, including cards outside the lazy viewport cache.
   final double Function(int index)? itemExtentBuilder;
+  final double Function(int index)? itemExtentOf;
+  double Function(int index)? get effectiveItemExtent =>
+      itemExtentBuilder ?? itemExtentOf;
   final Listenable? itemExtentListenable;
   final Duration? scrollDuration;
   final Curve scrollCurve;
@@ -88,6 +91,7 @@ class LockedFocusRow<T> extends StatefulWidget {
     this.clipBehavior = Clip.hardEdge,
     this.itemKey,
     this.itemExtentBuilder,
+    this.itemExtentOf,
     this.itemExtentListenable,
     this.scrollDuration,
     this.scrollCurve = Curves.easeOut,
@@ -269,11 +273,17 @@ class LockedFocusRowState<T> extends State<LockedFocusRow<T>> {
   void _scrollToIndex(int index) {
     if (!_scrollController.hasClients) return;
     final drift = _layoutDrift();
-    scrollListToIndex(
+    final extentOf = widget.itemExtentOf;
+    var offset = index * (widget.itemExtent + widget.itemSpacing);
+    if (extentOf != null) {
+      offset = 0;
+      for (var i = 0; i < index; i++) {
+        offset += extentOf(i) + widget.itemSpacing;
+      }
+    }
+    scrollListToOffset(
       _scrollController,
-      index,
-      itemExtent: widget.itemExtent + widget.itemSpacing,
-      leadingPadding: widget.leadingPadding + drift,
+      offset + widget.leadingPadding + drift,
       duration: widget.scrollDuration,
       curve: widget.scrollCurve,
       animate: widget.scrollDuration != Duration.zero,
@@ -293,7 +303,7 @@ class LockedFocusRowState<T> extends State<LockedFocusRow<T>> {
   /// before it has shrunk back, and the list keeps that in-between width for
   /// every card after it until the row scrolls back to its start.
   double _layoutDrift() {
-    if (widget.itemExtentBuilder != null) return 0;
+    if (widget.effectiveItemExtent != null) return 0;
     final stride = widget.itemExtent + widget.itemSpacing;
     final leading = Directionality.of(context) == TextDirection.rtl
         ? widget.padding.right
@@ -416,7 +426,7 @@ class LockedFocusRowState<T> extends State<LockedFocusRow<T>> {
       onKeyEvent: _onKeyEvent,
       child: SizedBox(
         height: widget.height,
-        child: widget.itemExtentBuilder != null
+        child: widget.effectiveItemExtent != null
             ? _buildExactExtentList()
             : ListView.separated(
                 controller: _scrollController,
@@ -472,7 +482,7 @@ class LockedFocusRowState<T> extends State<LockedFocusRow<T>> {
         itemExtentBuilder: (childIndex, _) {
           if (childIndex >= childCount) return null;
           return childIndex.isEven
-              ? widget.itemExtentBuilder!(childIndex ~/ 2)
+              ? widget.effectiveItemExtent!(childIndex ~/ 2)
               : widget.itemSpacing;
         },
       ),

@@ -6865,7 +6865,7 @@ abstract class AppLocalizations {
   /// Subtitle of the Upcoming Calendars settings entry
   ///
   /// In en, this message translates to:
-  /// **'Toggle Upcoming Calendars from Radarr/Sonarr.'**
+  /// **'Choose what the Radarr and Sonarr rows show.'**
   String get upcomingCalendarsDescription;
 
   /// Turns on the Radarr calendar home row
@@ -9274,7 +9274,7 @@ abstract class AppLocalizations {
   /// **'Genres and Studios'**
   String get homeRowsGenresAndStudios;
 
-  /// Home Rows editor: heading of the group of disabled rows from IMDb, TMDB, Letterboxd and MDBList lists
+  /// Home Rows editor: heading of the group of disabled rows from custom lists a user set up, such as their own MDBList, TMDB or Letterboxd lists
   ///
   /// In en, this message translates to:
   /// **'External Lists'**
@@ -21727,7 +21727,7 @@ abstract class AppLocalizations {
   /// No description provided for @rowsTypeDescription.
   ///
   /// In en, this message translates to:
-  /// **'Classic keeps per-row image type and info overlay. Modern uses portrait-to-backdrop rows.'**
+  /// **'Classic keeps per-row image type and info overlay. Modern uses portrait-to-backdrop rows. Carousel adds a details panel under each row.'**
   String get rowsTypeDescription;
 
   /// No description provided for @modernCardsOnMyMediaRow.
@@ -31444,6 +31444,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Left and Right slide the scrubber.'**
   String get afterHoursPixelPurgeCardRemote;
+
+  /// Section title for Recently Added and Recently Released home row settings
+  ///
+  /// In en, this message translates to:
+  /// **'Recently Added and Released'**
+  String get recentlyAddedAndReleased;
+
+  /// Setting to hide watched items from Recently Added and Recently Released home rows
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Watched'**
+  String get hideWatchedInRecentRows;
+
+  /// Description for hiding watched items from Recently Added and Recently Released home rows
+  ///
+  /// In en, this message translates to:
+  /// **'Hide watched content from Recently Added and Recently Released home rows.'**
+  String get hideWatchedInRecentRowsDescription;
+
+  /// Home Rows editor: heading of the group of disabled rows showing what's popular on Netflix, Prime Video, Disney+ and other streaming services
+  ///
+  /// In en, this message translates to:
+  /// **'Streaming Services'**
+  String get homeRowsStreamingServices;
+
+  /// Name of the home row style that shows a large details panel under each row's posters
+  ///
+  /// In en, this message translates to:
+  /// **'Carousel'**
+  String get homeRowsStyleCarousel;
+
+  /// What the carousel home row style gives you
+  ///
+  /// In en, this message translates to:
+  /// **'Posters with a large details panel underneath.'**
+  String get setupRowsCarouselHint;
 }
 
 class _AppLocalizationsDelegate

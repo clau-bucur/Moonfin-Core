@@ -5238,7 +5238,7 @@
   "@upcomingCalendars": {
     "description": "Settings screen for the Radarr and Sonarr calendar home rows"
   },
-  "upcomingCalendarsDescription": "Toggle Upcoming Calendars from Radarr/Sonarr.",
+  "upcomingCalendarsDescription": "Choose what the Radarr and Sonarr rows show.",
   "@upcomingCalendarsDescription": {
     "description": "Subtitle of the Upcoming Calendars settings entry"
   },
@@ -6888,7 +6888,7 @@
   },
   "homeRowsExternalLists": "External Lists",
   "@homeRowsExternalLists": {
-    "description": "Home Rows editor: heading of the group of disabled rows from IMDb, TMDB, Letterboxd and MDBList lists"
+    "description": "Home Rows editor: heading of the group of disabled rows from custom lists a user set up, such as their own MDBList, TMDB or Letterboxd lists"
   },
   "perRowSettings": "Per-Row Settings",
   "@perRowSettings": {
@@ -11656,7 +11656,7 @@
   "homeRowsStyleModern": "Modern",
   "homeRowsSection": "Home Rows",
   "rowsType": "Row Type",
-  "rowsTypeDescription": "Classic keeps per-row image type and info overlay. Modern uses portrait-to-backdrop rows.",
+  "rowsTypeDescription": "Classic keeps per-row image type and info overlay. Modern uses portrait-to-backdrop rows. Carousel adds a details panel under each row.",
   "modernCardsOnMyMediaRow": "Modern cards on My Media row",
   "modernCardsOnMyMediaRowDescription": "Display customizable posters that expand on focus. Disable to always show landscape thumbnail.",
   "sortOrder": "Sort Order",
@@ -18135,5 +18135,29 @@
   "afterHoursPixelPurgeCardRemote": "Left and Right slide the scrubber.",
   "@afterHoursPixelPurgeCardRemote": {
     "description": "Short remote controls of the Pixel Purge arcade game on its How to play card. The scrubber is the seek bar used as the paddle. Keep under about 90 characters, it shows as one line"
+  },
+  "recentlyAddedAndReleased": "Recently Added and Released",
+  "@recentlyAddedAndReleased": {
+    "description": "Section title for Recently Added and Recently Released home row settings"
+  },
+  "hideWatchedInRecentRows": "Hide Watched",
+  "@hideWatchedInRecentRows": {
+    "description": "Setting to hide watched items from Recently Added and Recently Released home rows"
+  },
+  "hideWatchedInRecentRowsDescription": "Hide watched content from Recently Added and Recently Released home rows.",
+  "@hideWatchedInRecentRowsDescription": {
+    "description": "Description for hiding watched items from Recently Added and Recently Released home rows"
+  },
+  "homeRowsStreamingServices": "Streaming Services",
+  "@homeRowsStreamingServices": {
+    "description": "Home Rows editor: heading of the group of disabled rows showing what's popular on Netflix, Prime Video, Disney+ and other streaming services"
+  },
+  "homeRowsStyleCarousel": "Carousel",
+  "@homeRowsStyleCarousel": {
+    "description": "Name of the home row style that shows a large details panel under each row's posters"
+  },
+  "setupRowsCarouselHint": "Posters with a large details panel underneath.",
+  "@setupRowsCarouselHint": {
+    "description": "What the carousel home row style gives you"
   }
 }

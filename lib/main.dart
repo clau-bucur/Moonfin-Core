@@ -41,6 +41,7 @@ import 'util/http_overrides_stub.dart'
 import 'util/device_performance.dart';
 import 'ui/navigation/app_router.dart';
 import 'ui/screensaver/screensaver_controller.dart';
+import 'util/device_hinge.dart';
 import 'util/platform_detection.dart';
 import 'util/video_app_profile.dart';
 import 'util/process_exit_reporter.dart';
@@ -238,6 +239,13 @@ Future<void> _detectAndSetTvMode() async {
       final isTV = await channel.invokeMethod<bool>('isTvDevice');
       if (isTV != null) {
         PlatformDetection.setTvMode(isTV);
+        if (isTV) {
+          try {
+            final touch =
+                await channel.invokeMethod<bool>('supportsTouchLayout');
+            if (touch != null) PlatformDetection.setSupportsTouchLayout(touch);
+          } catch (_) {}
+        }
         return;
       }
     } catch (_) {}
@@ -886,6 +894,8 @@ void main() async {
       GetIt.instance<AirPlayCommandBridge>().start();
     } catch (_) {}
   }
+
+  DeviceHinge.init();
 
   runApp(const MoonfinApp());
 }

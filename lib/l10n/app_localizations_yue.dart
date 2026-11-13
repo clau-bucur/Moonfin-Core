@@ -46,7 +46,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get animeMarkerSubbedAndDubbedShort => 'Sub/Dub';
 
   @override
-  String get animeMarkerPending => 'Pending';
+  String get animeMarkerPending => '待辦的';
 
   @override
   String get animeMarkerRecap => 'Recap';
@@ -169,7 +169,7 @@ class AppLocalizationsYue extends AppLocalizations {
   }
 
   @override
-  String get accountActive => 'Active';
+  String get accountActive => '積極的';
 
   @override
   String get addUser => '新增用戶';
@@ -280,7 +280,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get spotlightFilmography => 'Filmography';
 
   @override
-  String get spotlightCollectionsCard => 'Collections';
+  String get spotlightCollectionsCard => '收藏';
 
   @override
   String get spotlightPlaylistOrder => 'Playlist Order';
@@ -469,7 +469,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get detailScreenStyleStage => 'Stage';
 
   @override
-  String get detailScreenStylePremiere => 'Premiere';
+  String get detailScreenStylePremiere => '首播';
 
   @override
   String get detailScreenStyleQuickLook => 'Quick Look';
@@ -550,10 +550,10 @@ class AppLocalizationsYue extends AppLocalizations {
   String get interfaceLayoutAutomatic => 'Automatic';
 
   @override
-  String get interfaceLayoutTv => 'TV';
+  String get interfaceLayoutTv => '電視';
 
   @override
-  String get interfaceLayoutDesktop => 'Desktop';
+  String get interfaceLayoutDesktop => '桌面';
 
   @override
   String get interfaceLayoutPhone => 'Phone';
@@ -588,14 +588,14 @@ class AppLocalizationsYue extends AppLocalizations {
   String get glassQualityReduced => '精簡';
 
   @override
-  String get performanceMode => 'Performance';
+  String get performanceMode => '效能';
 
   @override
   String get performanceModeSubtitle =>
       'Auto measures this device and holds back on the ones short on memory, which keeps fewer images in memory and leaves trailers as still images. Takes full effect on the next launch.';
 
   @override
-  String get performanceModeAuto => 'Auto';
+  String get performanceModeAuto => '自動';
 
   @override
   String get performanceModeStandard => 'Standard';
@@ -611,7 +611,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Auto uses Impeller on boxes whose graphics run it smoothly and Skia everywhere else. Pick Skia if animations or video look wrong. Takes effect on the next launch.';
 
   @override
-  String get rendererModeAuto => 'Auto';
+  String get rendererModeAuto => '自動';
 
   @override
   String get rendererModeSkia => 'Skia';
@@ -641,7 +641,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get keyboardStyleNative => 'Native';
 
   @override
-  String get keyboardStyleClassic => 'Classic';
+  String get keyboardStyleClassic => '經典';
 
   @override
   String get keyboardStyleGlass => 'Glass';
@@ -1536,7 +1536,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get cast => '投放';
 
   @override
-  String get castMembers => 'Cast';
+  String get castMembers => '投放';
 
   @override
   String get trailer => '預告片';
@@ -2140,7 +2140,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get keyNameBackspace => 'Backspace';
 
   @override
-  String get keyNameDelete => 'Delete';
+  String get keyNameDelete => '刪除';
 
   @override
   String get keyNamePageUp => 'Page Up';
@@ -2149,7 +2149,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get keyNamePageDown => 'Page Down';
 
   @override
-  String get keyNameHome => 'Home';
+  String get keyNameHome => '主頁';
 
   @override
   String get keyNameEnd => 'End';
@@ -2514,7 +2514,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get premiere => '首播';
 
   @override
-  String get guideRepeatBadge => 'Repeat';
+  String get guideRepeatBadge => '重複';
 
   @override
   String get guideTimeline => '指南時間表';
@@ -2974,7 +2974,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get savedMediaPlayNextUnwatched => 'Play next unwatched';
 
   @override
-  String get savedMediaRead => 'Read';
+  String get savedMediaRead => '讀';
 
   @override
   String get savedMediaCancelDownload => 'Cancel download';
@@ -2983,7 +2983,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get sortBySize => 'Size';
 
   @override
-  String get sortByName => 'Name';
+  String get sortByName => '姓名';
 
   @override
   String get sortByDateAdded => 'Date added';
@@ -3204,16 +3204,16 @@ class AppLocalizationsYue extends AppLocalizations {
   String get loadingAnimationSize => 'Animation Size';
 
   @override
-  String get loadingAnimationSizeThumbnail => 'Thumbnail';
+  String get loadingAnimationSizeThumbnail => '縮圖';
 
   @override
-  String get loadingAnimationSizeSmall => 'Small';
+  String get loadingAnimationSizeSmall => '小的';
 
   @override
-  String get loadingAnimationSizeMedium => 'Medium';
+  String get loadingAnimationSizeMedium => '中等的';
 
   @override
-  String get loadingAnimationSizeLarge => 'Large';
+  String get loadingAnimationSizeLarge => '大的';
 
   @override
   String get loadingAnimationPosition => 'Animation Position';
@@ -3246,7 +3246,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get loadingAnimationPositionBottomRight => 'Bottom-Right';
 
   @override
-  String get loadingAnimationPositionBouncing => 'Bouncing';
+  String get loadingAnimationPositionBouncing => '彈跳';
 
   @override
   String get loadingAnimationSpeed => 'Animation Speed';
@@ -3339,7 +3339,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get countryCanada => 'Canada';
 
   @override
-  String get seasonalRowCountryOther => 'Other';
+  String get seasonalRowCountryOther => '其他';
 
   @override
   String get seasonalRowHolidays => 'Holidays';
@@ -3627,14 +3627,14 @@ class AppLocalizationsYue extends AppLocalizations {
   String get detailMetadataRuntimeAndSeasons => 'Runtime & Seasons';
 
   @override
-  String get detailMetadataStatus => 'Series Status';
+  String get detailMetadataStatus => '系列狀態';
 
   @override
   String get detailMetadataStatusSubtitle =>
       'Shows whether the series is continuing, ended, or returning';
 
   @override
-  String get detailMetadataGenres => 'Genres';
+  String get detailMetadataGenres => '流派';
 
   @override
   String get detailMetadataSeerrAvailability => 'Seerr Availability';
@@ -3674,10 +3674,10 @@ class AppLocalizationsYue extends AppLocalizations {
   String get detailSectionGroupCollection => 'Collection pages';
 
   @override
-  String get detailSectionGroupOther => 'Other';
+  String get detailSectionGroupOther => '其他';
 
   @override
-  String get detailSectionLogo => 'Logo';
+  String get detailSectionLogo => '標識';
 
   @override
   String get detailSectionLogoSubtitle => 'Shows the title as text when off';
@@ -3686,19 +3686,19 @@ class AppLocalizationsYue extends AppLocalizations {
   String get detailSectionTagline => 'Tagline';
 
   @override
-  String get detailSectionPoster => 'Poster';
+  String get detailSectionPoster => '海報';
 
   @override
   String get detailSectionVersionBadge => 'Version badge';
 
   @override
-  String get detailSectionUpNext => 'Next Up';
+  String get detailSectionUpNext => '下一步';
 
   @override
-  String get detailSectionLyrics => 'Lyrics';
+  String get detailSectionLyrics => '歌詞';
 
   @override
-  String get detailSectionCast => 'Cast';
+  String get detailSectionCast => '投放';
 
   @override
   String get detailSectionCastSubtitle => 'Also on collection pages';
@@ -3707,19 +3707,19 @@ class AppLocalizationsYue extends AppLocalizations {
   String get detailSectionCrew => 'Directors & writers';
 
   @override
-  String get detailSectionStudios => 'Studios';
+  String get detailSectionStudios => '工作室';
 
   @override
-  String get detailSectionChapters => 'Chapters';
+  String get detailSectionChapters => '章節';
 
   @override
-  String get detailSectionExtras => 'Extras';
+  String get detailSectionExtras => '特別收錄';
 
   @override
-  String get detailSectionCollections => 'Collections';
+  String get detailSectionCollections => '收藏';
 
   @override
-  String get detailSectionMoreLikeThis => 'More Like This';
+  String get detailSectionMoreLikeThis => '更多類似的';
 
   @override
   String get detailSectionMoreLikeThisSubtitle =>
@@ -3751,7 +3751,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get seerrStreamingOn => 'Streaming on';
 
   @override
-  String get detailSectionSeerrRecommendations => 'Recommendations';
+  String get detailSectionSeerrRecommendations => '建議';
 
   @override
   String get detailSectionSeerrSimilar => 'Similar titles';
@@ -3760,7 +3760,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get detailSectionSeerrCollection => 'Collection banner';
 
   @override
-  String get detailSectionSeerrPersonAppearances => 'Appearances';
+  String get detailSectionSeerrPersonAppearances => '演出作品';
 
   @override
   String get detailSectionSeerrPersonCrew => 'Crew credits';
@@ -3769,7 +3769,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get detailSectionPersonPagesSubtitle => 'On person pages';
 
   @override
-  String get detailSectionBiography => 'Biography';
+  String get detailSectionBiography => '傳';
 
   @override
   String get detailSectionBirthplace => 'Birthplace';
@@ -3801,7 +3801,7 @@ class AppLocalizationsYue extends AppLocalizations {
   }
 
   @override
-  String get upcomingEpisodeToday => 'Today';
+  String get upcomingEpisodeToday => '今天';
 
   @override
   String get upcomingEpisodeTomorrow => 'Tomorrow';
@@ -3850,7 +3850,7 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get upcomingCalendarsDescription =>
-      'Toggle Upcoming Calendars from Radarr/Sonarr.';
+      'Choose what the Radarr and Sonarr rows show.';
 
   @override
   String get enableRadarrCalendar => 'Enable Radarr\'s Upcoming Calendar';
@@ -4086,7 +4086,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get settingsAudioDtsHdPassthrough => 'DTS-HD MA 直通';
 
   @override
-  String get settingsAudioPassthroughMode => 'Passthrough';
+  String get settingsAudioPassthroughMode => '直通';
 
   @override
   String get settingsAudioPassthroughModeDescription =>
@@ -4739,10 +4739,10 @@ class AppLocalizationsYue extends AppLocalizations {
       'Classic is the original header with icon buttons. Modern adds labeled sort, group and filter chips under the search. Docked keeps the controls in a bar at the bottom of the screen.';
 
   @override
-  String get libraryStyleClassic => 'Classic';
+  String get libraryStyleClassic => '經典';
 
   @override
-  String get libraryStyleModern => 'Modern';
+  String get libraryStyleModern => '現代';
 
   @override
   String get libraryStyleDocked => 'Docked';
@@ -4755,7 +4755,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Classic is the original shelves under a featured title. Reading Room leads with what you\'re reading on large cards. Bookstore browses the whole library in a grid.';
 
   @override
-  String get bookLibraryStyleClassic => 'Classic';
+  String get bookLibraryStyleClassic => '經典';
 
   @override
   String get bookLibraryStyleReadingRoom => 'Reading Room';
@@ -4771,7 +4771,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Classic is the original rows under a Jump Back In card. Quick Access starts with a grid of your recent albums and playlists. Immersive leads with the album you\'re listening to.';
 
   @override
-  String get musicLibraryStyleClassic => 'Classic';
+  String get musicLibraryStyleClassic => '經典';
 
   @override
   String get musicLibraryStyleQuickAccess => 'Quick Access';
@@ -4930,7 +4930,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get mediaBarModeGallery => 'Gallery';
 
   @override
-  String get mediaBarModeBanner => 'Banner';
+  String get mediaBarModeBanner => '橫幅';
 
   @override
   String get mediaBarModeAya => 'Aya';
@@ -5149,7 +5149,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get homeRowsGenresAndStudios => 'Genres and Studios';
 
   @override
-  String get homeRowsExternalLists => 'External Lists';
+  String get homeRowsExternalLists => '外部清單';
 
   @override
   String get perRowSettings => '每行設定';
@@ -5280,10 +5280,10 @@ class AppLocalizationsYue extends AppLocalizations {
   String get screensaverLibraryContent => 'Library Content';
 
   @override
-  String get screensaverBackdrop => 'Backdrop';
+  String get screensaverBackdrop => '背景';
 
   @override
-  String get screensaverBackdropBlack => 'Black';
+  String get screensaverBackdropBlack => '黑色的';
 
   @override
   String get screensaverBackdropMoonfin => 'Moonfin';
@@ -5497,7 +5497,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get networks => '網路';
 
   @override
-  String get tags => 'Tags';
+  String get tags => '標籤';
 
   @override
   String get genresAndTags => 'Genres and Tags';
@@ -5728,7 +5728,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get seerrRequestedStatus => '已請求';
 
   @override
-  String get seerrDownloading => 'Downloading';
+  String get seerrDownloading => '正在下載';
 
   @override
   String seerrDownloadingSize(String done, String total) {
@@ -6481,7 +6481,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get adminTagMode => 'Tag mode';
 
   @override
-  String get adminEmbyConnect => 'Emby Connect';
+  String get adminEmbyConnect => 'Emby 連接';
 
   @override
   String get adminEmbyConnectUser => 'Emby Connect username or email';
@@ -6570,7 +6570,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'No channels yet. They show up here once a tuner is set up and the server has imported its channels.';
 
   @override
-  String get adminTranscodingHwaAdvanced => 'Advanced';
+  String get adminTranscodingHwaAdvanced => '進階';
 
   @override
   String get adminTranscodingHwaHelp =>
@@ -7022,13 +7022,13 @@ class AppLocalizationsYue extends AppLocalizations {
   String get adminMetadataFieldDateAdded => 'Date added';
 
   @override
-  String get adminMetadataFieldArtists => 'Artists';
+  String get adminMetadataFieldArtists => '歌手';
 
   @override
   String get adminMetadataFieldAlbumArtists => 'Album artists';
 
   @override
-  String get adminMetadataFieldAlbum => 'Album';
+  String get adminMetadataFieldAlbum => '專輯';
 
   @override
   String get adminMetadataFieldSeriesName => 'Series name';
@@ -7080,7 +7080,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Separate several names with a semicolon.';
 
   @override
-  String get adminMetadataSectionRatings => 'Ratings';
+  String get adminMetadataSectionRatings => '評級';
 
   @override
   String get adminMetadataItemLocked =>
@@ -7172,7 +7172,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get adminLiveTvTabSources => 'Tuners and guide';
 
   @override
-  String get adminLiveTvTabRecordings => 'Recordings';
+  String get adminLiveTvTabRecordings => '錄影';
 
   @override
   String get adminLiveTvAddTuner => 'Add tuner device';
@@ -7340,7 +7340,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get adminLogLevelCritical => 'Critical';
 
   @override
-  String get adminLogLevelNone => 'None';
+  String get adminLogLevelNone => '冇';
 
   @override
   String get adminActivityAllUsers => 'All users';
@@ -7351,7 +7351,7 @@ class AppLocalizationsYue extends AppLocalizations {
   }
 
   @override
-  String get adminTaskResultFailed => 'Failed';
+  String get adminTaskResultFailed => '失敗';
 
   @override
   String get adminTaskResultCancelled => 'Cancelled';
@@ -7609,7 +7609,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get adminRestoreSucceeded => 'Restore completed';
 
   @override
-  String get adminLogWatch => 'Watch';
+  String get adminLogWatch => '睇';
 
   @override
   String get adminLogStopWatching => 'Stop watching';
@@ -7625,13 +7625,13 @@ class AppLocalizationsYue extends AppLocalizations {
   String get adminGroupOverview => 'Overview';
 
   @override
-  String get adminGroupLibrary => 'Library';
+  String get adminGroupLibrary => '媒體庫';
 
   @override
-  String get adminGroupPlayback => 'Playback';
+  String get adminGroupPlayback => '回放';
 
   @override
-  String get adminGroupPeople => 'People';
+  String get adminGroupPeople => '人們';
 
   @override
   String get adminGroupSystem => 'System';
@@ -9651,7 +9651,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get adminMetadataDisplayOrderProduction => 'Production';
 
   @override
-  String get adminMetadataDisplayOrderTv => 'TV';
+  String get adminMetadataDisplayOrderTv => '電視';
 
   @override
   String get adminMetadataDisplayOrderAlternate => 'Alternate';
@@ -9777,19 +9777,19 @@ class AppLocalizationsYue extends AppLocalizations {
       'Uncheck a field to lock it and prevent its data from being changed.';
 
   @override
-  String get adminMetadataLockFieldName => 'Name';
+  String get adminMetadataLockFieldName => '姓名';
 
   @override
   String get adminMetadataLockFieldOverview => 'Overview';
 
   @override
-  String get adminMetadataLockFieldGenres => 'Genres';
+  String get adminMetadataLockFieldGenres => '流派';
 
   @override
   String get adminMetadataLockFieldOfficialRating => 'Parental rating';
 
   @override
-  String get adminMetadataLockFieldCast => 'People';
+  String get adminMetadataLockFieldCast => '人們';
 
   @override
   String get adminMetadataLockFieldProductionLocations =>
@@ -9799,13 +9799,13 @@ class AppLocalizationsYue extends AppLocalizations {
   String get adminMetadataLockFieldBirthLocation => 'Birth location';
 
   @override
-  String get adminMetadataLockFieldRuntime => 'Runtime';
+  String get adminMetadataLockFieldRuntime => '運行時';
 
   @override
-  String get adminMetadataLockFieldStudios => 'Studios';
+  String get adminMetadataLockFieldStudios => '工作室';
 
   @override
-  String get adminMetadataLockFieldTags => 'Tags';
+  String get adminMetadataLockFieldTags => '標籤';
 
   @override
   String get adminMetadataGenres => '流派';
@@ -11466,7 +11466,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Choose which systems to install. Cores are provided by the libretro project and let games run natively instead of in a browser view.';
 
   @override
-  String get emulatorCoreDownloading => 'Downloading';
+  String get emulatorCoreDownloading => '正在下載';
 
   @override
   String get emulatorCoreUnavailable => 'Not available for this device';
@@ -11704,13 +11704,13 @@ class AppLocalizationsYue extends AppLocalizations {
       '控制 Dolby Vision 設定檔 7 增強層流是否應直接播放。';
 
   @override
-  String get settingsAutoAftkrtEnabled => '自動（AFTKRT 已啟用）';
+  String get settingsAutoAftkrtEnabled => '自動';
 
   @override
-  String get settingsEnabledOnThisDevice => '在此裝置上啟用';
+  String get settingsEnabledOnThisDevice => '已啟用';
 
   @override
-  String get settingsDisabledPreferTranscode => '已停用（首選轉碼）';
+  String get settingsDisabledPreferTranscode => '關';
 
   @override
   String get settingsResumeRewindDescription => '恢復播放時（從「繼續觀看」或媒體項目頁面），應倒回多少秒？';
@@ -12210,7 +12210,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Select which studios should be included on the home row.';
 
   @override
-  String get selectAllStudios => 'Select All';
+  String get selectAllStudios => '選擇全部';
 
   @override
   String get deselectAllStudios => 'Deselect All';
@@ -12228,7 +12228,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get unselectedStudiosFilter => 'Unselected Studios';
 
   @override
-  String get filtersHeader => 'Filters';
+  String get filtersHeader => '過濾器';
 
   @override
   String get showHeader => 'Show';
@@ -12312,10 +12312,10 @@ class AppLocalizationsYue extends AppLocalizations {
   String get externalRowSortDefault => 'Default (List Order)';
 
   @override
-  String get externalRowSortName => 'Name';
+  String get externalRowSortName => '姓名';
 
   @override
-  String get externalRowSortReleaseDate => 'Release Date';
+  String get externalRowSortReleaseDate => '發布日期';
 
   @override
   String get externalRowSortRating => 'Rating';
@@ -12324,7 +12324,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get externalRowSortPopularity => 'Popularity';
 
   @override
-  String get externalRowSortShuffle => 'Shuffle';
+  String get externalRowSortShuffle => '隨機播放';
 
   @override
   String get audioPlaylists => '音訊播放清單';
@@ -12980,7 +12980,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Score to spend and the boosts you hold';
 
   @override
-  String get achievementsAppearance => 'Appearance';
+  String get achievementsAppearance => '外觀';
 
   @override
   String get achievementsAppearanceSubtitle =>
@@ -13022,7 +13022,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Your records and how the server is doing';
 
   @override
-  String get achievementsStatsWatched => 'Watched';
+  String get achievementsStatsWatched => '睇咗';
 
   @override
   String get achievementsStatsBests => 'Bests';
@@ -13334,7 +13334,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get friendsAccept => 'Accept';
 
   @override
-  String get friendsDecline => 'Decline';
+  String get friendsDecline => '衰退';
 
   @override
   String get friendsCancelRequest => 'Cancel request';
@@ -13514,7 +13514,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get chatGroupInfo => 'Group info';
 
   @override
-  String get chatGroupName => 'Group name';
+  String get chatGroupName => '團體名稱';
 
   @override
   String chatMemberCount(int count) {
@@ -13549,7 +13549,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get chatNobodyToAdd => 'No one left to add.';
 
   @override
-  String get chatLeave => 'Leave group';
+  String get chatLeave => '離開群組';
 
   @override
   String get chatLeaveBody =>
@@ -14451,7 +14451,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get playlistTypes => 'Playlist Types';
 
   @override
-  String get playlistTypeVideo => 'Video';
+  String get playlistTypeVideo => '影片';
 
   @override
   String get playlistTypeMusicVideo => 'Music Video';
@@ -14478,7 +14478,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get musicVideoPlaylistsSection => 'Music Video Playlists';
 
   @override
-  String get audioPlaylistsSection => 'Audio Playlists';
+  String get audioPlaylistsSection => '音訊播放清單';
 
   @override
   String get audiobookPlaylistsSection => 'Audiobook Playlists';
@@ -14620,10 +14620,10 @@ class AppLocalizationsYue extends AppLocalizations {
   String get filterUnreleased => 'Unreleased';
 
   @override
-  String get filterTrailers => 'Trailers';
+  String get filterTrailers => '預告片';
 
   @override
-  String get filterExtras => 'Extras';
+  String get filterExtras => '特別收錄';
 
   @override
   String get filterThemeSongs => 'Theme Songs';
@@ -14659,10 +14659,10 @@ class AppLocalizationsYue extends AppLocalizations {
   String get seerrMinVotes => 'Minimum Votes';
 
   @override
-  String get seerrOriginalLanguage => 'Original Language';
+  String get seerrOriginalLanguage => '原始語言';
 
   @override
-  String get seerrRuntime => 'Runtime';
+  String get seerrRuntime => '運行時';
 
   @override
   String get subtitleHdrSeparate => 'Separate HDR Style';
@@ -14753,10 +14753,10 @@ class AppLocalizationsYue extends AppLocalizations {
   String get setupOptional => 'Optional';
 
   @override
-  String get setupStyleClassic => 'Classic';
+  String get setupStyleClassic => '經典';
 
   @override
-  String get setupStyleModern => 'Modern';
+  String get setupStyleModern => '現代';
 
   @override
   String get setupRowsClassicHint => 'Compact. More rows on screen at once.';
@@ -14800,7 +14800,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'The poster up front, with play under it and the details beside it.';
 
   @override
-  String get setupStylePremiere => 'Premiere';
+  String get setupStylePremiere => '首播';
 
   @override
   String get setupDetailPremiereHint =>
@@ -15077,7 +15077,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get autoDownloadKeepUnwatched => 'Keep Unwatched Episodes';
 
   @override
-  String get autoDownloadKeepAll => 'All';
+  String get autoDownloadKeepAll => '全部';
 
   @override
   String get autoDownloadDelete => 'Delete Downloaded Episodes';
@@ -15101,7 +15101,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Never remove this automatically after watching';
 
   @override
-  String get autoDownloadDeleteNever => 'Never';
+  String get autoDownloadDeleteNever => '絕不';
 
   @override
   String get autoDownloadDeleteImmediately => 'Right after watching';
@@ -15170,7 +15170,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get autoDownloadWaitingForWifi => 'Waiting for WiFi';
 
   @override
-  String get downloadNotificationRunning => 'Downloading';
+  String get downloadNotificationRunning => '正在下載';
 
   @override
   String downloadNotificationRunningBatch(int done, int total) {
@@ -15308,13 +15308,13 @@ class AppLocalizationsYue extends AppLocalizations {
   String get animationSpeedSlow => 'Slow';
 
   @override
-  String get animationSpeedMedium => 'Medium';
+  String get animationSpeedMedium => '中等的';
 
   @override
   String get animationSpeedFast => 'Fast';
 
   @override
-  String get animationSpeedOff => 'Off';
+  String get animationSpeedOff => '關';
 
   @override
   String get pageTransitionFadeNone => 'No Fade';
@@ -15385,7 +15385,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get bottomNavbarTabsPinned => 'Pinned';
 
   @override
-  String get bottomNavbarTabsAvailable => 'Available';
+  String get bottomNavbarTabsAvailable => '可用的';
 
   @override
   String get bottomNavbarTabsReset => 'Reset to Automatic';
@@ -15538,7 +15538,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get settingsWatchTogetherSection => 'Watch Parties';
 
   @override
-  String get settingsAdvancedSection => 'Advanced';
+  String get settingsAdvancedSection => '進階';
 
   @override
   String get playerSettingsSubtitle =>
@@ -15597,16 +15597,16 @@ class AppLocalizationsYue extends AppLocalizations {
   String get siloServerRowSubtitle => 'From your server';
 
   @override
-  String get playlistSortReleaseDate => 'Release Date';
+  String get playlistSortReleaseDate => '發布日期';
 
   @override
   String get playlistSortCriticRating => 'Critic Rating';
 
   @override
-  String get playlistSortRuntime => 'Runtime';
+  String get playlistSortRuntime => '運行時';
 
   @override
-  String get playlistSortLastPlayed => 'Last Played';
+  String get playlistSortLastPlayed => '上次玩過';
 
   @override
   String get playlistSortPlayCount => 'Play Count';
@@ -15647,7 +15647,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get librarySortAlbumArtist => 'Album Artist';
 
   @override
-  String get librarySortAlbum => 'Album';
+  String get librarySortAlbum => '專輯';
 
   @override
   String get librarySortArtist => 'Artist';
@@ -15656,7 +15656,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get librarySortTrackNumber => 'Track Number';
 
   @override
-  String get librarySortGenre => 'Genre';
+  String get librarySortGenre => '類型';
 
   @override
   String get librarySortFoldersFirst => 'Folders First';
@@ -15686,7 +15686,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get detailsBackdropFullScreen => 'Full Screen';
 
   @override
-  String get detailsBackdropFit => 'Fit';
+  String get detailsBackdropFit => '合身';
 
   @override
   String get libraryBackdrops => 'Library Backdrops';
@@ -16057,7 +16057,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Also record a future showing automatically once one is found, to get a complete recording?';
 
   @override
-  String get recordPromptNow => 'Now';
+  String get recordPromptNow => '現在';
 
   @override
   String get recordPromptLater => 'Future showing';
@@ -16164,7 +16164,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get siloApproveSignInHint => 'Code shown on the other device';
 
   @override
-  String get siloApproveSignInApprove => 'Approve';
+  String get siloApproveSignInApprove => '核准';
 
   @override
   String get siloApproveSignInDone =>
@@ -16755,7 +16755,7 @@ class AppLocalizationsYue extends AppLocalizations {
       'Type tells episodes from movies. Status shows what\'s in your library, coming up or missing.';
 
   @override
-  String get calendarSettingsColorByType => 'Type';
+  String get calendarSettingsColorByType => '類型';
 
   @override
   String get calendarSettingsImageType => 'Card image';
@@ -17226,7 +17226,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get watchPartyBackToClose => 'Back to close';
 
   @override
-  String get watchPartyType => 'Type';
+  String get watchPartyType => '類型';
 
   @override
   String get watchPartyReplyHaha => 'Haha';
@@ -17490,7 +17490,7 @@ class AppLocalizationsYue extends AppLocalizations {
   }
 
   @override
-  String get afterHoursPlay => 'Play';
+  String get afterHoursPlay => '播放';
 
   @override
   String get afterHoursLeaderboards => 'Leaderboards';
@@ -17741,7 +17741,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get afterHoursCastTangleLine => 'Slowly chases your plug.';
 
   @override
-  String get afterHoursCastStatic => 'Static';
+  String get afterHoursCastStatic => '固定';
 
   @override
   String get afterHoursCastStaticLine =>
@@ -17846,6 +17846,26 @@ class AppLocalizationsYue extends AppLocalizations {
   @override
   String get afterHoursPixelPurgeCardRemote =>
       'Left and Right slide the scrubber.';
+
+  @override
+  String get recentlyAddedAndReleased => 'Recently Added and Released';
+
+  @override
+  String get hideWatchedInRecentRows => 'Hide Watched';
+
+  @override
+  String get hideWatchedInRecentRowsDescription =>
+      'Hide watched content from Recently Added and Recently Released home rows.';
+
+  @override
+  String get homeRowsStreamingServices => 'Streaming Services';
+
+  @override
+  String get homeRowsStyleCarousel => 'Carousel';
+
+  @override
+  String get setupRowsCarouselHint =>
+      'Posters with a large details panel underneath.';
 }
 
 /// The translations for Yue Chinese Cantonese, as used in China (`yue_CN`).
@@ -17854,6 +17874,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get appTitle => 'Moonfin';
+
+  @override
+  String get animeMarkerPending => '待办的';
 
   @override
   String get signIn => '登入';
@@ -17899,6 +17922,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get whosWatching => '谁在看？';
+
+  @override
+  String get accountActive => '积极的';
 
   @override
   String get addUser => '添加用户';
@@ -17969,8 +17995,38 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get settingsAppearanceTheme => '应用主题';
 
   @override
+  String get detailScreenStyleMoonfin => 'Classic';
+
+  @override
+  String get detailScreenStyleModern => 'Modern';
+
+  @override
+  String get spotlightCollectionsCard => '收藏';
+
+  @override
+  String get detailScreenStylePremiere => '首映';
+
+  @override
+  String get interfaceLayoutTv => '电视';
+
+  @override
+  String get interfaceLayoutDesktop => '桌面';
+
+  @override
+  String get glassQualityAuto => '汽车';
+
+  @override
+  String get performanceModeAuto => '汽车';
+
+  @override
+  String get rendererModeAuto => '汽车';
+
+  @override
   String get settingsAppearanceThemeSubtitle =>
       '在 Moonfin 和 Neon Pulse 之间切换，无需重新启动应用程序';
+
+  @override
+  String get keyboardStyleClassic => 'Classic';
 
   @override
   String get themeMoonfin => 'Moonfin';
@@ -18413,6 +18469,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get noBooksFound => '没有找到该作者的书籍。';
 
   @override
+  String get bookHeroRead => '读';
+
+  @override
   String get author => '作者';
 
   @override
@@ -18635,6 +18694,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get cast => '投掷';
+
+  @override
+  String get castMembers => '投掷';
 
   @override
   String get trailer => '拖车';
@@ -19071,6 +19133,12 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get playbackInformation => '播放信息';
 
   @override
+  String get keyNameDelete => '删除';
+
+  @override
+  String get keyNameHome => '家';
+
+  @override
   String get playback => '回放';
 
   @override
@@ -19295,6 +19363,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get premiere => '首映';
+
+  @override
+  String get guideRepeatBadge => '重复';
 
   @override
   String get guideTimeline => '指南时间表';
@@ -19567,6 +19638,12 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get downloadedItems => '下载的项目';
 
   @override
+  String get savedMediaRead => '读';
+
+  @override
+  String get sortByName => '姓名';
+
+  @override
   String get storageLimit => '存储限制';
 
   @override
@@ -19735,6 +19812,18 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get seasonalEffectsDescription => '视觉效果和季节性装饰';
 
   @override
+  String get loadingAnimationSizeThumbnail => '缩略图';
+
+  @override
+  String get loadingAnimationSizeSmall => '小的';
+
+  @override
+  String get loadingAnimationSizeMedium => '中等的';
+
+  @override
+  String get loadingAnimationSizeLarge => '大的';
+
+  @override
   String get snow => '雪';
 
   @override
@@ -19745,6 +19834,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get fallingLeaves => '落叶';
+
+  @override
+  String get seasonalRowCountryOther => '其他';
 
   @override
   String get themeMusic => '主题音乐';
@@ -19787,6 +19879,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get playerZoomMode => '播放器缩放模式';
 
   @override
+  String get scrollWheelActionOff => '离开';
+
+  @override
   String get fit => '合身';
 
   @override
@@ -19824,6 +19919,51 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get osdLockButtonDescription => '显示一个锁定按钮，该按钮会阻止触摸输入，直到长按为止';
+
+  @override
+  String get detailMetadataStatus => '系列状态';
+
+  @override
+  String get detailMetadataGenres => '流派';
+
+  @override
+  String get detailSectionGroupOther => '其他';
+
+  @override
+  String get detailSectionLogo => '标识';
+
+  @override
+  String get detailSectionPoster => '海报';
+
+  @override
+  String get detailSectionUpNext => '下一步';
+
+  @override
+  String get detailSectionCast => '投掷';
+
+  @override
+  String get detailSectionStudios => '工作室';
+
+  @override
+  String get detailSectionChapters => '章节';
+
+  @override
+  String get detailSectionCollections => '收藏';
+
+  @override
+  String get detailSectionMoreLikeThis => '更多类似的';
+
+  @override
+  String get detailSectionSeerrRecommendations => '建议';
+
+  @override
+  String get detailSectionSeerrPersonAppearances => '出场次数';
+
+  @override
+  String get detailSectionBiography => '传';
+
+  @override
+  String get upcomingEpisodeToday => '今天';
 
   @override
   String get audioBehavior => '音频行为';
@@ -20099,6 +20239,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get subtitleCustomizationDescription => '自定义字幕外观';
 
   @override
+  String get subtitleModeAlways => '总是';
+
+  @override
   String get subtitlePreviewText => '敏捷的棕色狐狸跳过了懒狗';
 
   @override
@@ -20338,6 +20481,18 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get showLibrariesFromAllServers => '显示所有连接服务器的库';
 
   @override
+  String get libraryStyleClassic => 'Classic';
+
+  @override
+  String get libraryStyleModern => 'Modern';
+
+  @override
+  String get bookLibraryStyleClassic => 'Classic';
+
+  @override
+  String get musicLibraryStyleClassic => 'Classic';
+
+  @override
   String get libraryVisibility => '图书馆可见性';
 
   @override
@@ -20392,6 +20547,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get mediaBarModeOff => '离开';
+
+  @override
+  String get mediaBarModeBanner => '横幅';
 
   @override
   String get enableMediaBar => '启用媒体栏';
@@ -20602,6 +20760,15 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get displayClockDuringScreensaver => '屏幕保护期间显示时钟';
 
   @override
+  String get screensaverBackdrop => '背景';
+
+  @override
+  String get screensaverBackdropBlack => '黑色的';
+
+  @override
+  String get screensaverBackdropMoonfin => 'Moonfin';
+
+  @override
   String get letterboxd => '信箱';
 
   @override
@@ -20681,6 +20848,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get networks => '网络';
+
+  @override
+  String get tags => '标签';
 
   @override
   String get resetRowsToDefaults => '将行重置为默认值';
@@ -20819,6 +20989,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get seerrRequestedStatus => '已请求';
 
   @override
+  String get seerrDownloading => '正在下载';
+
+  @override
   String itemsCount(int count) {
     return '$count Items';
   }
@@ -20952,6 +21125,15 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get deletedStatus => '已删除';
+
+  @override
+  String get processingStatus => '加工';
+
+  @override
+  String get issueTypeVideo => '视频';
+
+  @override
+  String get issueTypeAudio => '声音的';
 
   @override
   String get tmdbScore => 'TMDB分数';
@@ -21152,6 +21334,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get adminDrawerLibraries => '图书馆';
 
   @override
+  String get adminDrawerDisplay => '展示';
+
+  @override
   String get adminDrawerTranscoding => '转码';
 
   @override
@@ -21192,6 +21377,36 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get adminExitTooltip => '退出管理';
+
+  @override
+  String get adminEmbyConnect => 'Emby 连接';
+
+  @override
+  String get adminMetadataFieldArtists => '艺术家';
+
+  @override
+  String get adminMetadataFieldAlbum => '专辑';
+
+  @override
+  String get adminMetadataSectionRatings => '评级';
+
+  @override
+  String get adminLiveTvTabRecordings => '录音';
+
+  @override
+  String get adminLogLevelNone => '没有任何';
+
+  @override
+  String get adminLogWatch => '手表';
+
+  @override
+  String get adminGroupLibrary => '图书馆';
+
+  @override
+  String get adminGroupPlayback => '回放';
+
+  @override
+  String get adminGroupPeople => 'People';
 
   @override
   String get adminDashboardLoadFailed => '无法加载仪表板';
@@ -21490,6 +21705,39 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get adminMetadataCountryHint => '例如美国、德国、法国';
 
   @override
+  String get adminLibrarySectionGeneral => '一般的';
+
+  @override
+  String get adminLibrarySectionSubtitles => '字幕';
+
+  @override
+  String get adminLibrarySectionSeries => '系列';
+
+  @override
+  String get adminLibrarySectionMusic => '音乐';
+
+  @override
+  String get adminLibrarySectionMovies => '电影';
+
+  @override
+  String get adminLibRefreshNever => '绝不';
+
+  @override
+  String get adminLibDefault => '默认';
+
+  @override
+  String get adminLibDisplayTitle => '展示';
+
+  @override
+  String get adminLibChaptersSection => '章节';
+
+  @override
+  String get adminLibNone => '没有任何';
+
+  @override
+  String get adminLibEmbeddedAllowNone => '没有任何';
+
+  @override
   String get adminLibraryNameRequired => '库名称为必填项';
 
   @override
@@ -21685,6 +21933,27 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get adminEnableAllChannels => '允许访问所有频道';
 
   @override
+  String get adminParentalRatingNone => '没有任何';
+
+  @override
+  String get adminUnratedBook => '图书';
+
+  @override
+  String get adminUnratedChannelContent => '渠道';
+
+  @override
+  String get adminUnratedLiveTvChannel => '电视直播';
+
+  @override
+  String get adminUnratedMovie => '电影';
+
+  @override
+  String get adminUnratedMusic => '音乐';
+
+  @override
+  String get adminUnratedTrailer => 'Trailers';
+
+  @override
   String get adminResetPasswordWarning => '这将删除密码。用户无需密码即可登录。';
 
   @override
@@ -21765,6 +22034,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String adminApiKeyTokenCreated(String token, String created) {
     return 'Token: $token\\nCreated: $created';
   }
+
+  @override
+  String get adminBackupSubtitles => '字幕';
 
   @override
   String get adminCreatingBackup => '正在创建备份...';
@@ -22398,6 +22670,12 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   }
 
   @override
+  String get adminSdUsername => '用户名';
+
+  @override
+  String get adminSdPassword => '密码';
+
+  @override
   String adminTunerRemoveFailed(String error) {
     return 'Failed to remove tuner: $error';
   }
@@ -22549,6 +22827,27 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get adminMetadataFieldOverview => '概述';
+
+  @override
+  String get adminMetadataDisplayOrderTv => '电视';
+
+  @override
+  String get adminMetadataLockFieldName => '姓名';
+
+  @override
+  String get adminMetadataLockFieldGenres => '流派';
+
+  @override
+  String get adminMetadataLockFieldCast => 'People';
+
+  @override
+  String get adminMetadataLockFieldRuntime => '运行时';
+
+  @override
+  String get adminMetadataLockFieldStudios => '工作室';
+
+  @override
+  String get adminMetadataLockFieldTags => '标签';
 
   @override
   String get adminMetadataGenres => '流派';
@@ -22888,6 +23187,12 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get adminPlaybackEnableHwEncoding => '启用硬件编码';
 
   @override
+  String get adminPlaybackAudioSection => '声音的';
+
+  @override
+  String get adminPlaybackAutoOption => '汽车';
+
+  @override
   String get adminPlaybackEncoding => '编码';
 
   @override
@@ -23181,6 +23486,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
 
   @override
   String get adminGeneralSlowResponseThreshold => '慢响应阈值（毫秒）';
+
+  @override
+  String get adminGeneralSectionServer => '服务器';
 
   @override
   String get adminGeneralCachePath => '缓存路径';
@@ -23799,6 +24107,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get settingsSeasonalSurprise => '季节性惊喜';
 
   @override
+  String get emulatorCoreDownloading => '正在下载';
+
+  @override
   String get settingsHigh => '高的';
 
   @override
@@ -23881,6 +24192,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get settingsSkipIntrosAndOutros => '跳过片头和片尾？';
 
   @override
+  String get settingsNone => '没有任何';
+
+  @override
   String get settingsPromptUser => '提示用户';
 
   @override
@@ -23937,13 +24251,13 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
       '控制 Dolby Vision 配置文件 7 增强层流是否应直接播放。';
 
   @override
-  String get settingsAutoAftkrtEnabled => '自动（AFTKRT 已启用）';
+  String get settingsAutoAftkrtEnabled => '汽车';
 
   @override
-  String get settingsEnabledOnThisDevice => '在此设备上启用';
+  String get settingsEnabledOnThisDevice => '启用';
 
   @override
-  String get settingsDisabledPreferTranscode => '已禁用（首选转码）';
+  String get settingsDisabledPreferTranscode => '离开';
 
   @override
   String get settingsResumeRewindDescription => '恢复播放时（从“继续观看”或媒体项目页面），应倒回多少秒？';
@@ -24147,6 +24461,9 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   }
 
   @override
+  String get themeStoreSave => '节省';
+
+  @override
   String savedThemesDeletedMessage(String themeName) {
     return 'Deleted \"$themeName\" from this device.';
   }
@@ -24254,6 +24571,21 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   @override
   String get genresRowItemsDescription =>
       'Show Movies, Series, or both in Genres rows.';
+
+  @override
+  String get selectAllStudios => '选择全部';
+
+  @override
+  String get filtersHeader => '过滤器';
+
+  @override
+  String get externalRowSortName => '姓名';
+
+  @override
+  String get externalRowSortReleaseDate => '发布日期';
+
+  @override
+  String get externalRowSortShuffle => '随机播放';
 
   @override
   String get appearance => 'Appearance';
@@ -24522,6 +24854,21 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get openInBrowser => 'Open in Browser';
 
   @override
+  String get achievementsAppearance => 'Appearance';
+
+  @override
+  String get achievementsStatsWatched => '看过';
+
+  @override
+  String get friendsDecline => '衰退';
+
+  @override
+  String get chatGroupName => '团体名称';
+
+  @override
+  String get chatLeave => '离开群组';
+
+  @override
   String get embeddedBrowserNotAvailable =>
       'Embedded browser is not available on this platform.';
 
@@ -24733,7 +25080,112 @@ class AppLocalizationsYueCn extends AppLocalizationsYue {
   String get whenFullscreen => 'When fullscreen';
 
   @override
+  String get posterCategory => '海报';
+
+  @override
+  String get bannerCategory => '横幅';
+
+  @override
+  String get logoCategory => '标识';
+
+  @override
+  String get thumbnailCategory => '缩略图';
+
+  @override
+  String get resolutionAll => '全部';
+
+  @override
+  String get audiobookChapters => '章节';
+
+  @override
+  String get audiobookSleepOff => '离开';
+
+  @override
+  String get audiobookSave => '节省';
+
+  @override
+  String get audiobookCancel => '取消';
+
+  @override
+  String get audiobookDelete => '删除';
+
+  @override
+  String get impellerOff => '离开';
+
+  @override
+  String get playlistTypeVideo => '视频';
+
+  @override
+  String get filterTrailers => 'Trailers';
+
+  @override
+  String get seerrOriginalLanguage => '原始语言';
+
+  @override
+  String get seerrRuntime => '运行时';
+
+  @override
+  String get setupStyleClassic => 'Classic';
+
+  @override
+  String get setupStyleModern => 'Modern';
+
+  @override
+  String get setupStylePremiere => '首映';
+
+  @override
+  String get autoDownloadKeepAll => '全部';
+
+  @override
+  String get autoDownloadDeleteNever => '绝不';
+
+  @override
+  String get downloadNotificationRunning => '正在下载';
+
+  @override
+  String get animationSpeedMedium => '中等的';
+
+  @override
+  String get animationSpeedOff => '离开';
+
+  @override
+  String get bottomNavbarTabsAvailable => '可用的';
+
+  @override
   String get integrations => '集成';
+
+  @override
+  String get playlistSortReleaseDate => '发布日期';
+
+  @override
+  String get playlistSortRuntime => '运行时';
+
+  @override
+  String get playlistSortLastPlayed => '上次玩过';
+
+  @override
+  String get librarySortAlbum => '专辑';
+
+  @override
+  String get librarySortGenre => '类型';
+
+  @override
+  String get detailsBackdropFit => '合身';
+
+  @override
+  String get recordPromptNow => '现在';
+
+  @override
+  String get siloApproveSignInApprove => '批准';
+
+  @override
+  String get calendarSettingsColorByType => '类型';
+
+  @override
+  String get watchPartyType => '类型';
+
+  @override
+  String get afterHoursPlay => '玩';
 }
 
 /// The translations for Yue Chinese Cantonese, as used in Hong Kong (`yue_HK`).
@@ -24742,6 +25194,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get appTitle => 'Moonfin';
+
+  @override
+  String get animeMarkerPending => '待辦的';
 
   @override
   String get signIn => '登入';
@@ -24787,6 +25242,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get whosWatching => '誰在看？';
+
+  @override
+  String get accountActive => '積極的';
 
   @override
   String get addUser => '新增用戶';
@@ -24857,8 +25315,38 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get settingsAppearanceTheme => '應用主題';
 
   @override
+  String get detailScreenStyleMoonfin => 'Classic';
+
+  @override
+  String get detailScreenStyleModern => 'Modern';
+
+  @override
+  String get spotlightCollectionsCard => '收藏';
+
+  @override
+  String get detailScreenStylePremiere => '首播';
+
+  @override
+  String get interfaceLayoutTv => '電視';
+
+  @override
+  String get interfaceLayoutDesktop => '桌面';
+
+  @override
+  String get glassQualityAuto => '汽車';
+
+  @override
+  String get performanceModeAuto => '汽車';
+
+  @override
+  String get rendererModeAuto => '汽車';
+
+  @override
   String get settingsAppearanceThemeSubtitle =>
       '在 Moonfin 和 Neon Pulse 之間切換，無需重新啟動應用程式';
+
+  @override
+  String get keyboardStyleClassic => 'Classic';
 
   @override
   String get themeMoonfin => 'Moonfin';
@@ -25301,6 +25789,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get noBooksFound => '沒有找到該作者的書籍。';
 
   @override
+  String get bookHeroRead => '讀';
+
+  @override
   String get author => '作者';
 
   @override
@@ -25523,6 +26014,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get cast => '投擲';
+
+  @override
+  String get castMembers => '投擲';
 
   @override
   String get trailer => '拖車';
@@ -25959,6 +26453,12 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get playbackInformation => '播放訊息';
 
   @override
+  String get keyNameDelete => '刪除';
+
+  @override
+  String get keyNameHome => '家';
+
+  @override
   String get playback => '回放';
 
   @override
@@ -26183,6 +26683,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get premiere => '首播';
+
+  @override
+  String get guideRepeatBadge => '重複';
 
   @override
   String get guideTimeline => '指南時間表';
@@ -26455,6 +26958,12 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get downloadedItems => '下載的項目';
 
   @override
+  String get savedMediaRead => '讀';
+
+  @override
+  String get sortByName => '姓名';
+
+  @override
   String get storageLimit => '儲存限制';
 
   @override
@@ -26623,6 +27132,18 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get seasonalEffectsDescription => '視覺效果和季節性裝飾';
 
   @override
+  String get loadingAnimationSizeThumbnail => '縮圖';
+
+  @override
+  String get loadingAnimationSizeSmall => '小的';
+
+  @override
+  String get loadingAnimationSizeMedium => '中等的';
+
+  @override
+  String get loadingAnimationSizeLarge => '大的';
+
+  @override
   String get snow => '雪';
 
   @override
@@ -26633,6 +27154,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get fallingLeaves => '落葉';
+
+  @override
+  String get seasonalRowCountryOther => '其他';
 
   @override
   String get themeMusic => '主題音樂';
@@ -26675,6 +27199,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get playerZoomMode => '播放器縮放模式';
 
   @override
+  String get scrollWheelActionOff => '離開';
+
+  @override
   String get fit => '合身';
 
   @override
@@ -26712,6 +27239,51 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get osdLockButtonDescription => '顯示一個鎖定按鈕，該按鈕會阻止觸控輸入，直到長按為止';
+
+  @override
+  String get detailMetadataStatus => '系列狀態';
+
+  @override
+  String get detailMetadataGenres => '流派';
+
+  @override
+  String get detailSectionGroupOther => '其他';
+
+  @override
+  String get detailSectionLogo => '標識';
+
+  @override
+  String get detailSectionPoster => '海報';
+
+  @override
+  String get detailSectionUpNext => '下一步';
+
+  @override
+  String get detailSectionCast => '投擲';
+
+  @override
+  String get detailSectionStudios => '工作室';
+
+  @override
+  String get detailSectionChapters => '章節';
+
+  @override
+  String get detailSectionCollections => '收藏';
+
+  @override
+  String get detailSectionMoreLikeThis => '更多類似的';
+
+  @override
+  String get detailSectionSeerrRecommendations => '建議';
+
+  @override
+  String get detailSectionSeerrPersonAppearances => '出場次數';
+
+  @override
+  String get detailSectionBiography => '傳';
+
+  @override
+  String get upcomingEpisodeToday => '今天';
 
   @override
   String get audioBehavior => '音訊行為';
@@ -26987,6 +27559,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get subtitleCustomizationDescription => '自訂字幕外觀';
 
   @override
+  String get subtitleModeAlways => '總是';
+
+  @override
   String get subtitlePreviewText => '敏捷的棕色狐狸跳過了懶狗';
 
   @override
@@ -27226,6 +27801,18 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get showLibrariesFromAllServers => '顯示所有連接伺服器的庫';
 
   @override
+  String get libraryStyleClassic => 'Classic';
+
+  @override
+  String get libraryStyleModern => 'Modern';
+
+  @override
+  String get bookLibraryStyleClassic => 'Classic';
+
+  @override
+  String get musicLibraryStyleClassic => 'Classic';
+
+  @override
   String get libraryVisibility => '圖書館可見性';
 
   @override
@@ -27280,6 +27867,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get mediaBarModeOff => '離開';
+
+  @override
+  String get mediaBarModeBanner => '橫幅';
 
   @override
   String get enableMediaBar => '啟用媒體欄';
@@ -27490,6 +28080,15 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get displayClockDuringScreensaver => '螢幕保護期間顯示時鐘';
 
   @override
+  String get screensaverBackdrop => '背景';
+
+  @override
+  String get screensaverBackdropBlack => '黑色的';
+
+  @override
+  String get screensaverBackdropMoonfin => 'Moonfin';
+
+  @override
   String get letterboxd => '信箱';
 
   @override
@@ -27569,6 +28168,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get networks => '網路';
+
+  @override
+  String get tags => '標籤';
 
   @override
   String get resetRowsToDefaults => '將行重設為預設值';
@@ -27707,6 +28309,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get seerrRequestedStatus => '已請求';
 
   @override
+  String get seerrDownloading => '正在下載';
+
+  @override
   String itemsCount(int count) {
     return '$count Items';
   }
@@ -27840,6 +28445,15 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get deletedStatus => '已刪除';
+
+  @override
+  String get processingStatus => '加工';
+
+  @override
+  String get issueTypeVideo => '影片';
+
+  @override
+  String get issueTypeAudio => '聲音的';
 
   @override
   String get tmdbScore => 'TMDB分數';
@@ -28040,6 +28654,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get adminDrawerLibraries => '圖書館';
 
   @override
+  String get adminDrawerDisplay => '展示';
+
+  @override
   String get adminDrawerTranscoding => '轉碼';
 
   @override
@@ -28080,6 +28697,36 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get adminExitTooltip => '退出管理';
+
+  @override
+  String get adminEmbyConnect => 'Emby 連接';
+
+  @override
+  String get adminMetadataFieldArtists => '藝術家';
+
+  @override
+  String get adminMetadataFieldAlbum => '專輯';
+
+  @override
+  String get adminMetadataSectionRatings => '評級';
+
+  @override
+  String get adminLiveTvTabRecordings => '錄音';
+
+  @override
+  String get adminLogLevelNone => '沒有任何';
+
+  @override
+  String get adminLogWatch => '手錶';
+
+  @override
+  String get adminGroupLibrary => '圖書館';
+
+  @override
+  String get adminGroupPlayback => '回放';
+
+  @override
+  String get adminGroupPeople => 'People';
 
   @override
   String get adminDashboardLoadFailed => '無法載入儀表板';
@@ -28378,6 +29025,39 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get adminMetadataCountryHint => '例如美國、德國、法國';
 
   @override
+  String get adminLibrarySectionGeneral => '一般的';
+
+  @override
+  String get adminLibrarySectionSubtitles => '字幕';
+
+  @override
+  String get adminLibrarySectionSeries => '系列';
+
+  @override
+  String get adminLibrarySectionMusic => '音樂';
+
+  @override
+  String get adminLibrarySectionMovies => '電影';
+
+  @override
+  String get adminLibRefreshNever => '絕不';
+
+  @override
+  String get adminLibDefault => '預設';
+
+  @override
+  String get adminLibDisplayTitle => '展示';
+
+  @override
+  String get adminLibChaptersSection => '章節';
+
+  @override
+  String get adminLibNone => '沒有任何';
+
+  @override
+  String get adminLibEmbeddedAllowNone => '沒有任何';
+
+  @override
   String get adminLibraryNameRequired => '庫名稱為必填項';
 
   @override
@@ -28573,6 +29253,27 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get adminEnableAllChannels => '允許存取所有頻道';
 
   @override
+  String get adminParentalRatingNone => '沒有任何';
+
+  @override
+  String get adminUnratedBook => '圖書';
+
+  @override
+  String get adminUnratedChannelContent => '頻道';
+
+  @override
+  String get adminUnratedLiveTvChannel => '電視直播';
+
+  @override
+  String get adminUnratedMovie => '電影';
+
+  @override
+  String get adminUnratedMusic => '音樂';
+
+  @override
+  String get adminUnratedTrailer => 'Trailers';
+
+  @override
   String get adminResetPasswordWarning => '這將刪除密碼。用戶無需密碼即可登入。';
 
   @override
@@ -28653,6 +29354,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String adminApiKeyTokenCreated(String token, String created) {
     return 'Token: $token\\nCreated: $created';
   }
+
+  @override
+  String get adminBackupSubtitles => '字幕';
 
   @override
   String get adminCreatingBackup => '正在建立備份...';
@@ -29286,6 +29990,12 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   }
 
   @override
+  String get adminSdUsername => '使用者名稱';
+
+  @override
+  String get adminSdPassword => '密碼';
+
+  @override
   String adminTunerRemoveFailed(String error) {
     return 'Failed to remove tuner: $error';
   }
@@ -29437,6 +30147,27 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get adminMetadataFieldOverview => '概述';
+
+  @override
+  String get adminMetadataDisplayOrderTv => '電視';
+
+  @override
+  String get adminMetadataLockFieldName => '姓名';
+
+  @override
+  String get adminMetadataLockFieldGenres => '流派';
+
+  @override
+  String get adminMetadataLockFieldCast => 'People';
+
+  @override
+  String get adminMetadataLockFieldRuntime => '運行時';
+
+  @override
+  String get adminMetadataLockFieldStudios => '工作室';
+
+  @override
+  String get adminMetadataLockFieldTags => '標籤';
 
   @override
   String get adminMetadataGenres => '流派';
@@ -29776,6 +30507,12 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get adminPlaybackEnableHwEncoding => '啟用硬體編碼';
 
   @override
+  String get adminPlaybackAudioSection => '聲音的';
+
+  @override
+  String get adminPlaybackAutoOption => '汽車';
+
+  @override
   String get adminPlaybackEncoding => '編碼';
 
   @override
@@ -30069,6 +30806,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
 
   @override
   String get adminGeneralSlowResponseThreshold => '慢響應閾值（毫秒）';
+
+  @override
+  String get adminGeneralSectionServer => '伺服器';
 
   @override
   String get adminGeneralCachePath => '快取路徑';
@@ -30687,6 +31427,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get settingsSeasonalSurprise => '季節性驚喜';
 
   @override
+  String get emulatorCoreDownloading => '正在下載';
+
+  @override
   String get settingsHigh => '高的';
 
   @override
@@ -30769,6 +31512,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get settingsSkipIntrosAndOutros => '跳過片頭和片尾？';
 
   @override
+  String get settingsNone => '沒有任何';
+
+  @override
   String get settingsPromptUser => '提示用戶';
 
   @override
@@ -30824,13 +31570,13 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
       '控制 Dolby Vision 設定檔 7 增強層流是否應直接播放。';
 
   @override
-  String get settingsAutoAftkrtEnabled => '自動（AFTKRT 已啟用）';
+  String get settingsAutoAftkrtEnabled => '汽車';
 
   @override
-  String get settingsEnabledOnThisDevice => '在此裝置上啟用';
+  String get settingsEnabledOnThisDevice => '啟用';
 
   @override
-  String get settingsDisabledPreferTranscode => '已停用（首選轉碼）';
+  String get settingsDisabledPreferTranscode => '離開';
 
   @override
   String get settingsResumeRewindDescription => '恢復播放時（從「繼續觀看」或媒體項目頁面），應倒回多少秒？';
@@ -31034,6 +31780,9 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   }
 
   @override
+  String get themeStoreSave => '節省';
+
+  @override
   String savedThemesDeletedMessage(String themeName) {
     return 'Deleted \"$themeName\" from this device.';
   }
@@ -31141,6 +31890,21 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   @override
   String get genresRowItemsDescription =>
       'Show Movies, Series, or both in Genres rows.';
+
+  @override
+  String get selectAllStudios => '選擇全部';
+
+  @override
+  String get filtersHeader => '過濾器';
+
+  @override
+  String get externalRowSortName => '姓名';
+
+  @override
+  String get externalRowSortReleaseDate => '發布日期';
+
+  @override
+  String get externalRowSortShuffle => '隨機播放';
 
   @override
   String get appearance => 'Appearance';
@@ -31409,6 +32173,21 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get openInBrowser => 'Open in Browser';
 
   @override
+  String get achievementsAppearance => 'Appearance';
+
+  @override
+  String get achievementsStatsWatched => '看過';
+
+  @override
+  String get friendsDecline => '衰退';
+
+  @override
+  String get chatGroupName => '團體名稱';
+
+  @override
+  String get chatLeave => '離開群組';
+
+  @override
   String get embeddedBrowserNotAvailable =>
       'Embedded browser is not available on this platform.';
 
@@ -31620,5 +32399,110 @@ class AppLocalizationsYueHk extends AppLocalizationsYue {
   String get whenFullscreen => 'When fullscreen';
 
   @override
+  String get posterCategory => '海報';
+
+  @override
+  String get bannerCategory => '橫幅';
+
+  @override
+  String get logoCategory => '標識';
+
+  @override
+  String get thumbnailCategory => '縮圖';
+
+  @override
+  String get resolutionAll => '全部';
+
+  @override
+  String get audiobookChapters => '章節';
+
+  @override
+  String get audiobookSleepOff => '離開';
+
+  @override
+  String get audiobookSave => '節省';
+
+  @override
+  String get audiobookCancel => '取消';
+
+  @override
+  String get audiobookDelete => '刪除';
+
+  @override
+  String get impellerOff => '離開';
+
+  @override
+  String get playlistTypeVideo => '影片';
+
+  @override
+  String get filterTrailers => 'Trailers';
+
+  @override
+  String get seerrOriginalLanguage => '原始語言';
+
+  @override
+  String get seerrRuntime => '運行時';
+
+  @override
+  String get setupStyleClassic => 'Classic';
+
+  @override
+  String get setupStyleModern => 'Modern';
+
+  @override
+  String get setupStylePremiere => '首播';
+
+  @override
+  String get autoDownloadKeepAll => '全部';
+
+  @override
+  String get autoDownloadDeleteNever => '絕不';
+
+  @override
+  String get downloadNotificationRunning => '正在下載';
+
+  @override
+  String get animationSpeedMedium => '中等的';
+
+  @override
+  String get animationSpeedOff => '離開';
+
+  @override
+  String get bottomNavbarTabsAvailable => '可用的';
+
+  @override
   String get integrations => '整合';
+
+  @override
+  String get playlistSortReleaseDate => '發布日期';
+
+  @override
+  String get playlistSortRuntime => '運行時';
+
+  @override
+  String get playlistSortLastPlayed => '上次玩過';
+
+  @override
+  String get librarySortAlbum => '專輯';
+
+  @override
+  String get librarySortGenre => '類型';
+
+  @override
+  String get detailsBackdropFit => '合身';
+
+  @override
+  String get recordPromptNow => '現在';
+
+  @override
+  String get siloApproveSignInApprove => '核准';
+
+  @override
+  String get calendarSettingsColorByType => '類型';
+
+  @override
+  String get watchPartyType => '類型';
+
+  @override
+  String get afterHoursPlay => '玩';
 }

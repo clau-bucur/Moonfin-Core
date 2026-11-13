@@ -3895,7 +3895,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get upcomingCalendarsDescription =>
-      'Toggle Upcoming Calendars from Radarr/Sonarr.';
+      'Choose what the Radarr and Sonarr rows show.';
 
   @override
   String get enableRadarrCalendar => 'Enable Radarr\'s Upcoming Calendar';
@@ -12269,7 +12269,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rowsTypeDescription =>
-      'Classic keeps per-row image type and info overlay. Modern uses portrait-to-backdrop rows.';
+      'Classic keeps per-row image type and info overlay. Modern uses portrait-to-backdrop rows. Carousel adds a details panel under each row.';
 
   @override
   String get modernCardsOnMyMediaRow => 'Modern cards on My Media row';
@@ -18128,6 +18128,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get afterHoursPixelPurgeCardRemote =>
       'Left and Right slide the scrubber.';
+
+  @override
+  String get recentlyAddedAndReleased => 'Recently Added and Released';
+
+  @override
+  String get hideWatchedInRecentRows => 'Hide Watched';
+
+  @override
+  String get hideWatchedInRecentRowsDescription =>
+      'Hide watched content from Recently Added and Recently Released home rows.';
+
+  @override
+  String get homeRowsStreamingServices => 'Streaming Services';
+
+  @override
+  String get homeRowsStyleCarousel => 'Carousel';
+
+  @override
+  String get setupRowsCarouselHint =>
+      'Posters with a large details panel underneath.';
 }
 
 /// The translations for English, as used in the United Kingdom (`en_GB`).
@@ -18221,6 +18241,9 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get whosWatching => 'Who\'s watching?';
+
+  @override
+  String get accountActive => 'Active';
 
   @override
   String get addUser => 'Add User';
@@ -18514,6 +18537,9 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   String get detailScreenStyleMinimalist => 'Minimalist';
 
   @override
+  String get detailScreenStylePremiere => 'Premiere';
+
+  @override
   String get expandedTabs => 'Expanded Tabs';
 
   @override
@@ -18632,6 +18658,9 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   String get performanceModeReduced => 'Reduced';
 
   @override
+  String get rendererModeAuto => 'Auto';
+
+  @override
   String get trailerPreviewHeldBack =>
       'Off because Performance is set to Reduced for this device';
 
@@ -18645,6 +18674,9 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   @override
   String get customThemeSubtitle =>
       'Custom themes alter visual elements across Moonfin. Choose one of these options to suit your style.';
+
+  @override
+  String get keyboardStyleClassic => 'Classic';
 
   @override
   String get controller => 'Controller';
@@ -19417,6 +19449,9 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   String get extras => 'Extras';
 
   @override
+  String get additionalParts => 'Additional Parts';
+
+  @override
   String get behindTheScenes => 'Behind the Scenes';
 
   @override
@@ -20088,6 +20123,9 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get keyNameBackspace => 'Backspace';
+
+  @override
+  String get keyNameDelete => 'Delete';
 
   @override
   String get keyNamePageUp => 'Page Up';
@@ -21122,6 +21160,9 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   String get fallingLeaves => 'Falling Leaves';
 
   @override
+  String get seasonalRowCountryOther => 'Other';
+
+  @override
   String get themeMusic => 'Theme Music';
 
   @override
@@ -21372,6 +21413,48 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   @override
   String get detailMetadataUpcomingEpisodeDateSubtitle =>
       'Uses Sonarr and TMDB to show upcoming release dates';
+
+  @override
+  String get detailSectionGroupOther => 'Other';
+
+  @override
+  String get detailSectionLogo => 'Logo';
+
+  @override
+  String get detailSectionPoster => 'Poster';
+
+  @override
+  String get detailSectionUpNext => 'Next Up';
+
+  @override
+  String get detailSectionLyrics => 'Lyrics';
+
+  @override
+  String get detailSectionCast => 'Cast';
+
+  @override
+  String get detailSectionStudios => 'Studios';
+
+  @override
+  String get detailSectionChapters => 'Chapters';
+
+  @override
+  String get detailSectionExtras => 'Extras';
+
+  @override
+  String get detailSectionCollections => 'Collections';
+
+  @override
+  String get detailSectionMoreLikeThis => 'More Like This';
+
+  @override
+  String get detailSectionSeerrRecommendations => 'Recommendations';
+
+  @override
+  String get detailSectionSeerrPersonAppearances => 'Appearances';
+
+  @override
+  String get detailSectionBiography => 'Biography';
 
   @override
   String upcomingEpisodeNext(String date, int season, int episode) {
@@ -22194,6 +22277,21 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   String get libraryView => 'Library View';
 
   @override
+  String get libraryStyleClassic => 'Classic';
+
+  @override
+  String get libraryStyleModern => 'Modern';
+
+  @override
+  String get bookLibraryStyleClassic => 'Classic';
+
+  @override
+  String get musicLibraryStyleClassic => 'Classic';
+
+  @override
+  String get libraryShowLabel => 'Show';
+
+  @override
   String get groupItemsIntoCollections => 'Group Items into Collections';
 
   @override
@@ -22440,6 +22538,9 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   @override
   String get homeRowsPaddingDescription =>
       'Customize padding between home rows';
+
+  @override
+  String get homeRowsExternalLists => 'External Lists';
 
   @override
   String get perRowSettings => 'Per-Row Settings';
@@ -23544,6 +23645,48 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get adminExitTooltip => 'Exit Admin';
+
+  @override
+  String get adminEmbyConnect => 'Emby Connect';
+
+  @override
+  String get adminExternalIdTypeArtist => 'Artist';
+
+  @override
+  String get adminExternalIdTypeAlbumArtist => 'Album Artist';
+
+  @override
+  String get adminMetadataFieldArtists => 'Artists';
+
+  @override
+  String get adminMetadataFieldAlbum => 'Album';
+
+  @override
+  String get adminMetadataSectionRatings => 'Ratings';
+
+  @override
+  String get adminLiveTvTabRecordings => 'Recordings';
+
+  @override
+  String get adminPlayMethodDirectPlay => 'Direct playing';
+
+  @override
+  String get adminLogLevelNone => 'None';
+
+  @override
+  String get adminTaskResultFailed => 'Failed';
+
+  @override
+  String get adminLogWatch => 'Watch';
+
+  @override
+  String get adminGroupLibrary => 'Library';
+
+  @override
+  String get adminGroupPlayback => 'Playback';
+
+  @override
+  String get adminGroupPeople => 'People';
 
   @override
   String get adminDashboardLoadFailed => 'Failed to load dashboard';
@@ -28026,6 +28169,15 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
       'Sort Audio rows in ascending or descending order.';
 
   @override
+  String get externalRowSortName => 'Name';
+
+  @override
+  String get externalRowSortReleaseDate => 'Release Date';
+
+  @override
+  String get externalRowSortShuffle => 'Shuffle';
+
+  @override
   String get audioPlaylists => 'Audio Playlists';
 
   @override
@@ -28727,6 +28879,15 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get achievementsLoadFailed => 'Could not load your achievements.';
+
+  @override
+  String get friendsDecline => 'Decline';
+
+  @override
+  String get chatGroupName => 'Group name';
+
+  @override
+  String get chatLeave => 'Leave group';
 
   @override
   String get embeddedBrowserNotAvailable =>
@@ -29862,7 +30023,7 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
 
   @override
   String get hideHomeMediaDescription =>
-      'Hide Media Description on Home Screen';
+      'Hide Media Description on Details Page';
 
   @override
   String get hideHomeMediaDescriptionSubtitle =>
@@ -29930,6 +30091,9 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
   @override
   String get setupDetailMinimalistHint =>
       'Artwork, one play button and the episodes.';
+
+  @override
+  String get setupStylePremiere => 'Premiere';
 
   @override
   String get setupPickALook => 'Pick a look';
@@ -30289,5 +30453,89 @@ class AppLocalizationsEnGb extends AppLocalizationsEn {
       'In landscape the camera housing covers one edge of the screen. This holds the picture back from it, which only changes anything for video wide enough to reach that far.';
 
   @override
+  String get bottomNavbarTabsAvailable => 'Available';
+
+  @override
+  String get detailsPage => 'Details Page';
+
+  @override
   String get integrations => 'Integrations';
+
+  @override
+  String get advancedPlayback => 'Advanced Playback';
+
+  @override
+  String get playlistSortReleaseDate => 'Release Date';
+
+  @override
+  String get playlistSortRuntime => 'Runtime';
+
+  @override
+  String get playlistSortLastPlayed => 'Last Played';
+
+  @override
+  String get playlistSortPlayCount => 'Play Count';
+
+  @override
+  String get playlistSortRandom => 'Random';
+
+  @override
+  String get librarySortDateAdded => 'Date Added';
+
+  @override
+  String get librarySortDateEpisodeAdded => 'Date Episode Added';
+
+  @override
+  String get librarySortParentalRating => 'Parental Rating';
+
+  @override
+  String get librarySortMyRating => 'My Rating';
+
+  @override
+  String get librarySortAlbumArtist => 'Album Artist';
+
+  @override
+  String get librarySortAlbum => 'Album';
+
+  @override
+  String get librarySortArtist => 'Artist';
+
+  @override
+  String get librarySortGenre => 'Genre';
+
+  @override
+  String get detailsBackdropFit => 'Fit';
+
+  @override
+  String get recordPromptNow => 'Now';
+
+  @override
+  String get siloApproveSignInApprove => 'Approve';
+
+  @override
+  String get musicSortYear => 'Year';
+
+  @override
+  String get musicFilter => 'Filter';
+
+  @override
+  String get calendarSettingsView => 'View';
+
+  @override
+  String get calendarSettingsScope => 'Show';
+
+  @override
+  String get calendarSettingsColorByType => 'Type';
+
+  @override
+  String get watchPartyType => 'Type';
+
+  @override
+  String get afterHoursPlay => 'Play';
+
+  @override
+  String get afterHoursCastSkipIntro => 'Skip Intro';
+
+  @override
+  String get afterHoursCastStatic => 'Static';
 }
