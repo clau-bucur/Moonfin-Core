@@ -69,20 +69,32 @@ certificate and the ARM32/ARM64/x86-64 native libraries were verified.
 - Signing certificate SHA-256:
   `3af2f489977eec2dd8d1382d655e79e8f2b68ebf806275e87a9f859bf9ee3f82`.
 
-Initial ADB connection attempts and the final post-build TCP checks timed
-out for all three targets. Final checks at 15:41 UTC on November 13 found:
+Initial ADB connection attempts and the post-build TCP checks at 15:41 UTC
+on November 13 timed out for all three targets. The user selected this chat
+for the availability alert, which was posted here. Deployment resumed when
+the user reported the devices available later the same day.
+
+Bedroom accepted an in-place update with its existing local signing key.
+Shield and the living room TV had a different signing certificate, so both
+were initially left unchanged. The user then explicitly approved replacing
+both main apps and resetting their local data. Their original APKs were
+backed up and verified before the approved replacements.
 
 | Target | Result |
 | --- | --- |
-| Shield (`shield.gme:5555`) | Unavailable; no installation attempted |
-| Living room TV (`tvliving.gme:5555`) | Unavailable; no installation attempted |
-| Bedroom (`mitvbedroom.gme:5555`) | Unavailable; no installation attempted |
+| Shield (`shield.gme:5555`) | Installed; approved data reset; Add Server screen verified |
+| Living room TV (`tvliving.gme:5555`) | Installed; approved data reset; Add Server screen verified |
+| Bedroom (`mitvbedroom.gme:5555`) | Updated in place; data preserved; Home and Seerr navigation verified |
 
-The build is ready, but deployment remains pending device availability.
-The prepared deployment script requires matching signing certificates for
-an existing main installation and preserves app data; it never uninstalls
-or clears data. APK verification and device results are saved as
-`release-verification.json` and `deployment-results.json`.
+All three installed APK checksums match the verified release, and all three
+running main apps report version `3.1.0`, build `2000024`. The living room TV
+is a Philips 2021/22 UHD Android TV. Shield's display had returned to sleep
+after its initial successful launch; waking it again confirmed the setup
+screen and resumed main activity. No playback or Seerr request was started.
 
-The unavailable-device alert was posted in the chat. A separate mobile
-push could not be sent because no mobile notification channel is connected.
+Shield and the living room TV require server/account setup again after
+their approved resets. Bedroom retains its prior setup. Future updates can
+use the same local signing key for in-place installs on all three devices.
+APK verification, final device results and launch checks are saved as
+`release-verification.json`, `deployment-results.json` and
+`launch-verification.json` alongside the device screenshots.
